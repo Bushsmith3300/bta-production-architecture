@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Standard Chemistry Questions for Ghanaian SHS Learners!">
+  <meta name="author" content="Emmanuel Asiamah Amponsah">
+  <meta name="keywords" content="chemistry, past questions, WAEC, teaching assistant, asiamah, learn">
+<title>Login | BTA Quiz App</title>
+
+<style>
+    body {
+        font-family: 'Segoe UI', Arial, sans-serif;
+        background: linear-gradient(135deg, #141e30, #243b55);
+        height: 100vh;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .container {
+        width: 380px;
+        background: #ffffff;
+        padding: 35px;
+        border-radius: 15px;
+        box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+        animation: fadeIn 0.6s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    h2 {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #243b55;
+        font-size: 28px;
+    }
+
+    .error {
+        background: #ffe6e6;
+        color: #cc0000;
+        padding: 10px;
+        border-radius: 6px;
+        text-align: center;
+        margin-bottom: 15px;
+        font-size: 14px;
+    }
+
+    label {
+        display: block;
+        margin-top: 12px;
+        font-weight: bold;
+        color: #333;
+        font-size: 14px;
+    }
+
+    input {
+        width: 100%;
+        padding: 11px;
+        margin-top: 6px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        outline: none;
+        transition: 0.3s;
+        font-size: 14px;
+    }
+
+    input:focus {
+        border-color: #243b55;
+        box-shadow: 0 0 6px rgba(36,59,85,0.3);
+    }
+
+    button {
+        width: 100%;
+        padding: 12px;
+        margin-top: 22px;
+        background: #243b55;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    button:hover {
+        background: #1b2a3d;
+        transform: translateY(-2px);
+    }
+
+    .register-link {
+        text-align: center;
+        margin-top: 15px;
+        font-size: 14px;
+    }
+
+    .register-link a {
+        color: #243b55;
+        font-weight: bold;
+        text-decoration: none;
+    }
+
+    .register-link a:hover {
+        text-decoration: underline;
+    }
+
+   .flash {
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+/* Success message */
+.flash.success {
+    color: green;
+    background-color: #e6ffe6;
+    border: 1px solid green;
+}
+
+/* Error message */
+.flash.error {
+    color: red;
+    background-color: #ffe6e6;
+    border: 1px solid red;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- 🔥 FLASH MESSAGES GO HERE -->
+   {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div style="text-align:center" class= "flash {{ category }}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+     <h2>Log in with your BTA account details</h2>
+
+    <form method="POST" action="{{ url_for('auth.login') }}">
+    
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <label>Username</label>
+        <input type="text" name="username" required>
+
+        <label>Password</label>
+        <input type="password" name="password" required>
+
+        <button type="submit">Login</button>
+    </form>
+
+    <div class="register-link">
+        <span style="color:#cc0000">Don't have an account?</span><a href="{{ url_for('auth.register') }}"> Create a BTA account</a>
+    </div>
+
+</div>
+
+</body>
+</html>

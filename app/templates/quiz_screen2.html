@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Bush Teaching Assistant - WAEC Past Questions & Customized Tests for Ghanaian SHS Students">
+<meta name="author" content="Emmanuel Asiamah Amponsah">
+<meta name="keywords" content="chemistry, WAEC, past questions, SHS, teaching assistant, Ghana education">
+
+<title>BTA Chemistry Quiz</title>
+
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+  color: white;
+  display: flex;
+  flex-direction: column;
+}
+
+.container {
+  max-width: 850px;
+  margin: 40px auto;
+  padding: 20px;
+  flex: 1;
+}
+
+h1 {
+  text-align: center;
+  font-size: 3rem;
+  margin-bottom: 10px;
+  background: linear-gradient(to right, #00ffea, #ff00cc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.subtitle {
+  text-align: center;
+  margin-bottom: 40px;
+  opacity: 0.85;
+  font-size: 0.7rem;
+}
+
+#loading {
+ text-align:center; margin-top:80px;
+}
+
+.spinner {
+  width: 65px;
+  height: 65px;
+  margin:auto;
+  border:6px solid rgba(255,255,255,0.15);
+  border-top:6px solid #00ffea;
+  border-radius:50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.question-card {
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(12px);
+  padding: 35px;
+  border-radius: 20px;
+}
+
+#progress {
+  text-align:center;
+  margin-bottom:15px;
+  color:#00ffea;
+  font-weight:bold;
+}
+
+.options button {
+  width: 100%;
+  padding: 18px;
+  margin: 6px 0;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.07);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.15);
+  cursor: pointer;
+  text-align:left;
+}
+
+.options button:hover:not(:disabled) {
+  background: rgba(255,255,255,0.15);
+}
+
+.options button.correct {
+  background: #00ff9d !important;
+  color: black;
+}
+
+.options button.wrong {
+  background: #ff4d6d !important;
+}
+
+.options button.selected {
+  border: 2px solid #00ffea;
+}
+
+#feedback {
+  margin:20px 0;
+  text-align:center;
+  font-weight:bold;
+}
+
+#explanation {
+  background: rgba(0, 255, 234, 0.08); /* soft cyan glow instead of yellow */
+  border-left: 4px solid #00ffea;      /* visual indicator */
+  padding: 20px;
+  border-radius: 12px;
+  margin-top: 20px;
+  display: none;
+  line-height: 1.6;
+  color: #e6fefe;                     /* softer white for readability */
+
+}
+
+.btn-group {
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  margin-top:20px;
+}
+
+#topic-title {
+  text-align:center;
+  margin-bottom: 20px;
+  opacity: 0.9;
+  font-size: 2rem;
+}
+
+button {
+  padding:10px 20px;
+  border:none;
+  border-radius:20px;
+  cursor:pointer;
+  font-weight:bold;
+  font-size: 1rem;
+}
+
+#prev-btn { background:#888; }
+#next-btn { background:#00ffea; color:black; }
+#skip-btn { background:#ff9800; }
+
+/* NAV */
+.nav-links {
+  text-align: center;
+  margin: 45px 0 25px;
+}
+
+.nav-links a {
+  display: inline-block;
+  padding: 12px 28px;
+  margin: 8px;
+  text-decoration: none;
+  color: white;
+  font-size: 0.95rem;
+  border-radius: 30px;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  transition: 0.3s;
+  box-shadow: 0 6px 20px rgba(59,130,246,0.5);
+}
+
+.nav-links a:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(59,130,246,0.7);
+}
+
+/* LOGOUT */
+.logout {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.logout a {
+  color: #dc3545;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+footer {
+  text-align: center;
+  padding: 20px;
+  opacity: 0.7;
+  margin-top: auto;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+<h2 style="text-align:center;">Hi, {{ user.first_name }} 👋</h2>
+</div> 
+
+<div class="logout">
+  <a href="{{ url_for('auth.logout') }}">Logout</a>
+</div>
+
+<div class="container">
+  <h1 style="text-align:center">🧪 BTA Chemistry Quiz</h1>
+  <p class="subtitle">Powered by Bush Software Inc.</p>
+  <h2 id="topic-title">{{ topic }}</h2><br><br>
+
+  <p id="progress"></p>
+
+  <div id="loading">
+    <div class="spinner"></div>
+    <p>Loading questions...</p>
+  </div>
+
+  <div id="quiz-container" style="display:none;"></div>
+</div>
+
+<div class="nav-links">
+  <a href="https://wa.me/233554454161" target="_blank">Ask Teacher(Bush)</a>
+  <a href="{{url_for('dashboard.topic_select')}}">← Change topic</a>
+  <a href="{{url_for('dashboard.dashboard')}}">← Dashboard</a>
+</div>
+
+<footer>
+  <p>&copy; 2026 Bush Teaching Assistant</p>
+</footer>
+
+<script>
+
+let allQuestions = [];
+let currentIndex = 0;
+let userAnswers = [];
+
+// LOAD QUESTIONS
+async function loadQuestions() {
+
+  try {
+    const res = await fetch(`/questions/{{topic}}`);
+
+    if (!res.ok) {
+      throw new Error("Unauthorized or server error");
+    }
+
+    const data = await res.json();
+
+    allQuestions = data.questions.slice(0, 50);
+    userAnswers = new Array(allQuestions.length).fill(null);
+
+    if (allQuestions.length === 0) {
+      document.getElementById('loading').innerHTML =
+        "<p style='color:red;'>No questions found</p>";
+      return;
+    }
+
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('quiz-container').style.display = 'block';
+
+    showQuestion();
+
+  } catch (err) {
+    document.getElementById('loading').innerHTML =
+      "<p style='color:red;'>Failed to load questions</p>";
+  }
+}
+
+// SHOW QUESTION
+function showQuestion() {
+  const q = allQuestions[currentIndex];
+
+  document.getElementById('progress').textContent =
+    `Question ${currentIndex + 1} of ${allQuestions.length}`;
+
+  let optionsHTML = '';
+
+  q.options.forEach(opt => {
+    optionsHTML += `
+      <button data-letter="${opt.letter}"> ${opt.text}</button>
+    `;
+  });
+
+  document.getElementById('quiz-container').innerHTML = `
+    <div class="question-card">
+      <h2>${q.question}</h2><br><br>
+      <div class="options">${optionsHTML}</div>
+
+      <div id="feedback"></div>
+      <div id="explanation"></div>
+
+      <div class="btn-group">
+        <button id="prev-btn" onclick="prev()">← Previous</button>
+        <button id="skip-btn" onclick="skip()">Skip →</button>
+        <button id="next-btn" onclick="next()" style="display:none;">Next</button>
+      </div>
+    </div>
+  `;
+
+  const buttons = document.querySelectorAll('.options button');
+
+  buttons.forEach(btn => {
+    btn.onclick = () => selectAnswer(btn, q);
+  });
+
+  // Restore previous answer
+  const saved = userAnswers[currentIndex];
+  if (saved) {
+    buttons.forEach(b => {
+      const letter = b.dataset.letter;
+
+      if (letter === saved) b.classList.add('selected');
+      if (letter === q.answer) b.classList.add('correct');
+
+      b.disabled = true;
+    });
+
+    document.getElementById('next-btn').style.display = 'inline-block';
+    showExplanation(q);
+  }
+}
+
+// SELECT ANSWER
+function selectAnswer(btn, q) {
+
+  const selected = btn.dataset.letter;
+  userAnswers[currentIndex] = selected;
+
+  document.querySelectorAll('.options button').forEach(b => {
+    b.disabled = true;
+
+    const letter = b.dataset.letter;
+
+    if (letter === q.answer) b.classList.add('correct');
+    if (b === btn && selected !== q.answer) b.classList.add('wrong');
+  });
+
+  document.getElementById('feedback').innerHTML =
+    selected === q.answer
+      ? "<span style='color:#00ff9d;'>✓ Correct!</span>"
+      : "<span style='color:#ff4d6d;'>✗ Wrong!</span>";
+
+  showExplanation(q);
+
+  document.getElementById('next-btn').style.display = 'inline-block';
+  document.getElementById('skip-btn').disabled = true;
+}
+
+// EXPLANATION
+function showExplanation(q) {
+  const exp = document.getElementById('explanation');
+  exp.innerHTML = `<strong>Explanation:</strong><br>${q.explanation || "No explanation"}`;
+  exp.style.display = 'block';
+}
+
+// NAVIGATION
+function next() {
+  currentIndex++;
+  if (currentIndex >= allQuestions.length) return showScore();
+  window.scrollTo(0,0);
+  showQuestion();
+}
+
+function prev() {
+  if (currentIndex > 0) {
+    currentIndex--;
+    window.scrollTo(0,0);
+    showQuestion();
+  }
+}
+
+function skip() {
+  currentIndex++;
+  if (currentIndex >= allQuestions.length) return showScore();
+  window.scrollTo(0,0);
+  showQuestion();
+}
+
+// SCORE
+function showScore() {
+  let score = 0;
+
+  allQuestions.forEach((q, i) => {
+    if (userAnswers[i] === q.answer) score++;
+  });
+
+  document.getElementById('quiz-container').innerHTML = `
+    <div class="question-card">
+      <h2 style="text-align:center">Quiz Completed</h2>
+      <h1>${score} / ${allQuestions.length}</h1><br><br>
+      <p>Keep improving !</p>
+    </div>
+  `;
+}
+
+window.onload = loadQuestions;
+
+</script>
+</body>
+</html>

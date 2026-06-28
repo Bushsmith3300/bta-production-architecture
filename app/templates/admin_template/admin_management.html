@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Management</title>
+
+    <style>
+
+        /* RESET STYLES */
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+        }
+
+        /* PAGE BASE */
+        body{
+            font-family:Segoe UI, Tahoma, Geneva, Verdana, sans-serif;
+            background:#f4f6f9;
+            padding:30px;
+            color:#333;
+        }
+
+        /* HEADER */
+        .page-header{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:25px;
+        }
+
+        .page-header h1{
+            font-size:2rem;
+            color:#111827;
+        }
+
+        .page-header p{
+            color:#6b7280;
+            margin-top:5px;
+        }
+
+        .btn-dashboard{
+            display:inline-block;
+            padding:10px 18px;
+            background:#2563eb;
+            color:white;
+            text-decoration:none;
+            border-radius:8px;
+            font-weight:600;
+        }
+
+        .btn-dashboard:hover{
+            background:#1d4ed8;
+        }
+
+        /* STATS GRID */
+        .stats-grid{
+            display:grid;
+            grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+            gap:20px;
+            margin-bottom:25px;
+        }
+
+        .stat-card{
+            background:white;
+            border-radius:12px;
+            padding:25px;
+            box-shadow:0 3px 12px rgba(0,0,0,.08);
+            transition:.3s;
+        }
+
+        .stat-card:hover{
+            transform:translateY(-3px);
+        }
+
+        .stat-title{
+            color:#6b7280;
+            font-size:.95rem;
+        }
+
+        .stat-number{
+            margin-top:10px;
+            font-size:2rem;
+            font-weight:700;
+            color:#111827;
+        }
+
+        /* TABLE CARD */
+        .card{
+            background:white;
+            border-radius:12px;
+            overflow:hidden;
+            box-shadow:0 3px 12px rgba(0,0,0,.08);
+        }
+
+        .table-header{
+            padding:20px;
+            border-bottom:1px solid #e5e7eb;
+        }
+
+        .table-header h2{
+            color:#111827;
+        }
+
+        table{
+            width:100%;
+            border-collapse:collapse;
+        }
+
+        thead{
+            background:#111827;
+            color:white;
+        }
+
+        th{
+            padding:16px;
+            text-align:left;
+            font-size:14px;
+        }
+
+        td{
+            padding:16px;
+            border-bottom:1px solid #e5e7eb;
+            vertical-align:middle;
+        }
+
+        tbody tr:hover{
+            background:#f9fafb;
+        }
+
+        /* BADGES */
+        .badge{
+            display:inline-block;
+            padding:6px 12px;
+            border-radius:999px;
+            font-size:12px;
+            font-weight:600;
+        }
+
+        .role-admin{
+            background:#dbeafe;
+            color:#1e40af;
+        }
+
+        .role-super-admin{
+            background:#fee2e2;
+            color:#991b1b;
+        }
+
+        .active{
+            background:#dcfce7;
+            color:#166534;
+        }
+
+        .suspended{
+            background:#fee2e2;
+            color:#991b1b;
+        }
+
+        /* ACTION BUTTONS */
+        .actions{
+            display:flex;
+            flex-wrap:wrap;
+            gap:6px;
+        }
+
+        .actions form{
+            margin:0;
+        }
+
+        .btn{
+            border:none;
+            border-radius:6px;
+            padding:8px 12px;
+            font-size:12px;
+            font-weight:600;
+            color:white;
+            cursor:pointer;
+        }
+
+        .btn-suspend{ background:#dc2626; }
+        .btn-activate{ background:#16a34a; }
+        .btn-demote{ background:#f59e0b; }
+        .btn-delete{ background:#111827; }
+
+        .btn:hover{
+            opacity:.9;
+        }
+
+        /* PROTECTED LABEL */
+        .protected{
+            color:#991b1b;
+            font-weight:600;
+        }
+
+        /* FLASH MESSAGES */
+        .flash{
+            padding:14px;
+            border-radius:8px;
+            margin-bottom:15px;
+            font-weight:500;
+        }
+
+        .success{ background:#dcfce7; color:#166534; }
+        .warning{ background:#fef3c7; color:#92400e; }
+        .danger{ background:#fee2e2; color:#991b1b; }
+
+        /* RESPONSIVE */
+        @media(max-width:900px){
+            body{ padding:15px; }
+
+            .page-header{
+                flex-direction:column;
+                gap:15px;
+                align-items:flex-start;
+            }
+
+            .actions{
+                flex-direction:column;
+            }
+
+            table{
+                display:block;
+                overflow-x:auto;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+
+    <div>
+        <h1>Admin Management</h1>
+        <p>Manage administrators and super administrators.</p>
+    </div>
+
+    <a href="{{ url_for('dashboard_super_admin.index') }}"
+       class="btn-dashboard">
+        ← Dashboard
+    </a>
+
+</div>
+
+<!-- FLASH MESSAGES -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="flash {{ category }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+<!-- STATS CARDS -->
+<div class="stats-grid">
+
+    <div class="stat-card">
+        <div class="stat-title">Super Admins</div>
+        <div class="stat-number">{{ total_super_admins }}</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-title">Administrators</div>
+        <div class="stat-number">{{ total_admins }} + Super Admin (Bush)</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-title">Active Admins</div>
+        <div class="stat-number">{{ active_admins }}</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-title">Suspended Admins</div>
+        <div class="stat-number">{{ suspended_admins }}</div>
+    </div>
+
+</div>
+
+<!-- ADMIN TABLE -->
+<div class="card">
+
+    <div class="table-header">
+        <h2>Administrator Accounts</h2>
+    </div>
+
+    <table>
+
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Full Name</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            {% for admin in admins %}
+            <tr>
+
+                <td>{{ admin.id }}</td>
+
+                <td>
+                    <strong>
+                        {{ admin.surname }},
+                        {{ admin.first_name }}
+                        {% if admin.other_name %}
+                            {{ admin.other_name }}
+                        {% endif %}
+                    </strong>
+                </td>
+
+                <td>{{ admin.username }}</td>
+
+                <td>{{ admin.email }}</td>
+
+                <!-- ROLE -->
+                <td>
+                    {% if admin.role == "super_admin" %}
+                        <span class="badge role-super-admin">Super Admin</span>
+                    {% else %}
+                        <span class="badge role-admin">Admin</span>
+                    {% endif %}
+                </td>
+
+                <!-- STATUS -->
+                <td>
+                    {% if not admin.is_active %}
+                        <span class="badge suspended">Suspended</span>
+                    {% else %}
+                        <span class="badge active">Active</span>
+                    {% endif %}
+                </td>
+
+                <!-- ACTIONS -->
+                <td>
+                    <div class="actions">
+
+                        {% if admin.role != "super_admin" %}
+
+                            {% if not admin.is_active %}
+
+                                <!-- ACTIVATE -->
+
+                                <form  method="POST"
+                                     action="{{ url_for('admin_management.activate_admin', user_id=admin.id) }}"
+                                     onsubmit="return confirm('Reactivate this administrator?');">
+
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                                     <button type="submit" class="btn btn-activate">Activate</button>
+
+                                </form>
+                            {% else %}
+
+
+                                <!-- SUSPEND -->
+
+                                <form  method="POST"
+                                     action="{{ url_for('admin_management.suspend_admin', user_id=admin.id) }}"
+                                     onsubmit="return confirm('Suspend this user?');">
+      
+
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                                    <button type="submit" class="btn btn-suspend">Suspend</button>
+
+                                </form>
+
+                            {% endif %}
+
+
+
+                            <!-- DEMOTE -->
+
+                            <form method="POST"
+                                action="{{ url_for('admin_management.demote_admin', user_id=admin.id) }}"
+                                onsubmit="return confirm('Remove Administrator privelege for this user?');"> 
+
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                                <button type="submit" class="btn btn-demote">Demote</button>
+                            </form>
+
+                        {% else %}
+                            <span class="protected">Protected</span>
+                        {% endif %}
+
+                    </div>
+                </td>
+
+            </tr>
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+</body>
+</html>

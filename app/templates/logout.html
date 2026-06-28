@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Logged Out | BTA Quiz App</title>
+
+<style>
+    body {
+        margin: 0;
+        font-family: 'Segoe UI', Arial, sans-serif;
+        background: linear-gradient(135deg, #1e3c72, #2a5298);
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #fff;
+    }
+
+    .logout-container {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 40px;
+        border-radius: 15px;
+        text-align: center;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        backdrop-filter: blur(10px);
+        width: 90%;
+        max-width: 400px;
+    }
+
+    .logout-container h1 {
+        margin-bottom: 10px;
+        font-size: 28px;
+    }
+
+    .logout-container p {
+        font-size: 16px;
+        margin-bottom: 25px;
+        opacity: 0.9;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 12px 20px;
+        margin: 8px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: bold;
+        transition: 0.3s ease;
+    }
+
+    .btn-login {
+        background: #00c6ff;
+        color: #fff;
+    }
+
+    .btn-login:hover {
+        background: #009edb;
+    }
+
+    .btn-home {
+        background: #ffffff;
+        color: #1e3c72;
+    }
+
+    .btn-home:hover {
+        background: #e6e6e6;
+    }
+
+    .icon {
+        font-size: 50px;
+        margin-bottom: 10px;
+    }
+</style>
+</head>
+
+<body>
+
+<div class="logout-container">
+    <div class="icon">👋</div>
+    <h1>You have been logged out</h1>
+    <p>Thank you for using BTA Quiz App. Your session has ended successfully.</p>
+
+    <a href="{{ url_for('auth.login') }}" class="btn btn-login">Login Again</a>
+    <a href="{{ url_for('main.index') }}" class="btn btn-home">Go to Home</a>
+</div>
+
+</body>
+</html>

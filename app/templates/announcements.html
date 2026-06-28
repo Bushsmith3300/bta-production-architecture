@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Standard Chemistry Questions for Ghanaian SHS Learners!">
+  <meta name="author" content="Emmanuel Asiamah Amponsah">
+  <meta name="keywords" content="chemistry, past questions, WAEC, teaching assistant, asiamah, learn">
+
+<title>Announcements | BTA</title>
+
+<style>
+    body {
+        margin: 0;
+        font-family: 'Segoe UI', Arial, sans-serif;
+        background: linear-gradient(135deg, #0d1117 0%, #1f2937 100%);
+        color: #e2e8f0;
+        display: flex;
+        justify-content: center;
+        padding: 40px 10px;
+    }
+
+    .container {
+        width: 100%;
+        max-width: 700px;
+    }
+
+    /* HEADER CARD */
+    .header {
+        background: rgba(15,23,42,0.95);
+        border: 1px solid #3b82f6;
+        padding: 25px;
+        border-radius: 14px;
+        text-align: center;
+        margin-bottom: 20px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+    }
+
+    .header h1 {
+        margin: 0;
+        font-size: 2rem;
+        color: #60a5fa;
+    }
+
+    .header p {
+        margin-top: 8px;
+        color: #cbd5e1;
+        font-size: 0.95rem;
+    }
+
+    /* ANNOUNCEMENT CARD */
+    .card {
+        background: rgba(17,24,39,0.9);
+        border-left: 5px solid #3b82f6;
+        padding: 18px 20px;
+        border-radius: 12px;
+        margin-bottom: 15px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        transition: 0.3s;
+    }
+
+    .card:hover {
+        transform: translateY(-3px);
+        border-left-color: #60a5fa;
+    }
+
+
+    .welcome {
+        font-size: 18px;
+        margin-bottom: 20px;
+    }
+
+
+    .title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #f8fafc;
+        margin-bottom: 5px;
+    }
+
+    .message {
+        font-size: 1.2rem;
+        color: #cbd5e1;
+        line-height: 1.5;
+    }
+
+    .date {
+        margin-top: 10px;
+        font-size: 1.0rem;
+        color: #94a3b8;
+        text-align: left;
+    }
+
+     .time {
+        margin-top: 10px;
+        font-size: 1.0rem;
+        color: #94a3b8;
+        text-align: left;
+    }
+
+
+
+    /* EMPTY STATE */
+    .empty {
+        text-align: center;
+        padding: 40px;
+        background: rgba(17,24,39,0.6);
+        border-radius: 12px;
+        border: 1px dashed #3b82f6;
+        color: #94a3b8;
+    }
+
+    /* BACK BUTTON */
+    .back {
+        text-align: center;
+        margin-top: 25px;
+    }
+
+    .back a {
+        display: inline-block;
+        padding: 12px 30px;
+        background: linear-gradient(135deg, #3b82f6, #2563eb);
+        color: #fff;
+        text-decoration: none;
+        border-radius: 30px;
+        font-weight: 600;
+        transition: 0.3s;
+        box-shadow: 0 8px 20px rgba(59,130,246,0.5);
+    }
+
+    .back a:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 25px rgba(59,130,246,0.7);
+    }
+
+
+      /* LOGOUT */
+    .logout {
+        margin-top: 20px;
+        text-align: right;
+    }
+
+    .logout a {
+        color: #dc3545;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    .logout a:hover {
+        text-decoration: underline;
+    }
+
+</style>
+</head>
+
+<body>
+
+
+<div class="container">
+
+    <!-- LOGOUT -->
+    <div class="logout">
+        <a href="{{ url_for('auth.logout') }}">Logout</a>
+    </div>    
+
+
+    <!-- HEADER -->
+    <div class="header">
+        <h1>Announcement</h1>        
+        <div class="welcome"> Hey, {{user.first_name}}</div>
+        <p>Stay updated with important class and quiz updates</p>
+    </div>
+
+
+    <!-- ANNOUNCEMENTS LIST -->
+    {% if announcements %}
+        {% for ann in announcements %}
+        <div class="card">
+            <div class="title">{{ ann.title }}</div>
+            <div class="message"> <span style="color: #adf802"> {{ ann.message }} </span></div>
+            <div class="date"> <span style="color:#32cd32"> Date: {{ ann.date }} </span></div>         
+            <div class="date"> <span style="color:red"> Time: {{ ann.time }} </span></div>        
+   
+        </div>
+        {% endfor %}
+    
+   
+     {% else %}
+        <div class="empty">
+            No announcements available at the moment.
+        </div>
+    {% endif %}
+
+     <div> {{ today_quote.title }} </div>
+     <div> {{ today_quote.message }} </div>
+     <div> {{ today_quote.action }} </div>
+  
+     <div> <a style="color:#d4af37" href="https://wa.me/233554454161" target="_blank"> Contact your Teacher </a> </div>
+
+    <!-- BACK -->
+    <div class="back">
+        <a href="{{ url_for('dashboard.dashboard') }}">← Back to Dashboard</a>
+        
+      </div> 
+    </div>
+
+</div>
+
+</body>
+</html>
