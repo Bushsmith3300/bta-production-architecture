@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Standard Chemistry Questions for Ghanaian SHS Learners!">
+<meta name="author" content="Emmanuel Asiamah Amponsah">
+<meta name="keywords" content="chemistry, past questions, WAEC, teaching assistant, BTA, Ghana">
+
+<title>About Bush Teaching Assistant</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #0d1117, #1f2937);
+    color: #e2e8f0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* HEADER */
+header {
+    background: rgba(15,23,42,0.95);
+    backdrop-filter: blur(10px);
+    text-align: center;
+    padding: 1.5rem;
+    font-size: 1.8rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    border-bottom: 3px solid #3b82f6;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+/* MAIN CONTENT */
+.main-content {
+    flex: 1;
+    max-width: 900px;
+    margin: auto;
+    padding: 40px 20px;
+}
+
+/* TITLE */
+h2 {
+    font-family: 'Playfair Display', serif;
+    text-align: center;
+    font-size: 2.6rem;
+    margin-bottom: 25px;
+    background: linear-gradient(90deg, #3b82f6, #60a5fa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* TEXT */
+p {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    margin-bottom: 20px;
+    color: #cbd5e1;
+}
+
+.italize {
+    font-style: italic;
+    color: #60a5fa;
+}
+
+.red_font {
+    color: #f87171;
+    font-weight: 500;
+}
+
+/* LOGO */
+.logo {
+    width: 120px;
+    display: block;
+    margin: 0 auto 20px;
+    border-radius: 12px;
+}
+
+/* VIDEO */
+.video_wrapper {
+    max-width: 650px;
+    margin: 30px auto;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+    border: 2px solid #3b82f6;
+}
+
+video {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* BUTTONS */
+.btn-container {
+    text-align: center;
+    margin-top: 20px;
+}
+
+button, .a3 {
+    display: inline-block;
+    padding: 12px 28px;
+    margin: 10px 6px;
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: white;
+    border-radius: 40px;
+    font-weight: 600;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 20px rgba(59,130,246,0.6);
+}
+
+button:hover, .a3:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(59,130,246,0.9);
+}
+
+/* NAVIGATION */
+.nav_links {
+    text-align: center;
+    margin-top: 25px;
+}
+
+/* FOOTER */
+footer {
+    background: #0b0f1a;
+    text-align: center;
+    padding: 20px;
+    font-size: 0.9rem;
+    border-top: 2px solid #3b82f6;
+}
+
+footer p {
+    margin: 5px 0;
+}
+
+/* MOBILE */
+@media (max-width: 600px) {
+    h2 {
+        font-size: 2rem;
+    }
+
+    p {
+        font-size: 1rem;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    BUSH TEACHING ASSISTANT
+</header>
+
+<div class="main-content">
+
+<h2>About This Website</h2>
+
+<p>
+    <img src="{{ url_for('static', filename='images/BTA_new_logo.jpeg') }}" 
+         alt="BTA Logo" class="logo">
+
+    The <abbr title="Bush Teaching Assistant"><b>BTA</b></abbr> application provides learners and teachers access 
+    to <b>WAEC past questions</b> and exam-style practice.
+
+    <span class="red_font">
+        BTA is essential for students preparing for major academic examinations.
+    </span>
+
+    <span class="italize">
+        It adapts to all subjects within the Ghanaian curriculum.
+    </span>
+</p>
+
+<p>
+    Soon, you will be able to download BTA for all SHS and tertiary courses!
+</p>
+
+<div class="video_wrapper">
+    <video id="myvideo" controls muted loop>
+        <source src="{{ url_for('static', filename='videos/bta.mp4') }}" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+</div>
+
+<div class="btn-container">
+    <button onclick="playPause()">Play / Pause</button>
+</div>
+
+<div class="nav_links">
+    <a class="a3" href="{{ url_for('auth.login') }}">Login to BTA</a>
+    <a class="a3" href="{{ url_for('auth.register') }}">Register &gt;&gt;</a>
+    <a class="a3" href="{{ url_for('main.index') }}">&lt;&lt; Back Home</a>
+</div>
+
+</div>
+
+<footer>
+    <p>&copy; 2026 Bush Teaching Assistant</p>
+    <p>Connecting learners and educators</p>
+    <p>Developed by Emmanuel Asiamah Amponsah</p>
+</footer>
+
+<script>
+const video = document.getElementById("myvideo");
+
+function playPause() {
+    if (video.paused) {
+        video.play().catch(() => {
+            console.log("Autoplay blocked by browser.");
+        });
+    } else {
+        video.pause();
+    }
+}
+</script>
+
+</body>
+</html>

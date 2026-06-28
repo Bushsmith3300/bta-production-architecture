@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Bush Teaching Assistant - WAEC Past Questions & Customized Tests for Ghanaian SHS Students">
+    <meta name="author" content="Emmanuel Asiamah Amponsah">
+    <meta name="keywords" content="chemistry, WAEC, past questions, SHS, teaching assistant, Ghana education">
+
+<title>Bush Teaching Assistant!</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+  color: white;
+}
+
+header {
+  text-align: center;
+  padding: 40px 20px 10px;
+}
+
+header h1 {
+  font-size: 2.8rem;
+  background: linear-gradient(to right, #00ffea, #ff00cc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.container {
+  max-width: 1100px;
+  margin: auto;
+  padding: 30px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  background: rgba(255,255,255,0.08);
+  border-radius: 16px;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-6px);
+  border-color: #00ffea;
+}
+
+.card h3 {
+  color: #00ffea;
+}
+
+  /* NAV */
+        .nav-links {
+            text-align: center;
+            margin: 45px 0 25px;
+        }
+
+        .nav-links a {
+            display: inline-block;
+            padding: 12px 28px;
+            margin: 8px;
+            text-decoration: none;
+            color: white;
+            font-size: 0.95rem;
+            border-radius: 30px;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            transition: 0.3s;
+            box-shadow: 0 6px 20px rgba(59,130,246,0.5);
+        }
+
+        .nav-links a:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(59,130,246,0.7);
+        }
+
+
+footer {
+  text-align: center;
+  padding: 20px;
+  opacity: 0.7;
+}
+
+
+
+        /* LOGOUT */
+         .logout {
+              margin-top: 20px;    
+              text-align: center;
+         }
+
+         .logout a {
+             color: #dc3545;
+             text-decoration: none;
+             font-weight: bold;
+         }
+
+          .logout a:hover {
+             text-decoration: underline;
+         }
+
+
+</style>
+</head>
+
+<body>
+
+<div class="header">
+<h2 style="text-align:center;">Hi, {{ user.first_name }} 👋</h2>
+</div> 
+     
+<div class="logout">
+ <a href="{{ url_for('auth.logout') }}">Logout</a>
+</div> 
+
+<header>
+  <h1>New Curriculum Chemistry Topics</h1>
+  <p>Select a topic to practise BTA Quiz</p>
+</header>
+
+<div class="container">
+
+  <div class="card" onclick="startQuiz('atomic structure')">
+    <h3>Atomic Structure</h3>
+  </div>
+
+  <div class="card" onclick="startQuiz('electron configuration')">
+    <h3>Electron Configuration</h3>
+  </div>
+
+  <div class="card" onclick="startQuiz('periodic chemistry')">
+    <h3>Periodic Chemistry</h3>
+  </div>
+
+  <div class="card" onclick="startQuiz('hybridization')">
+    <h3>Hybridization</h3>
+  </div>
+
+  <div class="card" onclick="startQuiz('chemical bonding')">
+    <h3>Chemical Bonding</h3>
+  </div>
+
+  <div class="card" onclick="startQuiz('mole concept')">
+    <h3>Mole Concept</h3>
+  </div>
+
+  <div class="card" onclick="startQuiz('state of matter')">
+    <h3>State of Matter</h3>
+  </div>
+
+  <div class="card" onclick="startQuiz('energy and energy changes')">
+    <h3>Energy & Energy Changes</h3>
+  </div>
+
+  <div class="card" onclick="startQuiz('rate')">
+    <h3>Rate of Reaction</h3>
+  </div>
+
+  <div class="card" onclick="startQuiz('equilibrium')">
+    <h3>Chemical Equilibrium</h3>
+  </div>
+
+  <div class="card" onclick="startQuiz('acids, bases and salts')">
+    <h3>Acids, Bases & Salts</h3>
+  </div>
+
+  <div class="card" onclick="startQuiz('solubility')">
+    <h3>Solubility</h3>
+  </div>
+
+  <div class="card" onclick="startQuiz('redox')">
+    <h3>Redox</h3>
+  </div>
+
+  <div class="card" onclick="startQuiz('electrochemical cells')">
+    <h3>Electrochemical Cells</h3>
+  </div>
+
+  <div class="card" onclick="startQuiz('electrolysis')">
+    <h3>Electrolysis</h3>
+  </div>
+
+  <div class="card" onclick="startQuiz('chemistry and industry')">
+    <h3>Chemistry & Industry</h3>
+  </div>
+
+  <div class="card" onclick="startQuiz('transition metals')">
+    <h3>Transition Metals</h3>
+  </div>
+
+  <div class="card" onclick="startQuiz('organic')">
+    <h3>Organic Chemistry</h3>
+  </div>
+
+</div>
+
+
+ <div class="nav-links">
+  <a href="{{url_for("dashboard.subject_select")}}">← Change subject</a>
+  <a href="{{url_for("dashboard.dashboard")}}"> Go to Dashboard</a>
+ </div>
+
+
+<footer>
+  © 2026 Bush Teaching Assistant
+</footer>
+
+<script>
+function startQuiz(topic) {
+  const cleanTopic = topic.toLowerCase().trim();
+
+  // ✅ CORRECT ROUTE
+  window.location.href = `/quiz/${encodeURIComponent(cleanTopic)}`;
+}
+</script>
+
+</body>
+</html>

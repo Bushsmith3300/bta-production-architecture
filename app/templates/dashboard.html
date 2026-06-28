@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Standard Chemistry Questions for Ghanaian SHS Learners!">
+  <meta name="author" content="Emmanuel Asiamah Amponsah">
+  <meta name="keywords" content="chemistry, past questions, WAEC, teaching assistant, asiamah, learn">
+<title>BTA Dashboard</title>
+
+<style>
+    body {
+        margin: 0;
+        font-family: 'Segoe UI', Arial, sans-serif;
+        background: linear-gradient(135deg, #1e3c72, #2a5298);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 40px 10px;
+        min-height: 100vh;
+        color: #333;
+    }
+
+    .container {
+        background: #fff;
+        width: 100%;
+        max-width: 550px;
+        border-radius: 14px;
+        padding: 30px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    h1 {
+        color: #1e3c72;
+        margin-bottom: 5px;
+    }
+
+    .welcome {
+        font-size: 18px;
+        margin-bottom: 20px;
+        color:orange;
+    }
+
+    .card {
+        background: #f4f6f9;
+        padding: 15px;
+        border-radius: 10px;
+        text-align: left;
+        margin-bottom: 20px;
+    }
+
+    .card h3 {
+        margin-top: 0;
+        color: #1e3c72;
+    }
+
+    .card p {
+        margin: 6px 0;
+        font-size: 15px;
+    }
+
+    /* CLASS STATUS */
+    .class-status {
+        margin: 15px 0;
+        font-weight: bold;
+        font-size: 14px;
+    }
+
+    .live { color: #28a745; }
+    .offline { color: #dc3545; }
+
+    /* BUTTONS */
+    .btn-grid {
+        display: grid;
+        gap: 12px;
+        margin-top: 15px;
+    }
+
+    .btn {
+        padding: 15px;
+        border-radius: 10px;
+        font-size: 16px;
+        text-decoration: none;
+        color: #fff;
+        display: block;
+        font-weight: 500;
+        transition: 0.3s;
+    }
+
+    .practice { background: #28a745; }
+    .practice:hover { background: #218838; }
+
+    .teacher { background: #007bff; }
+    .teacher:hover { background: #0056b3; }
+
+    .announcement { background: #6f42c1; }
+    .announcement:hover { background: #5a32a3; }
+
+    .class { background: #ff9800; }
+    .class:hover { background: #e68900; }
+
+    .disabled {
+        background: gray !important;
+        cursor: not-allowed;
+        opacity: 0.7;
+    }
+
+    /* LOGOUT */
+    .logout {
+        margin-top: 20px;
+    }
+
+    .logout a {
+        color: #dc3545;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    .logout a:hover {
+        text-decoration: underline;
+    }
+
+    .flash {
+     padding: 12px;
+     border-radius: 8px;
+     margin-bottom: 15px;
+     font-weight: bold;
+    }
+
+    .flash.warning {
+     background: #fff3cd;
+     color: #856404;
+    }
+
+    .flash.danger {
+     background: #f8d7da;
+     color: #721c24;
+    }
+
+    .flash.success {
+      background: #d4edda;
+     color: #155724;
+    }
+
+
+    /* FOOTER */
+    footer {
+        width: 100%;
+        max-width: 550px;
+        text-align: center;
+        font-size: 13px;
+        color: #eaeaea;
+        padding: 15px 10px;
+        margin-top: auto;
+        opacity: 0.9;
+    }
+
+    footer p {
+        margin: 4px 0;
+    }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash {{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <h1>BTA Dashboard</h1>
+
+    <div class="welcome">
+        Welcome, {{ user.first_name }}
+    </div>
+
+
+    <!-- LAST QUIZ -->
+
+   <div class="card">
+    <h3>Last Quiz</h3>   
+
+    {% if last_quiz %}
+        <p><strong>Topic:</strong> {{ last_quiz.topic }}</p>
+        <p><strong>Date:</strong> {{ last_quiz.date }}</p>
+    {% else %}
+        <p>No quiz taken yet.</p>
+    {% endif %}
+</div>
+
+
+    <!-- CLASS STATUS -->
+    <div class="class-status">
+        {% if class_status["is_live"] %}
+            <span class="live">● LIVE CLASS is on-going. Click Enter Class to join</span>
+        {% else %}
+            <span class="offline">● NO LIVE class now</span>
+        {% endif %}
+    </div>
+
+    <!-- BUTTONS -->
+    <div class="btn-grid">
+
+        <a href="{{ url_for('dashboard.subject_select') }}" class="btn practice">
+            Personal Studies
+        </a>
+
+        <a href="{{ url_for('main.contact') }}" class="btn teacher">
+            Take Assignment from Teacher
+        </a>
+
+        <a href="{{ url_for('announcement.announcement_page') }}" class="btn announcement">
+           Class Announcement
+        </a>
+
+        {% if class_status["is_live"] %}
+            <a href="{{ url_for('dashboard.enter_class') }}" class="btn class">
+                Enter Class
+            </a>
+        {% else %}
+            <button class="btn class disabled" disabled>
+                Enter Class
+            </button>
+        {% endif %}
+
+    </div>
+
+    <!-- LOGOUT -->
+    <div class="logout">
+        <a href="{{ url_for('auth.logout') }}">Logout</a>
+    </div>
+
+</div>
+
+<footer>
+    <p>© 2026 Bush Teaching Assistant •</p>
+    <p>Developed by Emmanuel Asiamah Amponsah</p>
+</footer>
+
+</body>
+</html>

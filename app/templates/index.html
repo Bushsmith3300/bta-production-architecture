@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Bush Teaching Assistant - WAEC Past Questions & Customized Tests for Ghanaian SHS Students">
+    <meta name="author" content="Emmanuel Asiamah Amponsah">
+    <meta name="keywords" content="chemistry, WAEC, past questions, SHS, teaching assistant, Ghana education">
+    <title>Bush Teaching Assistant | WAEC Chemistry Revision</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #1e40af;
+            --primary-light: #3b82f6;
+            --accent: #60a5fa;
+            --dark: #0f172a;
+            --light: #f8fafc;
+            --gray: #64748b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #dbeafe 100%);
+            color: #1e293b;
+            line-height: 1.7;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* HEADER */
+        .header {
+            background: rgba(15, 23, 42, 0.97);
+            backdrop-filter: blur(12px);
+            color: white;
+            text-align: center;
+            padding: 1.8rem 1rem;
+            font-size: 1.65rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            border-bottom: 4px solid var(--accent);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* MAIN CONTENT */
+        main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            border-radius: 24px;
+            padding: 60px 50px;
+            max-width: 960px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
+            text-align: center;
+            animation: fadeInUp 0.8s ease forwards;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 4.2rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 16px;
+            line-height: 1.1;
+        }
+
+        .tagline {
+            font-size: 1.35rem;
+            color: #334155;
+            margin-bottom: 32px;
+            font-weight: 500;
+        }
+
+        .description {
+            font-size: 1.15rem;
+            color: #475569;
+            max-width: 680px;
+            margin: 0 auto 40px;
+        }
+
+        .highlight {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* Video Section */
+        .video-container {
+            margin: 50px auto;
+            max-width: 560px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+            background: #000;
+        }
+
+        video {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* Button */
+        .btn {
+            display: inline-block;
+            padding: 16px 48px;
+            background: linear-gradient(135deg, var(--primary-light), var(--primary));
+            color: white;
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4);
+            transition: all 0.4s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(59, 130, 246, 0.5);
+        }
+
+        /* FOOTER */
+        .footer {
+            background: var(--dark);
+            color: #cbd5f5;
+            text-align: center;
+            padding: 32px 20px;
+            font-size: 0.95rem;
+        }
+
+        .footer p {
+            margin: 8px 0;
+        }
+
+        /* RESPONSIVE DESIGN */
+        @media (max-width: 768px) {
+            .logo {
+                font-size: 3.2rem;
+            }
+
+            .container {
+                padding: 45px 25px;
+                margin: 20px;
+            }
+
+            .header {
+                font-size: 1.45rem;
+                padding: 1.4rem 1rem;
+            }
+
+            .tagline {
+                font-size: 1.2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 35px 20px;
+            }
+
+            .btn {
+                padding: 14px 36px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="header">
+        BUSH TEACHING ASSISTANT
+    </header>
+
+    <main>
+        <div class="container">
+            <h1 class="logo">BTA</h1>
+            
+            <p class="tagline">
+                Empowering Ghanaian SHS Students & Teachers with <span class="highlight">standard <abbr title="West African Examinatin Council">WAEC</abbr> questions</span>
+            </p>
+
+            <div class="description">
+                <p><strong>Bush Teaching Assistant (BTA)</strong> is a powerful tool that provides access to 
+                <strong><abbr title="West African Examinatin Council"> WAEC</abbr> 
+                standard questions</strong> and enables teachers to generate customized tests from selected topics.</p>
+                <p style="margin-top: 16px;"> Designed to make revision smarter, teaching more effective, and exam preparation seamless for Senior High School learners.</p>
+            </div>
+
+            <!-- Video -->
+            <div class="video-container">
+                <video controls preload="metadata" width="100%" muted loop>
+                    <source src="{{ url_for("static", filename="videos/bta2.mp4")}}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+
+            <!-- Call to Action -->
+            <div style="margin-top: 50px;">
+                <a href="{{url_for('main.about')}}" class="btn">Learn More About BTA</a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2026 Bush Teaching Assistant</p>
+        <p>Connecting learners and educators across Ghana</p>
+        <p>Developed by <strong>Emmanuel Asiamah Amponsah</strong></p>
+    </footer>
+
+</body>
+</html>
