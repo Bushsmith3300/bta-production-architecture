@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}BTA Admin{% endblock %}</title>
+
+    <style>
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+        }
+
+        body{
+            font-family:Arial, Helvetica, sans-serif;
+            background:#f4f6f9;
+        }
+
+        /* Layout */
+        .wrapper{
+            display:flex;
+            min-height:100vh;
+        }
+
+        /* Sidebar */
+        .sidebar{
+            width:250px;
+            background:#1f2937;
+            color:#fff;
+            flex-shrink:0;
+        }
+
+        .sidebar h2{
+            padding:20px;
+            text-align:center;
+            background:#111827;
+            font-size:24px;
+        }
+
+        .sidebar ul{
+            list-style:none;
+        }
+
+        .sidebar ul li{
+            border-bottom:1px solid rgba(255,255,255,.08);
+        }
+
+        .sidebar ul li a{
+            display:block;
+            color:white;
+            text-decoration:none;
+            padding:15px 20px;
+        }
+
+        .sidebar ul li a:hover{
+            background:#374151;
+        }
+
+        /* Main */
+        .main{
+            flex:1;
+            padding:30px;
+        }
+
+        .header{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:30px;
+        }
+
+        .header h1{
+            margin-bottom:5px;
+        }
+
+        .badge{
+            background:#2563eb;
+            color:white;
+            padding:10px 16px;
+            border-radius:6px;
+        }
+
+        /* Cards */
+        .dashboard-grid{
+            display:grid;
+            grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+            gap:20px;
+        }
+
+        .card{
+            background:white;
+            padding:20px;
+            border-radius:10px;
+            box-shadow:0 2px 8px rgba(0,0,0,.08);
+        }
+
+        .card-title{
+            color:#6b7280;
+            font-size:14px;
+        }
+
+        .card-value{
+            margin-top:10px;
+            font-size:32px;
+            font-weight:bold;
+        }
+
+        .section{
+            background:white;
+            margin-top:25px;
+            padding:20px;
+            border-radius:10px;
+            box-shadow:0 2px 8px rgba(0,0,0,.08);
+        }
+
+        .section-title{
+            margin-bottom:15px;
+        }
+
+        @media (max-width:768px){
+
+            .wrapper{
+                flex-direction:column;
+            }
+
+            .sidebar{
+                width:100%;
+            }
+
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+
+<div class="wrapper">
+
+    <aside class="sidebar">
+
+        <h2>BTA ADMIN</h2>
+
+        <ul>
+
+            <li>
+                <a href="{{ url_for('regular_admin.dashboard') }}">
+                    Dashboard
+                </a>
+            </li>
+
+            <li><a href="#">Questions</a></li>
+
+            <li><a href="#">Assignments</a></li>
+
+            <li><a href="#">Submissions</a></li>
+
+            <li><a href="#">Live Classes</a></li>
+
+            <li><a href="#">Announcements</a></li>
+
+            <li><a href="#">Reports</a></li>
+
+            <li><a href="#">Settings</a></li>
+
+            <li>
+                <a href="{{ url_for('auth.logout') }}">
+                    Logout
+                </a>
+            </li>
+
+        </ul>
+
+    </aside>
+
+    <main class="main">
+
+        <div class="header">
+
+            <div>
+
+                <h1>
+                    {% block page_title %}
+                    Dashboard
+                    {% endblock %}
+                </h1>
+
+                <p>
+                    {% block page_subtitle %}
+                    Welcome back.
+                    {% endblock %}
+                </p>
+
+            </div>
+
+            <div class="badge">
+
+                {{ session.get("full_name", "Teacher/Admin") }}
+                 <br>
+                <small>{{ session.get("role", "").replace("_", " ").title() }}                </small>
+
+            </div>
+
+        </div>
+
+        {% block content %}
+        {% endblock %}
+
+    </main>
+
+</div>
+
+{% block extra_js %}
+{% endblock %}
+
+</body>
+</html>

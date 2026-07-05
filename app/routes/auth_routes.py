@@ -224,12 +224,32 @@ def login():
 
         session["user_id"] = user.id
         session["username"] = user.username
+        session["role"] = user.role
+
+        full_name = f"{user.first_name}"
+
+        if user.other_name:
+            full_name += f" {user.other_name}"
+     
+        full_name += f" {user.surname}"
+
+        session["full_name"] = full_name
 
         session.permanent = True
 
-        return redirect(
-            url_for("dashboard.dashboard")
+
+        if user.role == "super_admin":
+            return redirect(url_for("dashboard_super_admin.dashboard"))
+
+
+        elif user.role == "admin":
+            return redirect(url_for("regular_admin.dashboard"))
+
+
+        else:
+            return redirect(url_for("dashboard.dashboard")
         )
+
 
     return render_template("login.html")
 

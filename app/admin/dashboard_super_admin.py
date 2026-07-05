@@ -9,7 +9,7 @@ super_admin_bp = Blueprint("dashboard_super_admin", __name__, url_prefix="/super
 
 @super_admin_bp.route("/")
 @super_admin_required
-def index():
+def dashboard():
 
     users = User.query.all()
 
@@ -24,7 +24,7 @@ def index():
     total_suspended_users = User.query.filter_by(is_active=False).count()
 
     return render_template(
-        "admin_template/dashboard_super_admin.html",
+        "super_admin/dashboard_super_admin.html",
         user=user,
         users=users,
         total_users=total_users,
