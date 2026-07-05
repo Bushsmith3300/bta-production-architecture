@@ -35,7 +35,7 @@ def index():
     ).count()
 
     return render_template(
-        "admin_template/admin_management.html",
+        "super_admin/admin_management.html",
         admins=admins,
         total_admins=total_admins,
         total_super_admins=total_super_admins,

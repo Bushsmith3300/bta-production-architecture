@@ -1,0 +1,93 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Dashboard Overview{% endblock %}
+{% block page_subtitle %}Manage your teaching activities{% endblock %}
+
+{% block content %}
+
+<div class="dashboard-grid">
+
+<div class="card">
+<div class="card-title">My Questions</div>
+<div class="card-value">{{ data.questions }}</div>
+</div>
+
+<div class="card">
+<div class="card-title">My Assignments</div>
+<div class="card-value">{{ data.assignments }}</div>
+</div>
+
+<div class="card">
+<div class="card-title">Assignment Questions</div>
+<div class="card-value">{{ data.assignment_questions }}</div>
+</div>
+
+<div class="card">
+<div class="card-title">Pending Submissions</div>
+<div class="card-value">{{ data.pending_submissions }}</div>
+</div>
+
+<div class="card">
+<div class="card-title">Live Classes</div>
+<div class="card-value">{{ data.live_classes }}</div>
+</div>
+
+<div class="card">
+<div class="card-title">Announcements</div>
+<div class="card-value">{{ data.announcements }}</div>
+</div>
+
+</div>
+
+<div class="section">
+<h2 class="section-title">Live Class Status</h2>
+
+{% if data.class_status and data.class_status.is_live %}
+<p><strong>{{ data.class_status.title }}</strong></p>
+<p style="color:green;">● LIVE</p>
+{% else %}
+<p>No active live class.</p>
+<p style="color:#b91c1c;">● OFFLINE</p>
+{% endif %}
+</div>
+
+<div class="section">
+<h2 class="section-title">Recent Activity</h2>
+
+{% if data.recent_activity %}
+<ul>
+{% for activity in data.recent_activity %}
+<li>{{ activity }}</li>
+{% endfor %}
+</ul>
+{% else %}
+<p>No recent activity.</p>
+{% endif %}
+</div>
+
+<div class="section">
+<h2 class="section-title">Quick Actions</h2>
+
+<div class="dashboard-grid">
+
+<a class="card" href="#">
+<div class="card-title">➕ Add Question</div>
+</a>
+
+<a class="card" href="#">
+<div class="card-title">📝 Create Assignment</div>
+</a>
+
+<a class="card" href="#">
+<div class="card-title">▶ Start Live Class</div>
+</a>
+
+<a class="card" href="#">
+<div class="card-title">📢 New Announcement</div>
+</a>
+
+</div>
+</div>
+
+{% endblock %}

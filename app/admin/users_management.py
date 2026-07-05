@@ -23,7 +23,7 @@ def index():
     total_suspended_users = User.query.filter_by(is_active=False).count()
 
     return render_template(
-        "admin_template/users_management.html",
+        "super_admin/users_management.html",
         users=users,
         total_users=total_users,
         total_admins=total_admins,
