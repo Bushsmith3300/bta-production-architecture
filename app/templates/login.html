@@ -7,7 +7,9 @@
   <meta name="author" content="Emmanuel Asiamah Amponsah">
   <meta name="keywords" content="chemistry, past questions, WAEC, teaching assistant, asiamah, learn">
 <title>Login | BTA Quiz App</title>
-
+  
+<link rel="stylesheet"
+href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <style>
     body {
         font-family: 'Segoe UI', Arial, sans-serif;
@@ -129,7 +131,32 @@
     border: 1px solid red;
 }
 
+  .password-container{
+    position: relative;
+      }
+
+  .password-container{
+    position:relative;
+}
+
+.password-container input{
+    width:100%;
+    padding-right:45px;
+    box-sizing:border-box;
+}
+
+#togglePassword{
+    position:absolute;
+    top:50%;
+    right:15px;
+    transform:translateY(-50%);
+    cursor:pointer;
+    color:#666;
+    font-size:18px;
+}
+
 </style>
+  
 </head>
 
 <body>
@@ -157,8 +184,18 @@
         <input type="text" name="username" required>
 
         <label>Password</label>
-        <input type="password" name="password" required>
 
+        <div class="password-container">
+
+        <input
+        type="password"
+        id="password"
+        name="password"
+        required>
+
+        <i class="bi bi-eye" id="togglePassword"></i>
+
+</div>
         <button type="submit">Login</button>
     </form>
 
@@ -167,6 +204,25 @@
     </div>
 
 </div>
+
+<script>
+
+const password = document.getElementById("password");
+const togglePassword = document.getElementById("togglePassword");
+
+togglePassword.addEventListener("click", function () {
+
+    if (password.type === "password") {
+        password.type = "text";
+        this.classList.replace("bi-eye", "bi-eye-slash");
+    } else {
+        password.type = "password";
+        this.classList.replace("bi-eye-slash", "bi-eye");
+    }
+
+});
+
+</script>
 
 </body>
 </html>
