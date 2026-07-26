@@ -1,6 +1,5 @@
 
 # app/routes/auth_routes.py
-import time
 import re
 
 from flask import (
@@ -37,33 +36,6 @@ auth_bp = Blueprint(
     __name__
 )
 
-
-@auth_bp.route("/raw-test")
-def raw_test():
-
-    start = time.time()
-    print("Starting raw SQL")
-
-    result = db.session.execute(
-        text("SELECT 1")
-    )
-
-    print("Raw SQL finished:", time.time() - start)
-
-    return "OK"
-
-@auth_bp.route("/user-test")
-def user_test():
-
-    start = time.time()
-    print("Starting user query")
-
-    user = User.query.first()
-
-    print("User query finished:", time.time() - start)
-
-    return "OK"
-
 # ---------------- REGISTER ----------------
 @auth_bp.route(
     "/register",
@@ -91,17 +63,17 @@ def register():
         first_name = request.form.get(
             "first_name",
             ""
-        ).strip()
+        ).strip().title()
 
         surname = request.form.get(
             "surname",
             ""
-        ).strip()
+        ).strip().title()
 
         other_name = request.form.get(
             "other_name",
             ""
-        ).strip()
+        ).strip().title()
 
         # VALIDATION
         if not username or len(username) < 3:
@@ -194,10 +166,6 @@ def login():
         user = User.query.filter_by(
             username=username
         ).first()
-
-
-        if not user:
-            print("No user found")
 
         if not user or not check_password_hash(
             user.password,
