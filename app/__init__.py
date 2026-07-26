@@ -10,6 +10,7 @@ from app.admin.dashboard_regular_admin import regular_admin_bp
 from app.admin.dashboard_super_admin import super_admin_bp
 from app.admin.users_management import users_management_bp
 from app.admin.admin_management import admin_management_bp 
+from app.admin.questions_management import questions_bp
 
 
 def create_app():
@@ -30,6 +31,7 @@ def create_app():
     app.register_blueprint(regular_admin_bp)
     app.register_blueprint(users_management_bp)  
     app.register_blueprint(admin_management_bp) 
+    app.register_blueprint(questions_bp)
 
 
     return app

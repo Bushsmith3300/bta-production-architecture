@@ -14,25 +14,15 @@ admin_management_bp = Blueprint(
 @super_admin_required
 def index():
 
-    admins = User.query.filter(
-        User.role.in_(["admin", "super_admin"])
-    ).all()
+    admins = User.query.filter(User.role.in_(["admin", "super_admin"])).all()
 
     total_admins = User.query.filter_by(role="admin").count()
 
-    total_super_admins = User.query.filter_by(
-        role="super_admin"
-    ).count()
+    total_super_admins = User.query.filter_by(role="super_admin").count()
 
-    active_admins = User.query.filter_by(
-        role="admin",
-        is_active=True
-    ).count()
+    active_admins = User.query.filter_by(role="admin", is_active=True).count()
 
-    suspended_admins = User.query.filter_by(
-        role="admin",
-        is_active=False
-    ).count()
+    suspended_admins = User.query.filter_by(role="admin", is_active=False).count()
 
     return render_template(
         "super_admin/admin_management.html",

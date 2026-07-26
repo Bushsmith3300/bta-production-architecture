@@ -59,6 +59,13 @@ class User(db.Model):
         index=True
     )
 
+
+    subject = db.Column(
+        db.String(50),
+        nullable=True
+    )
+
+
     # ====================================
     # STUDENT SIDE RELATIONSHIPS
     # ====================================
