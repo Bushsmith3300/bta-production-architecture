@@ -42,6 +42,7 @@ def get_questions(topic):
     return jsonify({
         "questions": [
             {
+                "question_id": q.id,
                 "question": q.question_text,
                 "options": [
                     {
@@ -74,10 +75,7 @@ def get_questions(topic):
 @login_required
 def quiz(topic):
 
-    user = db.session.get(
-        User,
-        session["user_id"]
-    )
+    user = db.session.get(User, session["user_id"])
 
     if not user:
         session.clear()

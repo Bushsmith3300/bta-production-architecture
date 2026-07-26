@@ -1,0 +1,246 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Question Details{% endblock %}
+
+{% block page_title %}
+Question Details
+{% endblock %}
+
+{% block page_subtitle %}
+View complete question information.
+{% endblock %}
+
+{% block extra_css %}
+<style>
+
+.question-card{
+
+background:white;
+
+padding:30px;
+
+border-radius:10px;
+
+box-shadow:0 2px 8px rgba(0,0,0,.08);
+
+}
+
+.row{
+
+margin-bottom:18px;
+
+}
+
+.label{
+
+font-weight:bold;
+
+color:#555;
+
+margin-bottom:6px;
+
+}
+
+.value{
+
+font-size:17px;
+
+}
+
+.option{
+
+padding:12px;
+
+background:#f4f6f9;
+
+margin-bottom:10px;
+
+border-radius:6px;
+
+}
+
+.actions{
+
+margin-top:30px;
+
+display:flex;
+
+gap:10px;
+
+flex-wrap:wrap;
+
+}
+
+
+.value,
+.option{
+
+     font-size:17px;
+
+     overflow-wrap:break-word;
+
+     word-break:break-word;
+
+}
+
+
+.btn{
+
+padding:10px 20px;
+
+border-radius:6px;
+
+text-decoration:none;
+
+color:white;
+
+}
+
+.edit{
+
+background:#2563eb;
+
+}
+
+.back{
+
+background:#6b7280;
+
+}
+
+.delete{
+
+background:#dc2626;
+
+border:none;
+
+cursor:pointer;
+
+}
+
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="question-card">
+
+<div class="row">
+<div class="label">ID</div>
+<div class="value">{{ question.id }}</div>
+</div>
+
+<div class="row">
+<div class="label">Topic</div>
+<div class="value">{{ question.topic }}</div>
+</div>
+
+<div class="row">
+<div class="label">Subject</div>
+<div class="value">{{ question.subject }}</div>
+</div>
+
+<div class="row">
+<div class="label">Difficulty</div>
+<div class="value">{{ question.difficulty }}</div>
+</div>
+
+<div class="row">
+<div class="label">Question</div>
+<div class="value">{{ question.question_text }}</div>
+</div>
+
+
+<div class="row">
+
+<div class="label">Options</div>
+
+<div class="value">
+
+<div class="option">
+A. {{ question.option_a }}
+</div>
+
+<div class="option">
+B. {{ question.option_b }}
+</div>
+
+<div class="option">
+C. {{ question.option_c }}
+</div>
+
+<div class="option">
+D. {{ question.option_d }}
+</div>
+
+</div>
+
+</div>
+
+<div class="row">
+<div class="label">Correct Answer</div>
+<div class="value">{{ question.correct_answer }}</div>
+</div>
+
+<div class="row">
+<div class="label">Explanation</div>
+<div class="value">{{ question.explanation or "No explanation provided." }}</div>
+</div>
+
+<div class="actions">
+
+<a class="btn back"
+   href="{{ url_for(
+        'questions.view_questions',
+		question_id=question.id,
+        page=page,
+        search=search,
+        filter_topic=question.topic,
+        subject=subject,
+        difficulty=difficulty
+   ) }}">
+    Back
+</a>
+
+<a
+    class="btn edit"
+    href="{{ url_for(
+        'questions.edit_question',
+        question_id=question.id,
+        page=page,
+        search=search,
+        filter_topic=question.topic,
+        subject=subject,
+        difficulty=difficulty
+    ) }}">
+    Edit
+</a>
+
+<form method="POST" action="{{ url_for('questions.delete_question',question_id=question.id) }}">
+
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+<input type="hidden" name="page" value="{{ page }}">
+<input type="hidden" name="search" value="{{ search }}">
+<input type="hidden" name="filter_topic" value="{{ filter_topic }}">
+<input type="hidden" name="subject" value="{{ subject }}">
+<input type="hidden" name="difficulty" value="{{ difficulty }}">
+
+
+  
+<button
+type="submit"
+class="btn delete"
+onclick="return confirm('Delete this question?')">
+
+Delete
+
+</button>
+
+</form>
+
+</div>
+
+</div>
+
+{% endblock %}

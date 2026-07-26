@@ -1,0 +1,335 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Add Question{% endblock %}
+
+{% block page_title %}
+Add New Question
+{% endblock %}
+
+{% block page_subtitle %}
+Create a new question for the question bank.
+{% endblock %}
+
+{% block extra_css %}
+<style>
+
+.form-card{
+    background:white;
+    padding:30px;
+    border-radius:10px;
+    box-shadow:0 2px 8px rgba(0,0,0,.08);
+}
+
+.form-group{
+    margin-bottom:18px;
+}
+
+label{
+    display:block;
+    font-weight:bold;
+    margin-bottom:6px;
+}
+
+input,
+select,
+textarea{
+    width:100%;
+    padding:12px;
+    border:1px solid #ccc;
+    border-radius:6px;
+    font-size:15px;
+}
+
+textarea{
+    resize:vertical;
+    min-height:120px;
+}
+
+.btn{
+    display:inline-block;
+    padding:12px 20px;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+    text-decoration:none;
+    font-size:15px;
+}
+
+.btn-success{
+    background:#16a34a;
+    color:white;
+}
+
+.btn-secondary{
+    background:#6b7280;
+    color:white;
+}
+
+.actions{
+    display:flex;
+    gap:10px;
+    margin-top:25px;
+    flex-wrap:wrap;
+}
+
+.flash{
+    padding:12px;
+    margin-bottom:15px;
+    border-radius:6px;
+}
+
+.success{background:#d1fae5;}
+.warning{background:#fef3c7;}
+.danger{background:#fee2e2;}
+
+
+
+/* ===============================
+   Mobile Responsive
+=================================*/
+
+@media (max-width:768px){
+
+    .form-card{
+        padding:20px;
+    }
+
+    .actions{
+        flex-direction:column;
+    }
+
+    .actions .btn{
+        width:100%;
+        text-align:center;
+    }
+
+    input,
+    select,
+    textarea{
+        font-size:16px;
+    }
+
+}
+
+
+</style>
+{% endblock %}
+
+{% block content %}
+
+{% with messages=get_flashed_messages(with_categories=true) %}
+{% if messages %}
+{% for category,message in messages %}
+<div class="flash {{ category }}">
+    {{ message }}
+</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+
+<div class="form-card">
+
+<form method="POST" autocomplete="off">
+
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+<div class="form-group">
+
+<label>Topic</label>
+
+<select name="topic" required>
+
+<option value="">Select Topic</option>
+
+<option value="atomic_structure">Atomic Structure</option>
+
+<option value="electron_config">Electron Configuration</option>
+
+<option value="periodic_chemistry">Periodic Chemistry</option>
+
+<option value="hybridization">Hybridization</option>
+
+<option value="chemical_bonding">Chemical Bonding</option>
+
+<option value="mole_concept">Mole Concept</option>
+
+<option value="state_of_matter">States of Matter</option>
+
+<option value="energy_and_energy_changes">
+Energy and Energy Changes
+</option>
+
+<option value="rate">
+Rate of Reaction
+</option>
+
+<option value="equilibrium">
+Chemical Equilibrium
+</option>
+
+<option value="acids_bases_salts">
+Acids, Bases and Salts
+</option>
+
+<option value="solubility">
+Solubility
+</option>
+
+<option value="redox">
+Redox Reactions
+</option>
+
+<option value="electrochemical_cells">
+Electrochemical Cells
+</option>
+
+<option value="electrolysis">
+Electrolysis
+</option>
+
+<option value="chemistry_and_industry">
+Chemistry and Industry
+</option>
+
+<option value="transition_metals">
+Transition Metals
+</option>
+
+<option value="organic">
+Organic Chemistry
+</option>
+
+
+</select>
+
+</div>
+
+
+{% if session.get("role") == "super_admin" %}
+
+<div class="form-group">
+    <label>Subject</label>
+
+    <select name="subject" required>
+        <option value="Chemistry">Chemistry</option>
+        <option value="Physics">Physics</option>
+        <option value="Biology">Biology</option>
+        <option value="Mathematics">Mathematics</option>
+        <option value="English">English</option>
+        <option value="ICT">ICT</option>
+        <option value="Integrated Science">Integrated Science</option>
+        <option value="Social Studies">Social Studies</option>
+    </select>
+</div>
+
+{% else %}
+
+<div class="form-group">
+
+    <label>Subject</label>
+
+    <input
+       type="text"
+       name="subject"
+       value="{{ session.get('subject') }}"
+       readonly
+       style="background:#f3f4f6;color:#555;cursor:not-allowed;">
+
+    <small style="color:#6b7280;">
+        Your assigned subject cannot be changed.
+    </small>
+
+</div>
+
+{% endif %}
+
+<div class="form-group">
+
+   <label>Difficulty</label>
+
+   <select name="difficulty" required>
+   <option value="">Select Difficulty</option>
+   <option value="DOK_1">DOK 1</option>
+   <option value="DOK_2">DOK 2</option>
+   <option value="DOK_3">DOK 3</option>
+   <option value="DOK_4">DOK 4</option>
+
+</select>
+
+</div>
+
+
+<div class="form-group">
+   <label>Question</label>
+   <textarea name="question_text" required></textarea>
+</div>
+
+
+<div class="form-group">
+   <label>Option A</label>
+   <input type="text" name="option_a" required>
+</div>
+
+
+<div class="form-group">
+   <label>Option B</label>
+   <input type="text" name="option_b" required>
+</div>
+
+
+<div class="form-group">
+   <label>Option C</label>
+   <input type="text" name="option_c" required>
+</div>
+
+
+<div class="form-group">
+   <label>Option D</label>
+   <input type="text" name="option_d" required>
+</div>
+
+<div class="form-group">
+   <label>Correct Answer</label>
+
+
+<select name="correct_answer" required>
+   <option value="">Choose</option>
+   <option value="A">A</option>
+   <option value="B">B</option>
+   <option value="C">C</option>
+   <option value="D">D</option>
+</select>
+
+
+</div>
+
+<div class="form-group">
+   <label>Explanation</label>
+   <textarea name="explanation"></textarea>
+</div>
+
+<div class="actions">
+
+  <button class="btn btn-success" type="submit">Save Question</button>
+
+  <a class="btn btn-secondary"
+     href="{{ url_for(
+    'questions.view_questions',
+     page=request.args.get('page',1),
+     search=request.args.get('search',''),
+     topic=request.args.get('topic',''),
+     subject=request.args.get('subject',''),
+     difficulty=request.args.get('difficulty','')
+) }}">
+Cancel
+</a>
+
+</div>
+
+
+</form>
+
+
+</div>
+
+{% endblock %}

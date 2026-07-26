@@ -1,0 +1,452 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Edit Question{% endblock %}
+
+{% block page_title %}
+Edit Question
+{% endblock %}
+
+{% block page_subtitle %}
+Modify an existing question.
+{% endblock %}
+
+{% block extra_css %}
+<style>
+
+.form-card{
+    background:#fff;
+    padding:30px;
+    border-radius:10px;
+    box-shadow:0 2px 8px rgba(0,0,0,.08);
+}
+
+.form-group{
+    margin-bottom:18px;
+}
+
+label{
+    display:block;
+    font-weight:bold;
+    margin-bottom:6px;
+}
+
+input,
+select,
+textarea{
+    width:100%;
+    padding:12px;
+    border:1px solid #ccc;
+    border-radius:6px;
+    font-size:15px;
+}
+
+textarea{
+    resize:vertical;
+    min-height:120px;
+}
+
+.btn{
+    display:inline-block;
+    padding:12px 20px;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+    text-decoration:none;
+    font-size:15px;
+}
+
+.btn-primary{
+    background:#2563eb;
+    color:#fff;
+}
+
+.btn-secondary{
+    background:#6b7280;
+    color:#fff;
+}
+
+.actions{
+    display:flex;
+    gap:10px;
+    margin-top:25px;
+    flex-wrap:wrap;
+}
+
+.flash{
+    padding:12px;
+    margin-bottom:15px;
+    border-radius:6px;
+}
+
+.success{
+    background:#d1fae5;
+}
+
+.warning{
+    background:#fef3c7;
+}
+
+.danger{
+    background:#fee2e2;
+}
+
+small{
+    display:block;
+    margin-top:6px;
+}
+
+@media (max-width:768px){
+
+    .form-card{
+        padding:20px;
+    }
+
+    .actions{
+        flex-direction:column;
+    }
+
+    .actions .btn{
+        width:100%;
+        text-align:center;
+    }
+
+    input,
+    select,
+    textarea{
+        font-size:16px;
+    }
+
+}
+
+</style>
+{% endblock %}
+
+{% block content %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+{% for category, message in messages %}
+
+<div class="flash {{ category }}">
+    {{ message }}
+</div>
+
+{% endfor %}
+{% endif %}
+{% endwith %}
+
+
+<div class="form-card">
+
+<form method="POST" autocomplete="off">
+
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+<input type="hidden" name="page" value="{{ page }}">
+<input type="hidden" name="search" value="{{ search }}">
+<input type="hidden" name="filter_topic" value="{{ filter_topic }}">
+<input type="hidden" name="subject" value="{{ subject }}">
+<input type="hidden" name="filter_difficulty" value="{{ difficulty }}">
+
+
+<div class="form-group">
+
+<label>Topic</label>
+
+<select name="topic" required>
+
+<option value="Atomic Structure"
+{% if request.form.get("topic", question.topic) == "Atomic Structure" %}selected{% endif %}>
+Atomic Structure
+</option>
+
+<option value="Electron Configuration"
+{% if request.form.get("topic", question.topic) == "Electron Configuration" %}selected{% endif %}>
+Electron Configuration
+</option>
+
+<option value="Periodic Chemistry"
+{% if request.form.get("topic", question.topic) == "Periodic Chemistry" %}selected{% endif %}>
+Periodic Chemistry
+</option>
+
+<option value="Hybridization"
+{% if request.form.get("topic", question.topic) == "Hybridization" %}selected{% endif %}>
+Hybridization
+</option>
+
+<option value="Chemical Bonding"
+{% if request.form.get("topic", question.topic) == "Chemical Bonding" %}selected{% endif %}>
+Chemical Bonding
+</option>
+
+<option value= "Mole Concept"
+{% if request.form.get("topic", question.topic) == "Mole Concept" %}selected{% endif %}>
+Mole Concept
+</option>
+
+<option value="State of Matter"
+{% if request.form.get("topic", question.topic) == "State of Matter" %}selected{% endif %}>
+States of Matter
+</option>
+
+<option value="Energy and Energy Changes"
+{% if request.form.get("topic", question.topic) == "Energy and Energy Changes" %}selected{% endif %}>
+Energy and Energy Changes
+</option>
+
+<option value= "Rate of Reaction"
+{% if request.form.get("topic", question.topic) == "Rate of Reaction" %}selected{% endif %}>
+Rate of Reaction
+</option>
+
+<option value="Equilibrium"
+{% if request.form.get("topic", question.topic) == "Equilibrium" %}selected{% endif %}>
+Chemical Equilibrium
+</option>
+
+<option value="Acids, Bases and Salts"
+{% if request.form.get("topic", question.topic) == "Acids, Bases and Salts" %}selected{% endif %}>
+Acids, Bases and Salts
+</option>
+
+<option value="Solubility
+{% if request.form.get("topic", question.topic) == "Solubility" %}selected{% endif %}>
+Solubility
+</option>
+
+<option value= "Redox Reactions"
+{% if request.form.get("topic", question.topic) == "Redox Reactions" %}selected{% endif %}>
+Redox Reactions
+</option>
+
+<option value="Electrochemical_Cells"
+{% if request.form.get("topic", question.topic) == "Electrochemical Cells" %}selected{% endif %}>
+Electrochemical Cells
+</option>
+
+<option value="Electrolysis"
+{% if request.form.get("topic", question.topic) == "Electrolysis" %}selected{% endif %}>
+Electrolysis
+</option>
+
+<option value="Chemistry and Industry"
+{% if request.form.get("topic", question.topic) == "Chemistry and Industry" %}selected{% endif %}>
+Chemistry and Industry
+</option>
+
+<option value="Transition Metals"
+{% if request.form.get("topic", question.topic) == "Transition Metals" %}selected{% endif %}>
+Transition Metals
+</option>
+
+<option value= "Organic"
+{% if request.form.get("topic", question.topic) == "Organic" %}selected{% endif %}>
+Organic Chemistry
+</option>
+
+</select>
+
+</div>
+
+
+{% if session.get("role") == "super_admin" %}
+
+<div class="form-group">
+
+    <label>Subject</label>
+
+    <select name="subject" required>
+
+        {% for subject in [
+        "Chemistry",
+        "Physics",
+        "Biology",
+        "Add Maths",
+        "English",
+        "ICT",
+        "General Science",
+        "Social Studies",
+		"Mathematics" ] %}
+
+        <option value="{{ subject }}"
+            {% if request.form.get("subject", question.subject) == subject %}selected{% endif %}>
+            {{ subject }}
+        </option>
+
+        {% endfor %}
+
+    </select>
+
+</div>
+
+{% else %}
+
+<div class="form-group">
+
+    <label>Subject</label>
+
+    <input
+        type="text"
+        name="subject"
+        value="{{ question.subject }}"
+        readonly
+        style="background:#f3f4f6;color:#555;cursor:not-allowed;">
+
+    <small style="color:#6b7280;">
+        Your assigned subject cannot be changed.
+    </small>
+
+</div>
+
+{% endif %}
+
+
+<div class="form-group">
+
+    <label>Difficulty</label>
+
+    <select name="difficulty" required>
+
+    <option value="" disabled
+        {% if not request.form.get("difficulty") and not question.difficulty %}selected{% endif %}>
+        Choose DOK Level
+    </option>
+
+    {% for d in ["DOK_1","DOK_2","DOK_3","DOK_4"] %}
+
+    <option value="{{ d }}"
+        {% if request.form.get("difficulty", question.difficulty) == d %}selected{% endif %}>
+        {{ d.replace("_"," ") }}
+    </option>
+
+    {% endfor %}
+
+</select>
+</div>
+
+
+<div class="form-group">
+
+    <label>Question</label>
+
+    <textarea
+        name="question_text"
+        required>{{ request.form.get("question_text", question.question_text) }}</textarea>
+
+</div>
+
+
+<div class="form-group">
+
+    <label>Option A</label>
+
+    <input
+        type="text"
+        name="option_a"
+        value="{{ request.form.get('option_a', question.option_a) }}"
+        required>
+
+</div>
+
+
+<div class="form-group">
+
+    <label>Option B</label>
+
+    <input
+        type="text"
+        name="option_b"
+        value="{{ request.form.get('option_b', question.option_b) }}"
+        required>
+
+</div>
+
+
+<div class="form-group">
+
+    <label>Option C</label>
+
+    <input
+        type="text"
+        name="option_c"
+        value="{{ request.form.get('option_c', question.option_c) }}"
+        required>
+
+</div>
+
+
+<div class="form-group">
+
+    <label>Option D</label>
+
+    <input
+        type="text"
+        name="option_d"
+        value="{{ request.form.get('option_d', question.option_d) }}"
+        required>
+
+</div>
+
+
+<div class="form-group">
+
+    <label>Correct Answer</label>
+
+    <select name="correct_answer" required>
+
+        {% for ans in ["A","B","C","D"] %}
+
+        <option value="{{ ans }}"
+            {% if request.form.get("correct_answer", question.correct_answer) == ans %}selected{% endif %}>
+            {{ ans }}
+        </option>
+
+        {% endfor %}
+
+    </select>
+
+</div>
+
+
+<div class="form-group">
+
+    <label>Explanation</label>
+
+    <textarea
+        name="explanation">{{ request.form.get("explanation", question.explanation) }}</textarea>
+
+</div>
+
+
+<div class="actions">
+
+    <button
+        class="btn btn-primary"
+        type="submit">
+        Update Question
+    </button>
+
+  <a class="btn btn-secondary"
+   href="{{ url_for(
+       'questions.view_questions',
+       question_id=question.id,
+       page=page,
+       search=search,
+       filter_topic=filter_topic,
+       subject=subject,
+       difficulty=difficulty
+   ) }}">
+    Back / Cancel
+</a>
+
+
+</div>
+
+</form>
+
+</div>
+
+{% endblock %}
+
+

@@ -225,6 +225,7 @@ def login():
         session["user_id"] = user.id
         session["username"] = user.username
         session["role"] = user.role
+        session["subject"] = user.subject
 
         full_name = f"{user.first_name}"
 

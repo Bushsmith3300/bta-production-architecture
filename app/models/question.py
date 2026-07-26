@@ -9,7 +9,7 @@ class Question(db.Model):
 
     topic = db.Column(db.String(100), nullable=False)
 
-    question_text = db.Column(db.String(500), nullable=False)
+    question_text = db.Column(db.Text, nullable=False)
 
     option_a = db.Column(db.String(300), nullable=False)
     option_b = db.Column(db.String(300), nullable=False)
@@ -18,8 +18,41 @@ class Question(db.Model):
 
     correct_answer = db.Column(db.String(1), nullable=False)
 
-    explanation = db.Column(db.String(1000), nullable=True)
+    explanation = db.Column(db.Text, nullable=True)
 
+    subject = db.Column(db.String(50), default="chemistry", nullable=False)
+
+    difficulty = db.Column(
+        db.Enum(
+        "DOK_1",
+        "DOK_2",
+        "DOK_3",
+        "DOK_4",
+        name="difficulty_level"
+    ),
+        nullable=False,
+        default="DOK_1"
+    )
+
+    created_at = db.Column(
+        db.DateTime,
+        nullable=False,
+        default=db.func.now()
+    )
+
+    updated_at = db.Column(
+        db.DateTime,
+        nullable=False,
+        default=db.func.now(),
+        onupdate=db.func.now()
+    )
+
+
+    question_hash = db.Column(
+        db.String(64),
+        nullable=False,
+        index=True
+    )
 
     # ======================================
     # RELATIONSHIPS (FIXED)

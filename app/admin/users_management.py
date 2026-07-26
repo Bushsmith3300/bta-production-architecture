@@ -16,7 +16,6 @@ users_management_bp = Blueprint(
 def index():
 
     users = User.query.order_by(User.id.desc()).all()
-
     total_users = len(users)
     total_admins = User.query.filter_by(role="admin").count()
     total_active_users = User.query.filter_by(is_active=True).count()
@@ -38,7 +37,8 @@ def index():
 def make_admin(user_id):
 
     user = User.query.get_or_404(user_id)
-    name = user.first_name
+    first_name = user.first_name
+    
 
     # Prevent modifying super admin
     if user.role == "super_admin":
@@ -78,7 +78,16 @@ def remove_admin(user_id):
 def suspend_user(user_id):
 
     user = User.query.get_or_404(user_id)
-    name = user.first_name
+    first_name = user.first_name
+    surname = user.surname
+    other_name = user.other_name 
+    full_name = first_name + " " + surname
+
+    if other_name:
+      full_name = full_name + " " + other_name
+
+    else:
+      full_name = full_name
 
     # Prevent suspending super admin
     if user.role == "super_admin":
@@ -88,8 +97,26 @@ def suspend_user(user_id):
     user.is_active = False
     db.session.commit()
 
-    flash(f"{name} has been suspended.", "warning")
+    flash(f"{full_name} has been suspended.", "warning")
     return redirect(url_for("users_management.index"))
+
+
+#--------------VIEW SUSPENDED USERS-------------
+@users_management_bp.route("/view-suspended")
+@super_admin_required
+def view_suspended():
+
+    suspended_users = (
+        User.query
+        .filter_by(is_active=False)
+        .order_by(User.id.desc())
+        .all()
+    )
+
+    return render_template(
+        "super_admin/suspended_users.html",
+        suspended_users=suspended_users
+    )
 
 
 # ---------------- ACTIVATE USER ----------------
@@ -98,12 +125,21 @@ def suspend_user(user_id):
 def activate_user(user_id):
 
     user = User.query.get_or_404(user_id)
-    name = user.first_name
+    first_name = user.first_name
+    surname = user.surname
+    other_name = user.other_name 
+    full_name = first_name + " " + surname
+
+    if other_name:
+      full_name = full_name + " " + other_name
+
+    else:
+      full_name = full_name
 
     user.is_active = True
     db.session.commit()
 
-    flash(f"{name} has been activated.", "success")
+    flash(f"{full_name} has been activated.", "success")
     return redirect(url_for("users_management.index"))
 
 

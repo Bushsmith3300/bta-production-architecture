@@ -118,7 +118,7 @@
             Online Class
         </a>
 
-        <a href="#">
+        <a href="{{ url_for('questions.view_questions') }}">
             <i class="bi bi-journal-text"></i>
             Questions
         </a>
@@ -163,7 +163,7 @@
 
                 <div class="ms-auto">
                     <span class="fw-semibold">
-                        Welcome {{ user.first_name }}
+                        Welcome Administrator {{ user.first_name }}
                     </span>
                 </div>
 
