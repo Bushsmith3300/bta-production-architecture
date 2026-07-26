@@ -255,7 +255,7 @@ async function loadQuestions() {
 
     const data = await res.json();
 
-    allQuestions = data.questions.slice(0, 50);
+    allQuestions = data.questions.slice(0, 100);
     userAnswers = new Array(allQuestions.length).fill(null);
 
     if (allQuestions.length === 0) {
