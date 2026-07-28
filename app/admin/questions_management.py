@@ -109,9 +109,9 @@ def view_questions():
 
     difficulty = request.args.get("difficulty", "", type=str).strip()
 
-    question_id = request.args.get("question_id", type=int)
+    question_id = request.args.get("question_id", "", type=int)
 
-
+    
 
     query = Question.query
 
@@ -282,10 +282,9 @@ def view_questions():
             total_questions=total_questions,
             total_topics=total_topics,
             topics=topics,
-            subjects=subjects,
+            subjects=subjects,            
             page=page,                    
             search=search,
-            question_id=question_id,
             filter_topic=filter_topic,
             subject=subject,
             difficulty=difficulty,    
@@ -314,6 +313,7 @@ def view_question(question_id):
     subject = request.args.get("subject", "")
     difficulty = request.args.get("difficulty", "")
     question_id = request.args.get("question_id", type=int)
+   
 
     if (
         session.get("role") == "admin"
@@ -336,8 +336,8 @@ def view_question(question_id):
              question=question,
              page=page,
              search=search,
-             question_id=question_id,
              filter_topic=filter_topic,
+             question_id=question_id,
              subject=subject,
              difficulty=difficulty,
     )
