@@ -133,6 +133,14 @@ textarea{
 
 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
+<input type="hidden" name="page" value="{{ page }}">
+<input type="hidden" name="search" value="{{ search }}">
+<input type="hidden" name="filter_topic" value="{{ filter_topic }}">
+<input type="hidden" name="filter_subject" value="{{ subject }}">
+<input type="hidden" name="filter_difficulty" value="{{ difficulty }}">
+
+
+
 <div class="form-group">
 
 <label>Topic</label>
@@ -141,63 +149,41 @@ textarea{
 
 <option value="">Select Topic</option>
 
-<option value="atomic_structure">Atomic Structure</option>
+<option value=">Atomic Structure">Atomic Structure</option>
 
-<option value="electron_config">Electron Configuration</option>
+<option value="Electron Configuration">Electron Configuration</option>
 
-<option value="periodic_chemistry">Periodic Chemistry</option>
+<option value="Periodic Chemistry">Periodic Chemistry</option>
 
-<option value="hybridization">Hybridization</option>
+<option value="Hybridization">Hybridization</option>
 
-<option value="chemical_bonding">Chemical Bonding</option>
+<option value="Chemical Bonding">Chemical Bonding</option>
 
 <option value="mole_concept">Mole Concept</option>
 
-<option value="state_of_matter">States of Matter</option>
+<option value="States of Matter">States of Matter</option>
 
-<option value="energy_and_energy_changes">
-Energy and Energy Changes
-</option>
+<option value="Energy and Energy Changes">Energy and Energy Changes</option>
 
-<option value="rate">
-Rate of Reaction
-</option>
+<option value="Rate of Reactions">Rate of Reactions</option>
 
-<option value="equilibrium">
-Chemical Equilibrium
-</option>
+<option value="Equilibrium">Equilibrium</option>
 
-<option value="acids_bases_salts">
-Acids, Bases and Salts
-</option>
+<option value="Acids, Bases and Salts">Acids, Bases and Salts</option>
 
-<option value="solubility">
-Solubility
-</option>
+<option value="Solubility">Solubility</option>
 
-<option value="redox">
-Redox Reactions
-</option>
+<option value="redox">Redox Reactions</option>
 
-<option value="electrochemical_cells">
-Electrochemical Cells
-</option>
+<option value="Electrochemical_Cells">Electrochemical Cells</option>
 
-<option value="electrolysis">
-Electrolysis
-</option>
+<option value="Electrolysis">Electrolysis</option>
 
-<option value="chemistry_and_industry">
-Chemistry and Industry
-</option>
+<option value="Chemistry and Industry">Chemistry and Industry</option>
 
-<option value="transition_metals">
-Transition Metals
-</option>
+<option value="Transition Metals">Transition Metals</option>
 
-<option value="organic">
-Organic Chemistry
-</option>
+<option value="Organic">Organic Chemistry</option>
 
 
 </select>
@@ -313,11 +299,10 @@ Organic Chemistry
   <button class="btn btn-success" type="submit">Save Question</button>
 
   <a class="btn btn-secondary"
-     href="{{ url_for(
-    'questions.view_questions',
+     href="{{ url_for('questions.view_questions',
      page=request.args.get('page',1),
      search=request.args.get('search',''),
-     topic=request.args.get('topic',''),
+     filter_topic=request.args.get('filter_topic',''),
      subject=request.args.get('subject',''),
      difficulty=request.args.get('difficulty','')
 ) }}">

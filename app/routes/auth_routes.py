@@ -167,10 +167,7 @@ def login():
             username=username
         ).first()
 
-        if not user or not check_password_hash(
-            user.password,
-            password
-        ):
+        if not user or not check_password_hash(user.password, password):
 
             flash(
                 "Invalid username or password",

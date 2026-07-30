@@ -352,9 +352,25 @@ def view_question(question_id):
 @admin_required
 def add_question():
 
+
+    page = request.args.get("page", 1, type=int)
+    search = request.args.get("search", "")
+    filter_topic = request.args.get("filter_topic", "")
+    subject = request.args.get("subject", "")
+    difficulty = request.args.get("difficulty", "")
+    
+    
     if request.method == "POST":
 
-        topic = request.form.get("topic", "").strip()
+        topic = request.form.get("topic", "",).strip()
+        page = request.form.get("page", 1)
+        search = request.form.get("search", "").strip()                      
+        subject = request.form.get("subject", "").strip()
+        difficulty = request.form.get("difficulty", "").strip()
+        filter_topic = request.form.get("filter_topic", "").strip()
+        filter_difficulty = request.form.get("filter_difficulty", "").strip()
+        filter_subject = request.form.get("filter_subject", "").strip()
+        
 
         if session.get("role") == "admin":
             subject = session.get("subject")
@@ -364,10 +380,6 @@ def add_question():
                 ""
             ).strip()
 
-        difficulty = request.form.get(
-            "difficulty",
-            ""
-        ).strip()
 
         question_text = request.form.get(
             "question_text",
@@ -403,6 +415,7 @@ def add_question():
             "explanation",
             ""
         ).strip()
+       
 
         # --------------------------------------------------
         # Validation
@@ -534,9 +547,7 @@ def add_question():
         # Duplicate check
         # --------------------------------------------------
 
-        duplicate = Question.query.filter_by(
-            question_hash=question_hash
-        ).first()
+        duplicate = Question.query.filter_by(question_hash=question_hash).first()
 
         if duplicate:
             flash(
@@ -593,10 +604,9 @@ def add_question():
                 url_for("questions.view_questions",
                  page=page,
                  search=search,
-                 filter_question_id=filter_question_id,
-                 topic=topic,
+                 filter_topic=filter_topic,
                  subject=subject,
-                 difficulty=difficulty)
+                 difficulty=difficulty,)
             )
 
         except IntegrityError:
@@ -625,9 +635,13 @@ def add_question():
                 url_for("questions.add_question")
             )
 
-    return render_template(
-        "admin/add_question.html"
-    )
+    return render_template("admin/add_question.html",
+            page=page,
+            search=search,
+            filter_topic=filter_topic,
+            subject=subject,
+            difficulty=difficulty,
+            )
 
 
 
@@ -1025,7 +1039,7 @@ def delete_question(question_id):
 
     page = request.args.get("page", 1, type=int)
     search = request.args.get("search", "")
-    filter_question_id = request.args.get("question_id", type=int)
+    question_id = request.args.get("question_id", type=int)
     topic = request.args.get("topic", "")
     subject = request.args.get("subject", "")
     difficulty = request.args.get("difficulty", "")
@@ -1043,7 +1057,7 @@ def delete_question(question_id):
             page=page,
             search=search,
             filter_topic=filter_topic,
-            filter_question_id=filter_question_id,
+            question_id=question_id,
             subject=subject,
             difficulty=difficulty,
         )
@@ -1064,7 +1078,6 @@ def delete_question(question_id):
             search=search,
             question_id=question_id,
             filter_topic=filter_topic,
-            filter_question_id=filter_question_id,
             subject=subject,
             difficulty=difficulty, 
         )
@@ -1103,7 +1116,7 @@ def delete_question(question_id):
         url_for("questions.view_questions",
             page=page,
             search=search,
-            filter_question_id=filter_question_id,
+            question_id=question_id,
             filter_topic=filter_topic,
             subject=subject,
             difficulty=difficulty,
@@ -1115,8 +1128,7 @@ def delete_question(question_id):
 # BULK DELETE
 # ======================================================
 
-@questions_bp.route("/bulk-delete", methods=["POST"]
-)
+@questions_bp.route("/bulk-delete", methods=["POST"])
 @admin_required
 def bulk_delete_questions():
 
@@ -1128,10 +1140,12 @@ def bulk_delete_questions():
 
     page = request.form.get("page", 1, type=int)
     search = request.form.get("search", "")
-    filter_question_id = request.args.get("question_id", type=int)
+    question_id = request.form.get("question_id", type=int)
     filter_topic = request.form.get("filter_topic", "")
     subject = request.form.get("subject", "")
     difficulty = request.form.get("difficulty", "")
+
+    print("Submitted IDs:", ids)
 
     if not ids:
 
@@ -1146,7 +1160,7 @@ def bulk_delete_questions():
                 page=page,
                 search=search,
                 filter_topic=filter_topic,
-                filter_question_id=filter_question_id,
+                question_id=question_id,
                 subject=subject,
                 difficulty=difficulty,
             )
@@ -1159,16 +1173,20 @@ def bulk_delete_questions():
 
         for question_id in ids:
 
+            print(f"\nProcessing ID: {question_id}")
+
             try:
                 question_id = int(question_id)
 
             except ValueError:
+                print(" -> Invalid ID")
                 skipped += 1
                 continue
 
             question = db.session.get(Question, question_id)
 
             if not question:
+                print(" -> Question not found")
                 skipped += 1
                 continue
 
@@ -1176,27 +1194,30 @@ def bulk_delete_questions():
                 session.get("role") == "admin"
                 and question.subject != session.get("subject")
             ):
+                print(" -> Unauthorized")
                 skipped += 1
                 continue
 
             if question_has_dependencies(question.id):
+                print(" -> Has dependencies")
                 skipped += 1
                 continue
 
+            print(" -> Deleting")
             db.session.delete(question)
             deleted += 1
+
+        print(f"\nDeleted={deleted}, Skipped={skipped}")
 
         db.session.commit()
 
         if deleted:
-
             flash(
                 f"{deleted} question(s) deleted successfully.",
                 "success"
             )
 
         if skipped:
-
             flash(
                 f"{skipped} question(s) were skipped because they were invalid, unauthorized, not found, or already in use.",
                 "warning"
@@ -1225,7 +1246,6 @@ def bulk_delete_questions():
             "questions.view_questions",
             page=page,
             search=search,
-            filter_question_id=filter_question_id,
             filter_topic=filter_topic,
             subject=subject,
             difficulty=difficulty,
@@ -1237,8 +1257,7 @@ def bulk_delete_questions():
 # DELETE ALL UNUSED QUESTIONS
 # ======================================================
 
-@questions_bp.route("/delete-unused", methods=["POST"]
-)
+@questions_bp.route("/delete-unused", methods=["POST"])
 @admin_required
 def delete_unused_questions():
 
@@ -1249,8 +1268,9 @@ def delete_unused_questions():
     page = request.form.get("page", 1, type=int)
     search = request.form.get("search", "")
     topic = request.form.get("topic", "")
+    filter_topic = request.form.get("filter_topic", "")
     subject = request.form.get("subject", "")
-    filter_question_id = request.args.get("question_id", type=int)
+    question_id = request.args.get("question_id", type=int)
     difficulty = request.form.get("difficulty", "")
    
 
@@ -1309,7 +1329,7 @@ def delete_unused_questions():
             "questions.view_questions",
             page=page,
             search=search,
-            filter_question_id=filter_question_id,
+            question_id=question_id,
             filter_topic=filter_topic,
             subject=subject,
             difficulty=difficulty
