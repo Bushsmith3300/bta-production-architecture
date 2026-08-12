@@ -67,42 +67,30 @@ def subject_select():
     )
 
 
-# ---------------- TOPIC SELECT ----------------
-@dashboard_bp.route("/topic_select", methods=["GET", "POST"])
-@login_required
-def topic_select():
 
-    user = db.session.get(
-        User,
-        session["user_id"]
+@dashboard_bp.route("/topics/<subject>")
+@login_required
+def topic_select(subject):
+
+    user = db.session.get(User, session["user_id"])
+
+    topics = (
+        db.session.query(Question.topic)
+        .filter(Question.subject == subject)
+        .distinct()
+        .order_by(Question.topic)
+        .all()
     )
 
-    if request.method == "POST":
-
-        selected = request.form.getlist("topics")
-
-        if not selected:
-
-            flash(
-                "Select at least one topic",
-                "error"
-            )
-
-            return redirect(
-                url_for("dashboard.topic_select")
-            )
-
-        return redirect(
-            url_for(
-                "quiz.quiz",
-                topic=selected[0]
-            )
-        )
+    topics = [t[0] for t in topics]
 
     return render_template(
         "topic_select.html",
-        user=user
+        user=user,
+        subject=subject,
+        topics=topics
     )
+
 
 
 # ---------------- ENTER CLASS ----------------

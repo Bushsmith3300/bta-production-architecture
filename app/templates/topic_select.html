@@ -112,111 +112,45 @@ footer {
 <body>
 
 <div class="header">
-<h2 style="text-align:center;">Hi, {{ user.first_name }} 👋</h2>
-</div> 
-     
+    <h2 style="text-align:center;">Hi, {{ user.first_name }} 👋</h2>
+</div>
+
 <div class="logout">
- <a href="{{ url_for('auth.logout') }}">Logout</a>
-</div> 
+    <a href="{{ url_for('auth.logout') }}">Logout</a>
+</div>
 
 <header>
-  <h1>New Curriculum Chemistry Topics</h1>
-  <p>Select a topic to practise BTA Quiz</p>
+    <h1>{{ subject }} Topics</h1>
+    <p>Select a topic to practise BTA Quiz</p>
 </header>
 
 <div class="container">
 
-  <div class="card" onclick="startQuiz('atomic structure')">
-    <h3>Atomic Structure</h3>
-  </div>
+    {% for topic in topics %}
 
-  <div class="card" onclick="startQuiz('electron configuration')">
-    <h3>Electron Configuration</h3>
-  </div>
+    <div class="card" onclick="startQuiz('{{ topic }}')">
+        <h3>{{ topic }}</h3>
+    </div>
 
-  <div class="card" onclick="startQuiz('periodic chemistry')">
-    <h3>Periodic Chemistry</h3>
-  </div>
-
-  <div class="card" onclick="startQuiz('hybridization')">
-    <h3>Hybridization</h3>
-  </div>
-
-  <div class="card" onclick="startQuiz('chemical bonding')">
-    <h3>Chemical Bonding</h3>
-  </div>
-
-  <div class="card" onclick="startQuiz('mole concept')">
-    <h3>Mole Concept</h3>
-  </div>
-
-  <div class="card" onclick="startQuiz('state of matter')">
-    <h3>State of Matter</h3>
-  </div>
-
-  <div class="card" onclick="startQuiz('energy and energy changes')">
-    <h3>Energy & Energy Changes</h3>
-  </div>
-
-  <div class="card" onclick="startQuiz('rate')">
-    <h3>Rate of Reaction</h3>
-  </div>
-
-  <div class="card" onclick="startQuiz('equilibrium')">
-    <h3>Chemical Equilibrium</h3>
-  </div>
-
-  <div class="card" onclick="startQuiz('acids, bases and salts')">
-    <h3>Acids, Bases & Salts</h3>
-  </div>
-
-  <div class="card" onclick="startQuiz('solubility')">
-    <h3>Solubility</h3>
-  </div>
-
-  <div class="card" onclick="startQuiz('redox')">
-    <h3>Redox</h3>
-  </div>
-
-  <div class="card" onclick="startQuiz('electrochemical cells')">
-    <h3>Electrochemical Cells</h3>
-  </div>
-
-  <div class="card" onclick="startQuiz('electrolysis')">
-    <h3>Electrolysis</h3>
-  </div>
-
-  <div class="card" onclick="startQuiz('chemistry and industry')">
-    <h3>Chemistry & Industry</h3>
-  </div>
-
-  <div class="card" onclick="startQuiz('transition metals')">
-    <h3>Transition Metals</h3>
-  </div>
-
-  <div class="card" onclick="startQuiz('organic')">
-    <h3>Organic Chemistry</h3>
-  </div>
+    {% endfor %}
 
 </div>
 
-
- <div class="nav-links">
-  <a href="{{url_for("dashboard.subject_select")}}">← Change subject</a>
-  <a href="{{url_for("dashboard.dashboard")}}"> Go to Dashboard</a>
- </div>
-
+<div class="nav-links">
+    <a href="{{ url_for('dashboard.subject_select') }}">← Change subject</a>
+    <a href="{{ url_for('dashboard.dashboard') }}">Go to Dashboard</a>
+</div>
 
 <footer>
-  © 2026 Bush Teaching Assistant
+    © 2026 Bush Teaching Assistant
 </footer>
 
 <script>
 function startQuiz(topic) {
-  const cleanTopic = topic.toLowerCase().trim();
+    const cleanTopic = topic.toLowerCase().trim();
 
-  // ✅ CORRECT ROUTE
-  window.location.href = `/quiz/${encodeURIComponent(cleanTopic)}`;
+    window.location.href =
+        `/quiz/{{ subject }}/${encodeURIComponent(cleanTopic)}`;
 }
 </script>
 

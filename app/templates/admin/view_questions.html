@@ -252,20 +252,73 @@ tr:hover{
 
 
 
+<!-- ====================================================== -->
+<!-- PRIMARY ACTION -->
+<!-- ====================================================== -->
 
-<div class="top-actions">
+<div class="primary-actions" style="margin-bottom:20px;">
 
-    <a class="btn btn-primary"
-       href="{{ url_for('questions.add_question') }}">
+    <a
+        href="{{ url_for('questions.add_question',
+            page=questions.page,
+            search=search,
+            topic=topic,
+            subject=subject,
+            difficulty=difficulty
+        ) }}"
+        class="btn btn-success">
 
-        + Add Question
+        <i class="fas fa-plus"></i> Add a Question
 
     </a>
 
 </div>
 
 
+<!-- ====================================================== -->
+<!-- BULK OPERATIONS -->
+<!-- ====================================================== -->
 
+<h4 style="margin-bottom:12px;">
+    Bulk Operations
+</h4>
+
+<div class="bulk-actions"
+     style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;">
+
+    <a
+        href="{{ url_for('questions.bulk_upload_questions',
+            page=page,
+            search=search,
+            filter_topic=filter_topic,
+            subject=subject,
+            difficulty=difficulty
+        ) }}"
+        class="btn btn-primary">
+
+        <i class="fas fa-upload"></i>
+        Bulk Upload Questions
+
+    </a>
+
+    <a
+        href="{{ url_for('questions.export_questions',
+            page=page,
+            search=search,
+            filter_topic=filter_topic,
+            subject=subject,
+            difficulty=difficulty
+        ) }}"
+        class="btn btn-info">
+
+        <i class="fas fa-download"></i>
+        Export Questions as backup
+
+    </a>
+
+</div>
+
+    
 
 <div class="stats">
 
@@ -333,7 +386,7 @@ tr:hover{
 
 
 
-<select name="subject">
+<select name="filter_subject">
 
 
     <option value="">
@@ -345,7 +398,7 @@ tr:hover{
 
         <option
             value="{{ item[0] }}"
-            {% if subject == item[0] %}selected{% endif %}
+            {% if filter_subject == item[0] %}selected{% endif %}
         >
 
             {{ item[0] }}
@@ -362,7 +415,7 @@ tr:hover{
 
 
 
-<select name="difficulty">
+<select name="filter_difficulty">
 
 
 <option value="">
@@ -371,25 +424,25 @@ tr:hover{
 
 
 <option value="DOK_1"
-{% if difficulty=="DOK_1" %}selected{% endif %}>
+{% if filter_difficulty=="DOK_1" %}selected{% endif %}>
 DOK 1
 </option>
 
 
 <option value="DOK_2"
-{% if difficulty=="DOK_2" %}selected{% endif %}>
+{% if filter_difficulty=="DOK_2" %}selected{% endif %}>
 DOK 2
 </option>
 
 
 <option value="DOK_3"
-{% if difficulty=="DOK_3" %}selected{% endif %}>
+{% if filter_difficulty=="DOK_3" %}selected{% endif %}>
 DOK 3
 </option>
 
 
 <option value="DOK_4"
-{% if difficulty=="DOK_4" %}selected{% endif %}>
+{% if filter_difficulty=="DOK_4" %}selected{% endif %}>
 DOK 4
 </option>
 
@@ -418,8 +471,8 @@ Search
     <input type="hidden" name="page" value="{{ page }}">
     <input type="hidden" name="search" value="{{ search }}">
     <input type="hidden" name="filter_topic" value="{{ filter_topic }}">
-    <input type="hidden" name="subject" value="{{ subject }}">
-    <input type="hidden" name="difficulty" value="{{ difficulty }}">
+    <input type="hidden" name="subject" value="{{ filter_subject }}">
+    <input type="hidden" name="difficulty" value="{{ filter_difficulty }}">
     <input type="hidden" name="question_id" value="{{ question_id }}">
 
     <div class="table-card">
@@ -504,8 +557,8 @@ Search
     page=page,
     search=search,
     filter_topic=question.topic,
-    subject=subject,
-    difficulty=difficulty,
+    filter_subject=filter_subject,
+    filter_difficulty=filter_difficulty,
    
 ) }}">
     View
@@ -518,8 +571,8 @@ Search
     page=page,
     search=search,
     filter_topic=question.topic,
-    subject=subject,
-    difficulty=difficulty,
+    filter_subject=filter_subject,
+    filter_difficulty=filter_difficulty,
    
 ) }}">
     Edit
@@ -546,12 +599,20 @@ Search
 
 </div>
 
-<br>
 
+<div style="margin-top:20px;">
 
-<button class="btn btn-danger">
-Delete Selected
-</button>
+    <button
+        type="submit"
+        class="btn btn-danger"
+        onclick="return confirm('Are you sure you want to delete the selected questions? This action cannot be undone.')">
+
+        <i class="fas fa-trash"></i>
+        Delete selected 
+
+    </button>
+
+</div>
 
 
 </form>

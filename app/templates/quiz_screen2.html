@@ -200,6 +200,7 @@ footer {
 }
 
 </style>
+
 </head>
 
 <body>
@@ -213,7 +214,7 @@ footer {
 </div>
 
 <div class="container">
-  <h1 style="text-align:center">🧪 BTA Chemistry Quiz</h1>
+  <h1 style="text-align:center">🧪 BTA {{ subject }} Quiz</h1>
   <p class="subtitle">Powered by Bush Software Inc.</p>
   <h2 id="topic-title">{{ topic }}</h2><br><br>
 
@@ -229,7 +230,9 @@ footer {
 
 <div class="nav-links">
   <a href="https://wa.me/233554454161" target="_blank">Ask Teacher(Bush)</a>
-  <a href="{{url_for('dashboard.topic_select')}}">← Change topic</a>
+  <a href="{{ url_for('dashboard.topic_select', subject=subject) }}">
+    ← Change topic
+  </a>
   <a href="{{url_for('dashboard.dashboard')}}">← Dashboard</a>
 </div>
 
@@ -237,7 +240,11 @@ footer {
   <p>&copy; 2026 Bush Teaching Assistant</p>
 </footer>
 
+
 <script>
+
+const subject = "{{ subject }}";
+const topic = "{{ topic }}";
 
 let allQuestions = [];
 let currentIndex = 0;
@@ -247,7 +254,10 @@ let userAnswers = [];
 async function loadQuestions() {
 
   try {
-    const res = await fetch(`/questions/{{topic}}`);
+
+    const res = await fetch(
+      `/questions/${encodeURIComponent(subject)}/${encodeURIComponent(topic)}`
+    );
 
     if (!res.ok) {
       throw new Error("Unauthorized or server error");
@@ -255,25 +265,26 @@ async function loadQuestions() {
 
     const data = await res.json();
 
-    allQuestions = data.questions.slice(0, 100);
+    allQuestions = data.questions.slice(0, 50);
     userAnswers = new Array(allQuestions.length).fill(null);
 
     if (allQuestions.length === 0) {
-      document.getElementById('loading').innerHTML =
+      document.getElementById("loading").innerHTML =
         "<p style='color:red;'>No questions found</p>";
       return;
     }
 
-    document.getElementById('loading').style.display = 'none';
-    document.getElementById('quiz-container').style.display = 'block';
+    document.getElementById("loading").style.display = "none";
+    document.getElementById("quiz-container").style.display = "block";
 
     showQuestion();
 
   } catch (err) {
-    document.getElementById('loading').innerHTML =
+    document.getElementById("loading").innerHTML =
       "<p style='color:red;'>Failed to load questions</p>";
   }
 }
+
 
 // SHOW QUESTION
 function showQuestion() {
@@ -285,9 +296,11 @@ function showQuestion() {
   let optionsHTML = '';
 
   q.options.forEach(opt => {
-    optionsHTML += `
-      <button data-letter="${opt.letter}"> ${opt.text}</button>
-    `;
+   optionsHTML += `
+     <button data-letter="${opt.letter}">
+       ${opt.letter}. ${opt.text}
+     </button>
+   `;
   });
 
   document.getElementById('quiz-container').innerHTML = `

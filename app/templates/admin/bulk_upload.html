@@ -1,0 +1,173 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Bulk Upload Questions{% endblock %}
+
+{% block page_title %}
+Bulk Upload Questions
+{% endblock %}
+
+{% block page_subtitle %}
+Upload multiple questions from a JSON export file.
+{% endblock %}
+
+{% block content %}
+
+<style>
+
+.upload-card{
+    max-width:700px;
+    margin:30px auto;
+    background:#fff;
+    padding:35px;
+    border-radius:12px;
+    box-shadow:0 3px 10px rgba(0,0,0,.08);
+}
+
+.upload-icon{
+    text-align:center;
+    font-size:60px;
+    color:#0d6efd;
+    margin-bottom:15px;
+}
+
+.upload-title{
+    text-align:center;
+    font-size:24px;
+    font-weight:600;
+    margin-bottom:10px;
+}
+
+.upload-description{
+    text-align:center;
+    color:#666;
+    margin-bottom:30px;
+}
+
+.form-group{
+    margin-bottom:25px;
+}
+
+.form-group label{
+    display:block;
+    font-weight:600;
+    margin-bottom:10px;
+}
+
+.form-group input[type=file]{
+    width:100%;
+    padding:12px;
+    border:1px solid #ccc;
+    border-radius:8px;
+    background:#fafafa;
+}
+
+.info-box{
+    background:#eef7ff;
+    border-left:5px solid #0d6efd;
+    padding:15px;
+    border-radius:6px;
+    margin-bottom:25px;
+    color:#444;
+}
+
+.button-group{
+    display:flex;
+    gap:10px;
+}
+
+.button-group .btn{
+    flex:1;
+}
+
+</style>
+
+
+<div class="upload-card">
+
+    <div class="upload-icon">
+        <i class="fas fa-file-upload"></i>
+    </div>
+
+    <div class="upload-title">
+        Bulk Question Upload
+    </div>
+
+    <div class="upload-description">
+        Upload a JSON file exported from the BTA Question Bank.
+    </div>
+
+    <div class="info-box">
+
+        <strong>Requirements</strong>
+
+        <ul style="margin-top:10px;margin-bottom:0;">
+
+            <li>Only <strong>.json</strong> files are accepted.</li>
+
+            <li>The JSON must contain a list of questions.</li>
+
+            <li>Duplicate questions will be skipped automatically.</li>
+
+            <li>Invalid questions will not be imported.</li>
+
+        </ul>
+
+        <p class="text-muted" style="margin-top:15px;">
+
+        After uploading, you'll receive a summary showing the number of
+        processed, imported, duplicate, invalid, and failed questions.
+
+        </p>
+
+    </div>
+
+<form method="POST" enctype="multipart/form-data">
+
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <!-- Preserve state -->
+    <input type="hidden" name="page" value="{{ page }}">
+    <input type="hidden" name="search" value="{{ search }}">
+    <input type="hidden" name="filter_topic" value="{{ filter_topic }}">
+    <input type="hidden" name="filter_subject" value="{{ filter_subject }}">
+    <input type="hidden" name="filter_difficulty" value="{{ filter_difficulty }}">
+
+    <div class="form-group">
+
+        <label>Select JSON File</label>
+
+        <input
+            type="file"
+            name="file"
+            accept=".json"
+            required>
+
+    </div>
+
+    <div class="button-group">
+
+        <button class="btn btn-success" type="submit">
+            <i class="fas fa-upload"></i>
+            Upload Questions
+        </button>
+
+        <a
+            class="btn btn-secondary"
+            href="{{ url_for(
+                'questions.view_questions',
+                page=page,
+                search=search,
+                filter_topic=filter_topic,
+                filter_subject=filter_subject,
+                filter_difficulty=filter_difficulty
+            ) }}">
+            Cancel
+        </a>
+
+    </div>
+
+</form>
+
+</div>
+
+{% endblock %}
