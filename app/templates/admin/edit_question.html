@@ -430,12 +430,11 @@ Organic Chemistry
   <a class="btn btn-secondary"
    href="{{ url_for(
        'questions.view_questions',
-       question_id=question.id,
        page=page,
        search=search,
-       filter_topic=filter_topic,
-       subject=subject,
-       difficulty=difficulty
+       filter_topic=question.topic,
+       filter_subject=filter_subject,
+       filter_difficulty=filter_difficulty
    ) }}">
     Back / Cancel
 </a>

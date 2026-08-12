@@ -1,4 +1,5 @@
 # app/routes/quiz_routes.py
+
 from flask import (
     Blueprint,
     jsonify,
@@ -26,15 +27,20 @@ quiz_bp = Blueprint(
 
 
 # ---------------- QUESTIONS API ----------------
-@quiz_bp.route("/questions/<path:topic>")
-@login_required
-def get_questions(topic):
 
-    topic = topic.lower().strip()
+@quiz_bp.route("/questions/<subject>/<path:topic>")
+@login_required
+def get_questions(subject, topic):
+
+    subject = subject.strip().title()
+    topic = topic.strip().lower()
 
     questions = (
         Question.query
-        .filter(Question.topic.ilike(f"%{topic}%"))
+        .filter(
+            Question.subject == subject,
+            Question.topic.ilike(f"%{topic}%")
+        )
         .order_by(func.random())
         .all()
     )
@@ -45,22 +51,10 @@ def get_questions(topic):
                 "question_id": q.id,
                 "question": q.question_text,
                 "options": [
-                    {
-                        "letter": "A",
-                        "text": q.option_a
-                    },
-                    {
-                        "letter": "B",
-                        "text": q.option_b
-                    },
-                    {
-                        "letter": "C",
-                        "text": q.option_c
-                    },
-                    {
-                        "letter": "D",
-                        "text": q.option_d
-                    }
+                    {"letter": "A", "text": q.option_a},
+                    {"letter": "B", "text": q.option_b},
+                    {"letter": "C", "text": q.option_c},
+                    {"letter": "D", "text": q.option_d},
                 ],
                 "answer": q.correct_answer,
                 "explanation": q.explanation
@@ -70,10 +64,11 @@ def get_questions(topic):
     })
 
 
+
 # ---------------- QUIZ PAGE ----------------
-@quiz_bp.route("/quiz/<path:topic>")
+@quiz_bp.route("/quiz/<subject>/<path:topic>")
 @login_required
-def quiz(topic):
+def quiz(subject, topic):
 
     user = db.session.get(User, session["user_id"])
 
@@ -85,6 +80,7 @@ def quiz(topic):
 
     return render_template(
         "quiz_screen2.html",
-        topic=topic,
-        user=user
+        user=user,
+        subject=subject,
+        topic=topic
     )

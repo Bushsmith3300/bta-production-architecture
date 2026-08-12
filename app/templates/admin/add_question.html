@@ -136,8 +136,8 @@ textarea{
 <input type="hidden" name="page" value="{{ page }}">
 <input type="hidden" name="search" value="{{ search }}">
 <input type="hidden" name="filter_topic" value="{{ filter_topic }}">
-<input type="hidden" name="filter_subject" value="{{ subject }}">
-<input type="hidden" name="filter_difficulty" value="{{ difficulty }}">
+<input type="hidden" name="filter_subject" value="{{ filter_subject }}">
+<input type="hidden" name="filter_difficulty" value="{{ filter_difficulty }}">
 
 
 
@@ -149,7 +149,7 @@ textarea{
 
 <option value="">Select Topic</option>
 
-<option value=">Atomic Structure">Atomic Structure</option>
+<option value="Atomic Structure">Atomic Structure</option>
 
 <option value="Electron Configuration">Electron Configuration</option>
 
@@ -159,7 +159,7 @@ textarea{
 
 <option value="Chemical Bonding">Chemical Bonding</option>
 
-<option value="mole_concept">Mole Concept</option>
+<option value="Mole Concept">Mole Concept</option>
 
 <option value="States of Matter">States of Matter</option>
 
@@ -173,7 +173,7 @@ textarea{
 
 <option value="Solubility">Solubility</option>
 
-<option value="redox">Redox Reactions</option>
+<option value="Redox Reactions">Redox Reactions</option>
 
 <option value="Electrochemical_Cells">Electrochemical Cells</option>
 
@@ -300,11 +300,11 @@ textarea{
 
   <a class="btn btn-secondary"
      href="{{ url_for('questions.view_questions',
-     page=request.args.get('page',1),
-     search=request.args.get('search',''),
-     filter_topic=request.args.get('filter_topic',''),
-     subject=request.args.get('subject',''),
-     difficulty=request.args.get('difficulty','')
+     page=page,
+     search=search,
+     filter_topic=filter_topic,
+     filter_subject=filter_subject,
+     filter_difficulty=filter_difficulty
 ) }}">
 Cancel
 </a>

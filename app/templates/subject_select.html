@@ -11,205 +11,339 @@
     
   <title>Bush Teaching Assistant</title>
     
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap');
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap');
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #0d1117 0%, #1f2937 100%);
-            color: #e2e8f0;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #0d1117 0%, #1f2937 100%);
+    color: #e2e8f0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
 
-        /* TOP BAR */
-        .top-bar {
-            height: 5px;
-            background: linear-gradient(to right, #3b82f6, #60a5fa);
-        }
+/* TOP BAR */
+.top-bar {
+    height: 5px;
+    background: linear-gradient(to right, #3b82f6, #60a5fa);
+}
 
-        /* HERO */
-        .hero {
-            text-align: center;
-            padding: 60px 20px 30px;
-            color: #cbd5e1;
-        }
+/* HERO */
+.hero {
+    text-align: center;
+    padding: 60px 20px 30px;
+    color: #cbd5e1;
+}
 
-        .hero h1 {
-            font-family: 'Playfair Display', serif;
-            font-size: 2.5rem;
-            background: linear-gradient(90deg, #3b82f6, #60a5fa);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 10px;
-         
-        }
+.hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    background: linear-gradient(90deg, #3b82f6, #60a5fa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 10px;
+}
 
-        .hero p {
-            color: #cbd5e1;
-            font-size: 1.05rem;
-        }
+.hero p {
+    color: #cbd5e1;
+    font-size: 1.05rem;
+}
 
-        /* MAIN */
-        .main-content {
-            flex: 1;
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 30px 20px;
-        }
+/* MAIN */
+.main-content {
+    flex: 1;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 30px 20px;
+}
 
-        /* SUBJECT GRID */
-        .subject-links {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-            gap: 20px;
-            margin-top: 25px;
-        }
+/* NAV */
+.nav-links {
+    text-align: center;
+    margin: 45px 0 25px;
+}
 
-        .subject-links a {
-            background: rgba(20, 25, 40, 0.95);
-            padding: 22px;
-            text-align: center;
-            text-decoration: none;
-            color: #e2e8f0;
-            border-radius: 14px;
-            font-size: 1.05rem;
-            font-weight: 500;
-            border: 1px solid #3b82f6;
-            transition: 0.3s;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
-        }
+.nav-links a {
+    display: inline-block;
+    padding: 12px 28px;
+    margin: 8px;
+    text-decoration: none;
+    color: white;
+    font-size: 0.95rem;
+    border-radius: 30px;
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    transition: 0.3s;
+    box-shadow: 0 6px 20px rgba(59,130,246,0.5);
+}
 
-        .subject-links a:hover {
-            transform: translateY(-4px);
-            background: linear-gradient(135deg, #3b82f6, #2563eb);
-            color: #fff;
-            box-shadow: 0 12px 30px rgba(59,130,246,0.7);
-        }
+.nav-links a:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(59,130,246,0.7);
+}
 
-        /* NAV */
-        .nav-links {
-            text-align: center;
-            margin: 45px 0 25px;
-        }
+/* FOOTER */
+.footer {
+    background: #0b0f1a;
+    color: #cbd5f0;
+    text-align: center;
+    padding: 25px 15px;
+    font-size: 0.9rem;
+    border-top: 2px solid #3b82f6;
+}
 
-        .nav-links a {
-            display: inline-block;
-            padding: 12px 28px;
-            margin: 8px;
-            text-decoration: none;
-            color: white;
-            font-size: 0.95rem;
-            border-radius: 30px;
-            background: linear-gradient(135deg, #3b82f6, #2563eb);
-            transition: 0.3s;
-            box-shadow: 0 6px 20px rgba(59,130,246,0.5);
-        }
+.footer-content p {
+    margin: 6px 0;
+}
 
-        .nav-links a:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(59,130,246,0.7);
-        }
+/* MOBILE */
+@media (max-width: 600px) {
+    .hero h1 {
+        font-size: 2rem;
+    }
+}
 
-        /* FOOTER */
-        .footer {
-            background: #0b0f1a;
-            color: #cbd5f0;
-            text-align: center;
-            padding: 25px 15px;
-            font-size: 0.9rem;
-            border-top: 2px solid #3b82f6;
-        }
+/* LOGOUT */
+.logout {
+    margin-top: 20px;
+    text-align: center;
+}
 
-        .footer-content p {
-            margin: 6px 0;
-        }
+.logout a {
+    color: #dc3545;
+    text-decoration: none;
+    font-weight: bold;
+}
 
-        /* MOBILE */
-        @media (max-width: 600px) {
-            .hero h1 {
-                font-size: 2rem;
-            }
-       }
+.logout a:hover {
+    text-decoration: underline;
+}
 
-          /* LOGOUT */
-         .logout {
-              margin-top: 20px;     
-              text-align: center;
-         }
+/* SUBJECT GRID */
+.subject-links {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 20px;
+    margin-top: 25px;
+}
 
-         .logout a {
-             color: #dc3545;
-             text-decoration: none;
-             font-weight: bold;
-         }
+/* Base card style */
+.subject-links a {
+    background: rgba(20, 25, 40, 0.95);
+    padding: 22px;
+    text-align: center;
+    text-decoration: none;
+    color: #e2e8f0;
+    border-radius: 14px;
+    font-size: 1.05rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+}
 
-          .logout a:hover {
-             text-decoration: underline;
-         }
+/* Shared hover animation */
+.subject-links a:hover {
+    transform: translateY(-4px);
+    color: #fff;
+}
 
-    </style>
+/* ==========================
+   CHEMISTRY
+========================== */
+
+.subject-links a.chemistry {
+    border: 2px solid #10b981;
+}
+
+.subject-links a.chemistry:hover {
+    background: linear-gradient(135deg, #10b981, #059669);
+    box-shadow: 0 12px 30px rgba(16,185,129,0.65);
+}
+
+/* ==========================
+   PHYSICS
+========================== */
+
+.subject-links a.physics {
+    border: 2px solid #3b82f6;
+}
+
+.subject-links a.physics:hover {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    box-shadow: 0 12px 30px rgba(59,130,246,0.65);
+}
+
+
+/* ==========================
+   BIOLOGY
+========================== */
+
+.subject-links a.biology {
+    border: 2px solid #14b8a6;
+}
+
+.subject-links a.biology:hover {
+    background: linear-gradient(135deg, #14b8a6, #0f766e);
+    box-shadow: 0 12px 30px rgba(20,184,166,0.65);
+}
+
+
+/* ==========================
+   ENGLISH
+========================== */
+
+.subject-links a.english {
+    background: linear-gradient(
+        135deg,
+        rgba(245,158,11,0.18),
+        rgba(20,25,40,0.95)
+    );
+    border: 2px solid #f59e0b;
+}
+
+.subject-links a.english:hover {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+
+/* ==========================
+   MATHEMATICS
+========================== */
+
+.subject-links a.mathematics {
+    background: linear-gradient(
+        135deg,
+        rgba(168,85,247,0.18),
+        rgba(20,25,40,0.95)
+    );
+    border: 2px solid #a855f7;
+}
+
+.subject-links a.mathematics:hover {
+    background: linear-gradient(135deg, #a855f7, #7e22ce);
+}
+
+
+/* ==========================
+   SOCIAL STUDIES
+========================== */
+
+.subject-links a.social-studies {
+    background: linear-gradient(
+        135deg,
+        rgba(234,88,12,0.18),
+        rgba(20,25,40,0.95)
+    );
+    border: 2px solid #ea580c;
+}
+
+.subject-links a.social-studies:hover {
+    background: linear-gradient(135deg, #ea580c, #c2410c);
+}
+
+
+/* ==========================
+   GENERAL SCIENCE
+========================== */
+
+.subject-links a.general-science {
+    background: linear-gradient(
+        135deg,
+        rgba(250, 204, 21, 0.18),
+        rgba(20, 25, 40, 0.95)
+    );
+    border: 2px solid #facc15;
+}
+
+.subject-links a.general-science:hover {
+    background: linear-gradient(135deg, #facc15, #eab308);
+    box-shadow: 0 12px 30px rgba(250, 204, 21, 0.65);
+}
+
+</style>
+
 </head>
 
 <body>
 
+   <div class="header">
+    <h2 style="text-align:center;">Hi, {{ user.first_name }} 👋</h2>
+</div>
 
-    <div class="header">
-        <h2 style="text-align:center;">Hi, {{ user.first_name }} 👋</h2>
-    </div> 
-     
-    <div class="logout">
-        <a href="{{ url_for('auth.logout') }}">Logout</a>
-    </div> 
+<div class="logout">
+    <a href="{{ url_for('auth.logout') }}">Logout</a>
+</div>
 
-    <!-- HERO -->
+<!-- HERO -->
+<div class="top-bar"></div>
 
-    <div class="top-bar"></div>
+<section class="hero">
+    <h1>
+        <abbr title="Bush Teaching Assistant">BTA</abbr> Subject-based Learning Tools
+    </h1>
+    <p>Choose a Subject</p>
+</section>
 
-    <section class="hero">
+<!-- MAIN -->
+<div class="main-content">
 
-        <h1>
-            <abbr title="Bush Teaching Assistant">BTA</abbr> Subject-based Learning Tools
-        </h1>
-        <p>Choose a Subject</p>
-    </section>
+    <div class="subject-links">
 
-    <!-- MAIN -->
-    <div class="main-content">
+        <a href="{{ url_for('dashboard.topic_select', subject='Chemistry') }}"
+           class="chemistry">
+            🧪 Chemistry
+        </a>
 
-        <div class="subject-links">
-            <a href="{{url_for("dashboard.topic_select")}}">BTA<sub>CHEMISTRY</sub></a>
-            <a href="{{url_for("main.contact")}}">BTA<sub>PHYSICS</sub></a>
-            <a href="{{url_for("main.contact")}}">BTA<sub>ADD-MATHS</sub></a>
-            <a href="{{url_for("main.contact")}}">BTA<sub>BIOLOGY</sub></a>
-            <a href="{{url_for("main.contact")}}">BTA<sub>ENGLISH</sub></a>
-            <a href="{{url_for("main.contact")}}">BTA<sub>SOCIAL STUDIES</sub></a>
-            <a href="{{url_for("main.contact")}}">BTA<sub>MATHEMATICS</sub></a>
-            <a href="{{url_for("main.contact")}}">BTA<sub>GENERAL SCIENCE</sub></a>
-        </div>
+        <a href="{{ url_for('dashboard.topic_select', subject='Physics') }}"
+           class="physics">
+            ⚛️ Physics
+        </a>
 
-        <div class="nav-links">
-            <a href="{{url_for("dashboard.dashboard")}}">← Go to Dashboard</a>
-            <a href="{{url_for("main.contact")}}">Contact Author</a>
-        </div>
+        <a href="{{ url_for('dashboard.topic_select', subject='Biology') }}"
+           class="biology">
+            🌿 Biology
+        </a>
+
+        <a href="{{ url_for('main.contact') }}"
+           class="english">
+            📘 BTA<sub>ENGLISH</sub>
+        </a>
+
+        <a href="{{ url_for('main.contact') }}"
+           class="social-studies">
+            🌍 BTA<sub>SOCIAL STUDIES</sub>
+        </a>
+
+        <a href="{{ url_for('main.contact') }}"
+           class="mathematics">
+            ➗ BTA<sub>MATHEMATICS</sub>
+        </a>
+
+        <a href="{{ url_for('main.contact') }}"
+           class="general-science">
+            🔬 BTA<sub>GENERAL SCIENCE</sub>
+        </a>
 
     </div>
 
-    <!-- FOOTER -->
-    <footer class="footer">
-        <div class="footer-content">
-            <p>&copy; 2026 Bush Teaching Assistant</p>
-            <p>Connecting learners and educators</p>
-            <p>Developed by Emmanuel Asiamah Amponsah</p>
-        </div>
-    </footer>
+    <div class="nav-links">
+        <a href="{{ url_for('dashboard.dashboard') }}">← Go to Dashboard</a>
+        <a href="{{ url_for('main.contact') }}">Contact Author</a>
+    </div>
 
-</body>
-</html>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+    <div class="footer-content">
+        <p>&copy; 2026 Bush Teaching Assistant</p>
+        <p>Connecting learners and educators</p>
+        <p>Developed by Emmanuel Asiamah Amponsah</p>
+    </div>
+</footer>

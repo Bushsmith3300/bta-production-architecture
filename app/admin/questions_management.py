@@ -10,6 +10,18 @@ from flask import (
     session
 )
 
+from flask import current_app
+
+from sqlalchemy.exc import SQLAlchemyError
+
+from datetime import datetime
+
+import json
+
+from io import BytesIO
+
+from flask import send_file
+
 from sqlalchemy.exc import IntegrityError
 
 from sqlalchemy import or_, func
@@ -100,19 +112,15 @@ def view_questions():
     """
 
     page = request.args.get("page", 1, type=int)
-
     search = request.args.get("search", "", type=str).strip()
-
     filter_topic = request.args.get("filter_topic", "", type=str).strip()
-
-    subject = request.args.get("subject", "", type=str).strip()
-
-    difficulty = request.args.get("difficulty", "", type=str).strip()
-
+    filter_subject = request.args.get("filter_subject", "", type=str).strip()
+    filter_difficulty = request.args.get("filter_difficulty", "", type=str).strip()
+    
+    
     question_id = request.args.get("question_id", "", type=int)
 
-    
-
+   
     query = Question.query
 
 
@@ -160,15 +168,15 @@ def view_questions():
         )
 
 
-    if subject and session.get("role") != "admin":
+    if filter_subject and session.get("role") != "admin":
 
-        query = query.filter(Question.subject == subject)
+        query = query.filter(Question.subject == filter_subject)
 
 
-    if difficulty:
+    if filter_difficulty:
 
         query = query.filter(
-            Question.difficulty == difficulty)
+            Question.difficulty == filter_difficulty)
             
            
 
@@ -277,17 +285,17 @@ def view_questions():
 
     
 
-    return render_template("admin/view_questions.html",
+    return render_template("admin/view_questions.html",  
+            subjects=subjects,            
+            page=page,                    
+            search=search,
             questions=questions,
             total_questions=total_questions,
             total_topics=total_topics,
             topics=topics,
-            subjects=subjects,            
-            page=page,                    
-            search=search,
             filter_topic=filter_topic,
-            subject=subject,
-            difficulty=difficulty,    
+            filter_subject=filter_subject,
+            filter_difficulty=filter_difficulty,    
         
         )
 
@@ -308,11 +316,11 @@ def view_question(question_id):
     # --------------------------------------------------
 
     page = request.args.get("page", 1, type=int)
-    search = request.args.get("search", "")
-    filter_topic = request.args.get("filter_topic", "")
-    subject = request.args.get("subject", "")
-    difficulty = request.args.get("difficulty", "")
-    question_id = request.args.get("question_id", type=int)
+    search = request.args.get("search", "", type=str).strip()
+    filter_topic = request.args.get("filter_topic", "", type=str).strip()
+    filter_subject = request.args.get("filter_subject", "", type=str).strip()
+    filter_difficulty = request.args.get("filter_difficulty", "", type=str).strip()
+    
    
 
     if (
@@ -326,20 +334,20 @@ def view_question(question_id):
         return redirect(url_for("questions.view_questions",
              page=page,
              search=search,
-             question_id=question.id,
              filter_topic=filter_topic,
-             subject=subject,
-             difficulty=difficulty))
+             filter_subject=filter_subject,
+             filter_difficulty=filter_difficulty,
+             ))
 
 
     return render_template("admin/view_question.html",
-             question=question,
+             question=question, 
+             question_id=question_id,
              page=page,
              search=search,
-             filter_topic=filter_topic,
-             question_id=question_id,
-             subject=subject,
-             difficulty=difficulty,
+             filter_topic=filter_topic,             
+             filter_subject=filter_subject,
+             filter_difficulty=filter_difficulty,
     )
 
 
@@ -352,33 +360,42 @@ def view_question(question_id):
 @admin_required
 def add_question():
 
+    
+    # -----------------------------------------
+    # State preservation after GET
+    # ----------------------------------------- 
 
     page = request.args.get("page", 1, type=int)
     search = request.args.get("search", "")
     filter_topic = request.args.get("filter_topic", "")
-    subject = request.args.get("subject", "")
-    difficulty = request.args.get("difficulty", "")
+    filter_subject = request.args.get("filter_subject", "")
+    filter_difficulty = request.args.get("filter_difficulty", "")
     
     
     if request.method == "POST":
 
-        topic = request.form.get("topic", "",).strip()
-        page = request.form.get("page", 1)
-        search = request.form.get("search", "").strip()                      
-        subject = request.form.get("subject", "").strip()
-        difficulty = request.form.get("difficulty", "").strip()
-        filter_topic = request.form.get("filter_topic", "").strip()
-        filter_difficulty = request.form.get("filter_difficulty", "").strip()
-        filter_subject = request.form.get("filter_subject", "").strip()
+        # -----------------------------------------
+        # State preservation after POST
+        # -----------------------------------------
         
+        page = request.form.get("page", 1, type=int)
+        search = request.form.get("search", "").strip()
+        filter_topic = request.form.get("filter_topic", "").strip()
+        filter_subject = request.form.get("filter_subject", "").strip()
+        filter_difficulty = request.form.get("filter_difficulty", "").strip()
 
+        # -----------------------------------------
+        # Question data
+        # -----------------------------------------
+        
+        topic = request.form.get("topic", "").strip()  
+        
+        difficulty = request.form.get("difficulty", "").strip()
+ 
         if session.get("role") == "admin":
             subject = session.get("subject")
         else:
-            subject = request.form.get(
-                "subject",
-                ""
-            ).strip()
+            subject = request.form.get("subject", "").strip()
 
 
         question_text = request.form.get(
@@ -420,6 +437,9 @@ def add_question():
         # --------------------------------------------------
         # Validation
         # --------------------------------------------------
+        
+        print(request.form)
+        print("Topic:", request.form.get("topic"))
 
         if not topic:
             flash(
@@ -602,11 +622,12 @@ def add_question():
 
             return redirect(
                 url_for("questions.view_questions",
-                 page=page,
-                 search=search,
-                 filter_topic=filter_topic,
-                 subject=subject,
-                 difficulty=difficulty,)
+                page=page,
+                search=search,
+                filter_topic=filter_topic,
+                filter_subject=filter_subject,
+                filter_difficulty=filter_difficulty,
+                )
             )
 
         except IntegrityError:
@@ -639,8 +660,8 @@ def add_question():
             page=page,
             search=search,
             filter_topic=filter_topic,
-            subject=subject,
-            difficulty=difficulty,
+            filter_subject=filter_subject,
+            filter_difficulty=filter_difficulty,
             )
 
 
@@ -663,8 +684,8 @@ def edit_question(question_id):
     page = request.args.get("page", 1, type=int)
     search = request.args.get("search", "", type=str).strip()
     filter_topic = request.args.get("filter_topic", "", type=str).strip()
-    subject = request.args.get("subject", "", type=str).strip()
-    difficulty = request.args.get("difficulty", "", type=str).strip()
+    filter_subject = request.args.get("filter_subject", "", type=str).strip()
+    filter_difficulty = request.args.get("filter_difficulty", "", type=str).strip()
    
     
     # --------------------------------------------------
@@ -683,13 +704,16 @@ def edit_question(question_id):
 
     if request.method == "POST":
 
-        page = request.form.get("page", 1, type=int)
-        search = request.form.get("search", "").strip()
-        filter_topic = request.form.get("filter_topic", "").strip()
+        page = request.args.get("page", 1, type=int)
+        search = request.args.get("search", "", type=str).strip()
+        filter_topic = request.args.get("filter_topic", "", type=str).strip()
+        filter_subject = request.args.get("filter_subject", "", type=str).strip()
+        filter_difficulty = request.args.get("filter_difficulty", "", type=str).strip()
+   
+   
         question_id = request.form.get("question_id", "").strip()
 
         
-
         if session.get("role") == "admin":
             subject = session.get("subject")
             
@@ -748,8 +772,8 @@ def edit_question(question_id):
                page=page,
                search=search,
                filter_topic=filter_topic,
-               subject=subject,
-               difficulty=difficulty,
+               filter_subject=filter_subject,
+               filter_difficulty=filter_difficulty,
            )
         )
 
@@ -761,9 +785,8 @@ def edit_question(question_id):
                page=page,
                search=search,
                filter_topic=filter_topic,
-               subject=subject,
-               difficulty=difficulty,
-           )
+               filter_subject=filter_subject,
+               filter_difficulty=filter_difficulty, )
         )
 
 
@@ -775,8 +798,8 @@ def edit_question(question_id):
                page=page,
                search=search,
                filter_topic=filter_topic,
-               subject=subject,
-               difficulty=difficulty,	
+               filter_subject=filter_subject,
+               filter_difficulty=filter_difficulty,	
            )
         )
 
@@ -788,9 +811,9 @@ def edit_question(question_id):
                page=page,
                search=search,
                filter_topic=filter_topic,
-               subject=subject,
-               difficulty=difficulty,
-           )
+               filter_subject=filter_subject,
+               filter_difficulty=filter_difficulty,
+               )
         )
 
 
@@ -802,10 +825,11 @@ def edit_question(question_id):
                page=page,
                search=search,
                filter_topic=filter_topic,
-               subject=subject,
-               difficulty=difficulty,
-           )
+               filter_subject=filter_subject,
+               filter_difficulty=filter_difficulty,
+               )
         )
+
 
         if not option_c:
             flash("Option C is required.", "danger")
@@ -815,10 +839,11 @@ def edit_question(question_id):
                page=page,
                search=search,
                filter_topic=filter_topic,
-               subject=subject,
-               difficulty=difficulty,
-           )
+               filter_subject=filter_subject,
+               filter_difficulty=filter_difficulty,  
+               )
         )
+
 
         if not option_d:
             flash("Option D is required.", "danger")
@@ -828,9 +853,9 @@ def edit_question(question_id):
                page=page,
                search=search,
                filter_topic=filter_topic,
-               subject=subject,
-               difficulty=difficulty,
-           )
+               filter_subject=filter_subject,
+               filter_difficulty=filter_difficulty,
+               )
         )
 
         options = [
@@ -851,9 +876,9 @@ def edit_question(question_id):
                page=page,
                search=search,
                filter_topic=filter_topic,
-               subject=subject,
-               difficulty=difficulty,
-           )
+               filter_subject=filter_subject,
+               filter_difficulty=filter_difficulty,
+               )
         )
                 
             
@@ -869,9 +894,9 @@ def edit_question(question_id):
                page=page,
                search=search,
                filter_topic=filter_topic,
-               subject=subject,
-               difficulty=difficulty,
-           )
+               filter_subject=filter_subject,
+               filter_difficulty=filter_difficulty,
+               )
         )
 
         if difficulty not in [
@@ -891,9 +916,9 @@ def edit_question(question_id):
                page=page,
                search=search,
                filter_topic=filter_topic,
-               subject=subject,
-               difficulty=difficulty,
-           )
+               filter_subject=filter_subject,
+               filter_difficulty=filter_difficulty,
+               )
         )
 
         # --------------------------------------------------
@@ -929,9 +954,9 @@ def edit_question(question_id):
                page=page,
                search=search,
                filter_topic=filter_topic,
-               subject=subject,
-               difficulty=difficulty,
-           )
+               filter_subject=filter_subject,
+               filter_difficulty=filter_difficulty,
+               )
         )
         
 
@@ -969,8 +994,8 @@ def edit_question(question_id):
                page=page,
                search=search,
                filter_topic=filter_topic,
-               subject=subject,
-               difficulty=difficulty,
+               filter_subject=filter_subject,
+               filter_difficulty=filter_difficulty,
            )
         )
 
@@ -989,8 +1014,8 @@ def edit_question(question_id):
                page=page,
                search=search,
                filter_topic=filter_topic,
-               subject=subject,
-               difficulty=difficulty,
+               filter_subject=filter_subject,
+               filter_difficulty=filter_difficulty,
            )
         )
                       
@@ -1010,8 +1035,8 @@ def edit_question(question_id):
                page=page,
                search=search,
                filter_topic=filter_topic,
-               subject=subject,
-               difficulty=difficulty,
+               filter_subject=filter_subject,
+               filter_difficulty=filter_difficulty,
            )
         )
 
@@ -1020,8 +1045,8 @@ def edit_question(question_id):
            page=page,
            search=search,
            filter_topic=filter_topic,
-           subject=subject,
-           difficulty=difficulty,
+           filter_subject=filter_subject,
+           filter_difficulty=filter_difficulty,
        )
     
 
@@ -1033,16 +1058,15 @@ def edit_question(question_id):
 @admin_required
 def delete_question(question_id):
 
-    question = Question.query.get_or_404(
-        question_id
-    )
+    question = Question.query.get_or_404(question_id)
 
-    page = request.args.get("page", 1, type=int)
-    search = request.args.get("search", "")
-    question_id = request.args.get("question_id", type=int)
-    topic = request.args.get("topic", "")
-    subject = request.args.get("subject", "")
-    difficulty = request.args.get("difficulty", "")
+    page = request.form.get("page", 1, type=int)
+    search = request.form.get("search", "")
+    question_id = request.form.get("question_id", type=int)
+    filter_topic = request.form.get("filter_topic", "")
+    filter_subject = request.form.get("filter_subject", "")
+    filter_difficulty = request.form.get("filter_difficulty", "")
+    
 
     if (
         session.get("role") == "admin" and question.subject != session.get("subject")
@@ -1057,9 +1081,8 @@ def delete_question(question_id):
             page=page,
             search=search,
             filter_topic=filter_topic,
-            question_id=question_id,
-            subject=subject,
-            difficulty=difficulty,
+            filter_subject=filter_subject,
+            filter_difficulty=filter_difficulty,
         )
 
         )
@@ -1076,10 +1099,9 @@ def delete_question(question_id):
             url_for("questions.view_questions",
             page=page,
             search=search,
-            question_id=question_id,
             filter_topic=filter_topic,
-            subject=subject,
-            difficulty=difficulty, 
+            filter_subject=filter_subject,
+            filter_difficulty=filter_difficulty, 
         )
         )
 
@@ -1116,10 +1138,9 @@ def delete_question(question_id):
         url_for("questions.view_questions",
             page=page,
             search=search,
-            question_id=question_id,
             filter_topic=filter_topic,
-            subject=subject,
-            difficulty=difficulty,
+            filter_subject=filter_subject,
+            filter_difficulty=filter_difficulty,
          )       
         ) 
     
@@ -1142,10 +1163,9 @@ def bulk_delete_questions():
     search = request.form.get("search", "")
     question_id = request.form.get("question_id", type=int)
     filter_topic = request.form.get("filter_topic", "")
-    subject = request.form.get("subject", "")
-    difficulty = request.form.get("difficulty", "")
+    filter_subject = request.form.get("filter_subject", "")
+    filter_difficulty = request.form.get("filter_difficulty", "")
 
-    print("Submitted IDs:", ids)
 
     if not ids:
 
@@ -1160,9 +1180,8 @@ def bulk_delete_questions():
                 page=page,
                 search=search,
                 filter_topic=filter_topic,
-                question_id=question_id,
-                subject=subject,
-                difficulty=difficulty,
+                filter_subject=filter_subject,
+                filter_difficulty=filter_difficulty,
             )
         )
 
@@ -1173,7 +1192,6 @@ def bulk_delete_questions():
 
         for question_id in ids:
 
-            print(f"\nProcessing ID: {question_id}")
 
             try:
                 question_id = int(question_id)
@@ -1247,8 +1265,8 @@ def bulk_delete_questions():
             page=page,
             search=search,
             filter_topic=filter_topic,
-            subject=subject,
-            difficulty=difficulty,
+            filter_subject=filter_subject,
+            filter_difficulty=filter_difficulty,
         )
     )
 
@@ -1269,9 +1287,9 @@ def delete_unused_questions():
     search = request.form.get("search", "")
     topic = request.form.get("topic", "")
     filter_topic = request.form.get("filter_topic", "")
-    subject = request.form.get("subject", "")
+    filter_subject = request.form.get("filter_subject", "")
     question_id = request.args.get("question_id", type=int)
-    difficulty = request.form.get("difficulty", "")
+    filter_difficulty = request.form.get("filter_difficulty", "")
    
 
     deleted = 0
@@ -1335,3 +1353,561 @@ def delete_unused_questions():
             difficulty=difficulty
         )
     )
+    
+    
+
+# ======================================================
+# BULK QUESTIONS UPLOAD
+# ======================================================
+    
+    
+@questions_bp.route("/bulk-upload", methods=["GET", "POST"])
+@admin_required
+def bulk_upload_questions():
+    
+    # -----------------------------------------
+    # State preservation after GET
+    # -----------------------------------------
+
+    page = request.args.get("page", 1, type=int)
+    search = request.args.get("search", "")
+    filter_topic = request.args.get("filter_topic", "")
+    filter_subject = request.args.get("filter_subject", "")
+    filter_difficulty = request.args.get("filter_difficulty", "")
+
+    if request.method == "POST":
+        
+        # -----------------------------------------
+        # State preservation after POST
+        # -----------------------------------------
+        
+        page = request.form.get("page", 1, type=int)
+        search = request.form.get("search", "")
+        filter_topic = request.form.get("filter_topic", "")
+        filter_subject = request.form.get("filter_subject", "")
+        filter_difficulty = request.form.get("filter_difficulty", "") 
+
+        # -----------------------------------------
+        # Uploaded file
+        # -----------------------------------------
+
+        file = request.files.get("file")
+
+        if not file or file.filename == "":
+            
+            flash("Please select a JSON file.", "warning")
+            
+            return redirect(url_for(
+                        "questions.bulk_upload_questions",
+                        page=page,
+                        search=search,
+                        filter_topic=filter_topic,
+                        filter_subject=filter_subject,
+                        filter_difficulty=filter_difficulty,
+                    )
+                )
+
+
+        if not file.filename.lower().endswith(".json"):
+            
+            flash("Only JSON files are allowed.", "danger")
+            
+            return redirect(url_for(
+                        "questions.bulk_upload_questions",
+                        page=page,
+                        search=search,
+                        filter_topic=filter_topic,
+                        filter_subject=filter_subject,
+                        filter_difficulty=filter_difficulty,
+                    )
+                )
+
+
+        try:
+
+            questions = json.load(file)
+            
+            
+            if not isinstance(questions, list):
+                
+                flash("JSON must contain a list of questions.", "danger")
+                
+                return redirect(url_for(
+                        "questions.bulk_upload_questions",
+                        page=page,
+                        search=search,
+                        filter_topic=filter_topic,
+                        filter_subject=filter_subject,
+                        filter_difficulty=filter_difficulty,
+                    )
+                )
+
+            
+                 
+            if not questions:
+                
+                flash("The uploaded JSON file contains no questions.", "warning")
+                
+                return redirect(
+                    url_for(
+                        "questions.bulk_upload_questions",
+                        page=page,
+                        search=search,
+                        filter_topic=filter_topic,
+                        filter_subject=filter_subject,
+                        filter_difficulty=filter_difficulty,
+                    )
+                )
+            
+
+            
+
+            # -----------------------------------------
+            # Upload statistics variables
+            # -----------------------------------------
+
+            added = 0
+            duplicates = 0
+            invalid = 0
+            errors = 0
+            total = len(questions)
+
+
+            # -----------------------------------------
+            # Load all existing hashes once
+            # -----------------------------------------
+
+            existing_hashes = {row[0]
+            for row in db.session.query(Question.question_hash)
+            .filter(Question.question_hash.isnot(None)).all()
+
+            }
+            
+            # -----------------------------------------
+            # Process questions
+            # -----------------------------------------
+
+
+            for item in questions:
+
+                if not isinstance(item, dict):
+                    invalid += 1
+                    continue
+
+                topic = str(item.get("topic") or "").strip()
+                question_subject = str(item.get("subject") or "").strip()
+                question_difficulty = str(item.get("difficulty") or "").strip()
+                question_text = str(item.get("question_text") or "").strip()
+                option_a = str(item.get("option_a") or "").strip()
+                option_b = str(item.get("option_b") or "").strip()
+                option_c = str(item.get("option_c") or "").strip()
+                option_d = str(item.get("option_d") or "").strip()
+                correct_answer = str(item.get("correct_answer") or "").strip().upper()
+                explanation = str(item.get("explanation") or "").strip()
+
+
+                # -----------------------------------------
+                # Restrict normal admins
+                # -----------------------------------------
+
+                if session.get("role") == "admin":
+                    question_subject = session.get("subject")
+
+                    if not question_subject:
+                        flash("Your account has no assigned subject. Contact Super-Administrator (Bush)", "danger")
+                        return redirect(url_for("questions.bulk_upload_questions"))
+                                        
+                                        
+                # -----------------------------------------
+                # Required fields
+                # -----------------------------------------
+
+                if not all([
+                    topic,
+                    question_subject,
+                    question_difficulty,
+                    question_text,
+                    option_a,
+                    option_b,
+                    option_c,
+                    option_d,
+                    correct_answer
+                ]):
+                    invalid += 1
+                    continue   
+
+                options = [
+                    option_a.lower(),
+                    option_b.lower(),
+                    option_c.lower(),
+                    option_d.lower()
+                ]
+
+
+                if len(set(options)) != 4:
+                    invalid += 1
+                    continue    
+
+
+                if correct_answer not in [
+                    "A",
+                    "B",
+                    "C",
+                    "D"
+                ]:
+                    invalid += 1
+                    continue         
+
+
+                if question_difficulty not in [
+                    "DOK_1",
+                    "DOK_2",
+                    "DOK_3",
+                    "DOK_4"
+                ]:
+                    invalid += 1
+                    continue      
+
+
+                question_hash = generate_question_hash(
+                    topic=topic,
+                    subject=question_subject,
+                    question_text=question_text,
+                    option_a=option_a,
+                    option_b=option_b,
+                    option_c=option_c,
+                    option_d=option_d,
+                    correct_answer=correct_answer,
+                )                     
+                
+                
+                if question_hash in existing_hashes:
+                    duplicates += 1
+                    continue
+
+                    
+                question = Question(
+                    topic=topic,
+                    subject=question_subject,
+                    difficulty=question_difficulty,
+                    question_text=question_text,
+                    option_a=option_a,
+                    option_b=option_b,
+                    option_c=option_c,
+                    option_d=option_d,
+                    correct_answer=correct_answer,
+                    explanation=explanation,
+                    question_hash=question_hash,
+                )
+
+                try:
+
+                    with db.session.begin_nested():
+
+                        db.session.add(question)
+                        
+                        db.session.flush()
+                        
+                    existing_hashes.add(question_hash)    
+
+                    added += 1
+
+
+                except SQLAlchemyError:
+                    
+                    
+                    current_app.logger.exception(
+                    f"Failed to import question. "
+                    f"Subject={question_subject}, "
+                    f"Topic={topic}, "
+                    f"Question={question_text}")
+
+                    errors += 1
+
+                    continue
+
+                                                                                       
+            try:
+                db.session.commit()
+
+
+            except SQLAlchemyError:
+                
+                db.session.rollback()
+                
+                current_app.logger.exception("Bulk upload database commit failed.")
+
+                flash("A database error occurred while saving the uploaded questions. Please try again.",
+                      "danger")
+
+                return redirect(url_for(
+                    "questions.bulk_upload_questions",
+                    page=page,
+                    search=search,
+                    filter_topic=filter_topic,
+                    filter_subject=filter_subject,
+                    filter_difficulty=filter_difficulty,
+                )
+                
+                )
+                
+            # -----------------------------------------
+            # Log upload summary
+            # -----------------------------------------
+
+            current_app.logger.info(
+                f"Bulk upload completed. "
+                f"Processed={total}, "
+                f"Added={added}, "
+                f"Duplicates={duplicates}, "
+                f"Invalid={invalid}, "
+                f"Errors={errors}"
+            )
+ 
+
+            flash(f"Processed {total} questions.", "info")
+            
+        
+            flash(
+                f"{added} question(s) imported successfully.",
+                "success"
+            )
+
+            if duplicates:
+
+
+                flash(
+                    f"{duplicates} duplicate question(s) skipped.",
+                    "warning"
+                )
+
+
+            if invalid:
+
+                flash(
+                    f"{invalid} invalid question(s) skipped.",
+                    "warning"
+                )       
+
+
+            if errors:
+
+                flash(
+                    f"{errors} question(s) could not be saved.",
+                    "warning"
+                )  
+                            
+                        
+            return redirect(url_for(
+
+                    "questions.view_questions",
+
+                    page=page,
+
+                    search=search,
+
+                    filter_topic=filter_topic,
+
+                    filter_subject=filter_subject,
+                    
+                    filter_difficulty=filter_difficulty,
+                )
+
+            ) 
+
+
+        except json.JSONDecodeError:
+
+            db.session.rollback()
+
+            flash(
+                "Invalid JSON file.",
+                "danger"
+            )
+            
+            
+            return redirect(url_for(
+                "questions.bulk_upload_questions",
+                page=page,
+                search=search,
+                filter_topic=filter_topic,
+                filter_subject=filter_subject,
+                filter_difficulty=filter_difficulty, 
+                )
+            )
+            
+
+        except Exception as e:
+                db.session.rollback()
+
+                current_app.logger.exception("Unexpected bulk upload error.")
+
+                flash(
+                    f"Error reading file: {e}",
+                    "danger"
+                )
+                        
+                return redirect(url_for(
+                    "questions.bulk_upload_questions",
+                    page=page,
+                    search=search,
+                    filter_topic=filter_topic,
+                    filter_subject=filter_subject,
+                    filter_difficulty=filter_difficulty,
+               )
+             )
+            
+             
+
+    return render_template(
+        "admin/bulk_upload.html",
+        page=page,
+        search=search,
+        filter_topic=filter_topic,
+        filter_subject=filter_subject,
+        filter_difficulty=filter_difficulty,
+    )    
+    
+    
+# ======================================================
+# EXPORT QUESTIONS
+# ======================================================
+
+@questions_bp.route("/export")
+@admin_required
+def export_questions():
+
+
+    # -----------------------------------------
+    # Preserve filters (optional)
+    # -----------------------------------------
+
+    page = request.args.get("page", 1, type=int)
+    search = request.args.get("search", "")
+    filter_topic = request.args.get("filter_topic", "")
+    subject = request.args.get("subject", "")
+    difficulty = request.args.get("difficulty", "")
+
+    query = Question.query
+
+    # -----------------------------------------
+    # Restrict normal admins
+    # -----------------------------------------
+
+    if session.get("role") == "admin":
+
+        subject = session.get("subject")
+
+        query = query.filter_by(
+            subject=subject
+    )
+
+    else:
+
+        if subject:
+           query = query.filter_by(subject=subject)
+
+    if filter_topic:
+        query = query.filter_by(topic=filter_topic)
+
+    if difficulty:
+        query = query.filter_by(difficulty=difficulty)
+
+
+    questions = query.order_by(Question.topic, Question.id).all()
+
+    # -----------------------------------------
+    # Nothing to export
+    # -----------------------------------------
+
+    if not questions:
+        flash(
+            "No questions found to export.",
+            "warning"
+        )
+
+        return redirect(
+        url_for(
+            "questions.view_questions",
+            page=page,
+            search=search,
+            filter_topic=filter_topic,
+            subject=subject,
+            difficulty=difficulty,
+        )
+    )
+
+
+
+    data = []
+
+    for question in questions:
+
+        data.append({
+
+            "topic": question.topic,
+
+            "subject": question.subject,
+
+            "difficulty": question.difficulty,
+
+            "question_text": question.question_text,
+
+            "option_a": question.option_a,
+
+            "option_b": question.option_b,
+
+            "option_c": question.option_c,
+
+            "option_d": question.option_d,
+
+            "correct_answer": question.correct_answer,
+
+            "explanation": question.explanation
+
+        })
+
+    json_data = json.dumps(
+        data,
+        indent=4,
+        ensure_ascii=False
+    )
+
+    # -----------------------------------------
+    # Generate filename
+    # -----------------------------------------
+
+    today = datetime.now().strftime("%Y-%m-%d")
+
+    filename_parts = []
+
+    if subject:
+        filename_parts.append(subject.lower().replace(" ", "_"))
+
+    if filter_topic:
+        filename_parts.append(filter_topic.lower())
+
+    if difficulty:
+        filename_parts.append(difficulty.lower())
+
+    if filename_parts:
+        filename = "_".join(filename_parts)
+    else:
+        filename = "all_questions"
+
+    filename = f"{filename}_{today}.json"
+
+
+    return send_file(
+
+        BytesIO(json_data.encode("utf-8")),
+
+        mimetype="application/json",
+
+        as_attachment=True,
+
+        download_name=filename
+
+    )
+        
+        

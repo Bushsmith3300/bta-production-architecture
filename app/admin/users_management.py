@@ -48,7 +48,7 @@ def make_admin(user_id):
     user.role = "admin"
     db.session.commit()
 
-    flash(f"{name} has been promoted to admin.", "success")
+    flash(f"{first_name} has been promoted to admin.", "success")
     return redirect(url_for("users_management.index"))
 
 
@@ -58,7 +58,7 @@ def make_admin(user_id):
 def remove_admin(user_id):
 
     user = User.query.get_or_404(user_id)
-    name = user.first_name
+    first_name = user.first_name
 
     # Prevent modifying super admin
     if user.role == "super_admin":
@@ -68,7 +68,7 @@ def remove_admin(user_id):
     user.role = "student"
     db.session.commit()
 
-    flash(f"Admin privileges removed from {name}", "warning")
+    flash(f"Admin privileges removed from {first_name}", "warning")
     return redirect(url_for("users_management.index"))
 
 
@@ -89,7 +89,8 @@ def suspend_user(user_id):
     else:
       full_name = full_name
 
-    # Prevent suspending super admin
+    #----- Prevent suspending super admin------
+
     if user.role == "super_admin":
         flash("Cannot suspend a super admin.", "danger")
         return redirect(url_for("users_management.index"))
@@ -149,7 +150,7 @@ def activate_user(user_id):
 def delete_user(user_id):
 
     user = User.query.get_or_404(user_id)
-    name = user.first_name
+    first_name = user.first_name
 
     # Prevent deleting super admin
     if user.role == "super_admin":
@@ -159,5 +160,5 @@ def delete_user(user_id):
     db.session.delete(user)
     db.session.commit()
 
-    flash(f"{name} has been deleted successfully.", "success")
+    flash(f"{first_name} has been deleted successfully.", "success")
     return redirect(url_for("users_management.index"))
