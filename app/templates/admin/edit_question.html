@@ -145,8 +145,7 @@ small{
 <input type="hidden" name="page" value="{{ page }}">
 <input type="hidden" name="search" value="{{ search }}">
 <input type="hidden" name="filter_topic" value="{{ filter_topic }}">
-<input type="hidden" name="subject" value="{{ subject }}">
-<input type="hidden" name="filter_difficulty" value="{{ difficulty }}">
+<input type="hidden" name="filter_difficulty" value="{{ filter_difficulty }}">
 
 
 <div class="form-group">
@@ -267,11 +266,10 @@ Organic Chemistry
         "ICT",
         "General Science",
         "Social Studies",
-		"Mathematics" ] %}
+	"Mathematics" ] %}
 
         <option value="{{ subject }}"
-            {% if request.form.get("subject", question.subject) == subject %}selected{% endif %}>
-            {{ subject }}
+            {% if request.form.get("subject", question.subject) == subject %}selected{% endif %}>{{ subject }} 
         </option>
 
         {% endfor %}
@@ -432,7 +430,7 @@ Organic Chemistry
        'questions.view_questions',
        page=page,
        search=search,
-       filter_topic=question.topic,
+       filter_topic=filter_topic,
        filter_subject=filter_subject,
        filter_difficulty=filter_difficulty
    ) }}">
