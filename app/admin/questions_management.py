@@ -676,6 +676,12 @@ def edit_question(question_id):
 
     question = Question.query.get_or_404(question_id)
    
+    
+    if session.get("role") == "admin":
+        subject = session.get("subject")
+    else:
+        subject = question.subject
+
 
     # --------------------------------------------------
     # Preserve current page and filters
@@ -693,8 +699,7 @@ def edit_question(question_id):
     # --------------------------------------------------
 
     if (
-        session.get("role") == "admin"
-        and question.subject != session.get("subject")
+        session.get("role") == "admin" and question.subject != session.get("subject")
     ):
         flash(
             "You do not have permission to edit this question.",
@@ -703,32 +708,45 @@ def edit_question(question_id):
         return redirect(url_for("questions.view_questions"))
 
     if request.method == "POST":
+        
 
-        page = request.args.get("page", 1, type=int)
-        search = request.args.get("search", "", type=str).strip()
-        filter_topic = request.args.get("filter_topic", "", type=str).strip()
-        filter_subject = request.args.get("filter_subject", "", type=str).strip()
-        filter_difficulty = request.args.get("filter_difficulty", "", type=str).strip()
-   
-   
+        # --------------------------------------------------
+        # Preserve current page and filters
+        # --------------------------------------------------
+
+        page = request.form.get("page", 1, type=int)
+        search = request.form.get("search", "", type=str).strip()
+        filter_topic = request.form.get("filter_topic", "", type=str).strip()
+        filter_subject = request.form.get("filter_subject", "", type=str).strip()
+        filter_difficulty = request.form.get("filter_difficulty", "", type=str).strip()
+
+        # --------------------------------------------------
+        # Question ID
+        # --------------------------------------------------
+
         question_id = request.form.get("question_id", "").strip()
 
-        
+        # --------------------------------------------------
+        # Subject
+        # --------------------------------------------------
+
         if session.get("role") == "admin":
             subject = session.get("subject")
-            
         else:
             subject = request.form.get("subject", "").strip()
-            
-            
+
+        # --------------------------------------------------
+        # Question data
+        # --------------------------------------------------
 
         topic = request.form.get("topic", "").strip()
-        
+
         difficulty = request.form.get("difficulty", "").strip()
-        
 
-        question_text = request.form.get("question_text", "").strip()
-
+        question_text = request.form.get(
+            "question_text",
+            ""
+        ).strip()
 
         option_a = request.form.get(
             "option_a",
@@ -768,7 +786,7 @@ def edit_question(question_id):
             flash("Topic is required.", "danger")
             return redirect(
                url_for("questions.edit_question",
-               question_id=question.id,
+               question_id=question.id,    
                page=page,
                search=search,
                filter_topic=filter_topic,
@@ -905,21 +923,23 @@ def edit_question(question_id):
             "DOK_3",
             "DOK_4"
         ]:
+
             flash(
                 "Invalid difficulty level. Choose DOK_1, DOK_2, DOK_3 or DOK_4.",
                 "danger"
             )
 
             return redirect(
-               url_for("questions.edit_question",
-               question_id=question.id,
-               page=page,
-               search=search,
-               filter_topic=filter_topic,
-               filter_subject=filter_subject,
-               filter_difficulty=filter_difficulty,
-               )
-        )
+                url_for(
+                    "questions.edit_question",
+                    question_id=question.id,
+                    page=page,
+                    search=search,
+                    filter_topic=filter_topic,
+                    filter_subject=filter_subject,
+                    filter_difficulty=filter_difficulty,
+                )
+            )
 
         # --------------------------------------------------
         # Generate question hash
@@ -989,15 +1009,15 @@ def edit_question(question_id):
             )
 
             return redirect(
-               url_for("questions.edit_question",
-               question_id=question.id,
-               page=page,
-               search=search,
-               filter_topic=filter_topic,
-               filter_subject=filter_subject,
-               filter_difficulty=filter_difficulty,
-           )
-        )
+                url_for(
+                    "questions.view_questions",
+                    page=page,
+                    search=search,
+                    filter_topic=filter_topic,
+                    filter_subject=filter_subject,
+                    filter_difficulty=filter_difficulty,
+                )
+            ) 
 
         except IntegrityError:
 
@@ -1029,20 +1049,21 @@ def edit_question(question_id):
                 "danger"
             )
 
-            return redirect(
-               url_for("questions.edit_question",
-               question_id=question.id,
-               page=page,
-               search=search,
-               filter_topic=filter_topic,
-               filter_subject=filter_subject,
-               filter_difficulty=filter_difficulty,
-           )
-        )
+            return redirect(url_for("questions.view_questions",
+                page=page,
+                search=search,
+                filter_topic=filter_topic,
+                filter_subject=filter_subject,
+                filter_difficulty=filter_difficulty,
+            
+               )
+            )
+               
 
     return render_template("admin/edit_question.html",
            question=question,
            page=page,
+           subject=subject,
            search=search,
            filter_topic=filter_topic,
            filter_subject=filter_subject,
