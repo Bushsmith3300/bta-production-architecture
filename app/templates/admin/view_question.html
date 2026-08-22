@@ -195,8 +195,8 @@ D. {{ question.option_d }}
         page=page,
         search=search,
         filter_topic=question.topic,
-        subject=subject,
-        difficulty=difficulty
+        filter_subject=question.subject,
+        filter_difficulty=question.difficulty
    ) }}">
     Back
 </a>
@@ -209,11 +209,12 @@ D. {{ question.option_d }}
         page=page,
         search=search,
         filter_topic=question.topic,
-        subject=subject,
-        difficulty=difficulty
+        filter_subject=question.subject,
+        filter_difficulty=question.difficulty
     ) }}">
     Edit
 </a>
+
 
 <form method="POST" action="{{ url_for('questions.delete_question',question_id=question.id) }}">
 

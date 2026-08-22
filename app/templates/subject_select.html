@@ -311,10 +311,17 @@ body {
         </a>
 
 
-        <a href="{{ url_for('dashboard.topic_select', subject='Additional Mathematics') }}"
-           class="mathematics">
-            ➗ Additional Mathematics   
-        </a> 
+        <a href="{{ url_for('dashboard.topic_select', subject='Additional Mathematics') }}" 
+		   class="mathematics"> 
+			∑ Additional Mathematics
+		</a>
+
+
+        <a href="{{ url_for('dashboard.topic_select', subject='Social Studies') }}" 
+		   class="Social Studies"> 
+			🌍 Social Studies
+		</a>
+
 
 
         <a href="{{ url_for('main.contact') }}"
@@ -322,16 +329,16 @@ body {
             📘 BTA<sub>ENGLISH</sub>
         </a>
         
-
-        <a href="{{ url_for('main.contact') }}"
-           class="social-studies">
-            🌍 BTA<sub>SOCIAL STUDIES</sub>
-        </a>
-
-        <a href="{{ url_for('main.contact') }}"
-           class="mathematics">
-            ➗ BTA<sub>MATHEMATICS</sub>
-        </a>
+		
+		
+		
+		
+		<a href="{{ url_for('dashboard.topic_select', subject='Mathematics') }}" 
+		   class="mathematics"> 
+			➗ Mathematics
+		</a> 
+		
+		
 
         <a href="{{ url_for('main.contact') }}"
            class="general-science">

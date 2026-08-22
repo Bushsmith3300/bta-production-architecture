@@ -124,7 +124,9 @@ small{
 {% block content %}
 
 {% with messages = get_flashed_messages(with_categories=true) %}
+
 {% if messages %}
+
 {% for category, message in messages %}
 
 <div class="flash {{ category }}">
@@ -132,7 +134,9 @@ small{
 </div>
 
 {% endfor %}
+
 {% endif %}
+
 {% endwith %}
 
 
@@ -140,13 +144,61 @@ small{
 
 <form method="POST" autocomplete="off">
 
-<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<input
+    type="hidden"
+    name="csrf_token"
+    value="{{ csrf_token() }}"
+>
 
-<input type="hidden" name="page" value="{{ page }}">
-<input type="hidden" name="search" value="{{ search }}">
-<input type="hidden" name="filter_topic" value="{{ filter_topic }}">
-<input type="hidden" name="filter_difficulty" value="{{ filter_difficulty }}">
+<!-- ==================================================
+     PRESERVE PAGE AND FILTERS
+     ================================================== -->
 
+<input
+    type="hidden"
+    name="page"
+    value="{{ page }}"
+>
+
+<input
+    type="hidden"
+    name="search"
+    value="{{ search }}"
+>
+
+<input
+    type="hidden"
+    name="filter_topic"
+    value="{{ filter_topic }}"
+>
+
+<input
+    type="hidden"
+    name="filter_subject"
+    value="{{ filter_subject }}"
+>
+
+<input
+    type="hidden"
+    name="filter_difficulty"
+    value="{{ filter_difficulty }}"
+>
+
+
+<!-- ==================================================
+     QUESTION ID
+     ================================================== -->
+
+<input
+    type="hidden"
+    name="question_id"
+    value="{{ question.id }}"
+>
+
+
+<!-- ==================================================
+     TOPIC
+     ================================================== -->
 
 <div class="form-group">
 
@@ -154,127 +206,63 @@ small{
 
 <select name="topic" required>
 
-<option value="Atomic Structure"
-{% if request.form.get("topic", question.topic) == "Atomic Structure" %}selected{% endif %}>
-Atomic Structure
+<option value="" disabled>
+    Choose Topic
 </option>
 
-<option value="Electron Configuration"
-{% if request.form.get("topic", question.topic) == "Electron Configuration" %}selected{% endif %}>
-Electron Configuration
+{% for topic_option in topics %}
+
+<option
+    value="{{ topic_option }}"
+    {% if request.form.get("topic", question.topic) == topic_option %}
+    selected
+    {% endif %}
+>
+    {{ topic_option }}
 </option>
 
-<option value="Periodic Chemistry"
-{% if request.form.get("topic", question.topic) == "Periodic Chemistry" %}selected{% endif %}>
-Periodic Chemistry
-</option>
-
-<option value="Hybridization"
-{% if request.form.get("topic", question.topic) == "Hybridization" %}selected{% endif %}>
-Hybridization
-</option>
-
-<option value="Chemical Bonding"
-{% if request.form.get("topic", question.topic) == "Chemical Bonding" %}selected{% endif %}>
-Chemical Bonding
-</option>
-
-<option value= "Mole Concept"
-{% if request.form.get("topic", question.topic) == "Mole Concept" %}selected{% endif %}>
-Mole Concept
-</option>
-
-<option value="State of Matter"
-{% if request.form.get("topic", question.topic) == "State of Matter" %}selected{% endif %}>
-States of Matter
-</option>
-
-<option value="Energy and Energy Changes"
-{% if request.form.get("topic", question.topic) == "Energy and Energy Changes" %}selected{% endif %}>
-Energy and Energy Changes
-</option>
-
-<option value= "Rate of Reaction"
-{% if request.form.get("topic", question.topic) == "Rate of Reaction" %}selected{% endif %}>
-Rate of Reaction
-</option>
-
-<option value="Equilibrium"
-{% if request.form.get("topic", question.topic) == "Equilibrium" %}selected{% endif %}>
-Chemical Equilibrium
-</option>
-
-<option value="Acids, Bases and Salts"
-{% if request.form.get("topic", question.topic) == "Acids, Bases and Salts" %}selected{% endif %}>
-Acids, Bases and Salts
-</option>
-
-<option value="Solubility
-{% if request.form.get("topic", question.topic) == "Solubility" %}selected{% endif %}>
-Solubility
-</option>
-
-<option value= "Redox Reactions"
-{% if request.form.get("topic", question.topic) == "Redox Reactions" %}selected{% endif %}>
-Redox Reactions
-</option>
-
-<option value="Electrochemical_Cells"
-{% if request.form.get("topic", question.topic) == "Electrochemical Cells" %}selected{% endif %}>
-Electrochemical Cells
-</option>
-
-<option value="Electrolysis"
-{% if request.form.get("topic", question.topic) == "Electrolysis" %}selected{% endif %}>
-Electrolysis
-</option>
-
-<option value="Chemistry and Industry"
-{% if request.form.get("topic", question.topic) == "Chemistry and Industry" %}selected{% endif %}>
-Chemistry and Industry
-</option>
-
-<option value="Transition Metals"
-{% if request.form.get("topic", question.topic) == "Transition Metals" %}selected{% endif %}>
-Transition Metals
-</option>
-
-<option value= "Organic"
-{% if request.form.get("topic", question.topic) == "Organic" %}selected{% endif %}>
-Organic Chemistry
-</option>
+{% endfor %}
 
 </select>
 
+<small style="color:#6b7280;">
+    The current topic is automatically selected.
+</small>
+
 </div>
 
+
+<!-- ==================================================
+     SUBJECT
+     ================================================== -->
 
 {% if session.get("role") == "super_admin" %}
 
 <div class="form-group">
 
-    <label>Subject</label>
+<label>Subject</label>
 
-    <select name="subject" required>
+<select name="subject" required>
 
-        {% for subject in [
-        "Chemistry",
-        "Physics",
-        "Biology",
-        "Add Maths",
-        "English",
-        "ICT",
-        "General Science",
-        "Social Studies",
-	"Mathematics" ] %}
+{% for subject_option in subjects %}
 
-        <option value="{{ subject }}"
-            {% if request.form.get("subject", question.subject) == subject %}selected{% endif %}>{{ subject }} 
-        </option>
+<option
+    value="{{ subject_option }}"
+    {% if request.form.get("subject", question.subject) == subject_option %}
+    selected
+    {% endif %}
+>
+    {{ subject_option }}
+</option>
 
-        {% endfor %}
+{% endfor %}
 
-    </select>
+</select>
+
+<small style="color:#6b7280;">
+    The current subject is automatically selected.
+    You can change it if necessary.
+</small>
 
 </div>
 
@@ -282,161 +270,254 @@ Organic Chemistry
 
 <div class="form-group">
 
-    <label>Subject</label>
+<label>Subject</label>
 
-    <input
-        type="text"
-        name="subject"
-        value="{{ question.subject }}"
-        readonly
-        style="background:#f3f4f6;color:#555;cursor:not-allowed;">
+<input
+    type="text"
+    name="subject"
+    value="{{ question.subject }}"
+    readonly
+    style="
+        background:#f3f4f6;
+        color:#555;
+        cursor:not-allowed;
+    "
+>
 
-    <small style="color:#6b7280;">
-        Your assigned subject cannot be changed.
-    </small>
+<small style="color:#6b7280;">
+    Your assigned subject cannot be changed.
+</small>
 
 </div>
 
 {% endif %}
 
 
+<!-- ==================================================
+     DIFFICULTY
+     ================================================== -->
+
 <div class="form-group">
 
-    <label>Difficulty</label>
+<label>Difficulty</label>
 
-    <select name="difficulty" required>
+<select name="difficulty" required>
 
-    <option value="" disabled
-        {% if not request.form.get("difficulty") and not question.difficulty %}selected{% endif %}>
-        Choose DOK Level
-    </option>
+<option
+    value=""
+    disabled
+    {% if not request.form.get("difficulty")
+       and not question.difficulty %}
+    selected
+    {% endif %}
+>
+    Choose DOK Level
+</option>
 
-    {% for d in ["DOK_1","DOK_2","DOK_3","DOK_4"] %}
+{% for d in [
+    "DOK_1",
+    "DOK_2",
+    "DOK_3",
+    "DOK_4"
+] %}
 
-    <option value="{{ d }}"
-        {% if request.form.get("difficulty", question.difficulty) == d %}selected{% endif %}>
-        {{ d.replace("_"," ") }}
-    </option>
+<option
+    value="{{ d }}"
+    {% if request.form.get(
+        "difficulty",
+        question.difficulty
+    ) == d %}
+    selected
+    {% endif %}
+>
+    {{ d.replace("_", " ") }}
+</option>
 
-    {% endfor %}
+{% endfor %}
 
 </select>
+
 </div>
 
+
+<!-- ==================================================
+     QUESTION
+     ================================================== -->
 
 <div class="form-group">
 
-    <label>Question</label>
+<label>Question</label>
 
-    <textarea
-        name="question_text"
-        required>{{ request.form.get("question_text", question.question_text) }}</textarea>
+<textarea
+    name="question_text"
+    required>{{ request.form.get(
+        "question_text",
+        question.question_text
+    ) }}</textarea>
 
 </div>
 
+
+<!-- ==================================================
+     OPTION A
+     ================================================== -->
 
 <div class="form-group">
 
-    <label>Option A</label>
+<label>Option A</label>
 
-    <input
-        type="text"
-        name="option_a"
-        value="{{ request.form.get('option_a', question.option_a) }}"
-        required>
+<input
+    type="text"
+    name="option_a"
+    value="{{ request.form.get(
+        'option_a',
+        question.option_a
+    ) }}"
+    required
+>
 
 </div>
 
+
+<!-- ==================================================
+     OPTION B
+     ================================================== -->
 
 <div class="form-group">
 
-    <label>Option B</label>
+<label>Option B</label>
 
-    <input
-        type="text"
-        name="option_b"
-        value="{{ request.form.get('option_b', question.option_b) }}"
-        required>
+<input
+    type="text"
+    name="option_b"
+    value="{{ request.form.get(
+        'option_b',
+        question.option_b
+    ) }}"
+    required
+>
 
 </div>
 
+
+<!-- ==================================================
+     OPTION C
+     ================================================== -->
 
 <div class="form-group">
 
-    <label>Option C</label>
+<label>Option C</label>
 
-    <input
-        type="text"
-        name="option_c"
-        value="{{ request.form.get('option_c', question.option_c) }}"
-        required>
+<input
+    type="text"
+    name="option_c"
+    value="{{ request.form.get(
+        'option_c',
+        question.option_c
+    ) }}"
+    required
+>
 
 </div>
 
+
+<!-- ==================================================
+     OPTION D
+     ================================================== -->
 
 <div class="form-group">
 
-    <label>Option D</label>
+<label>Option D</label>
 
-    <input
-        type="text"
-        name="option_d"
-        value="{{ request.form.get('option_d', question.option_d) }}"
-        required>
+<input
+    type="text"
+    name="option_d"
+    value="{{ request.form.get(
+        'option_d',
+        question.option_d
+    ) }}"
+    required
+>
 
 </div>
 
+
+<!-- ==================================================
+     CORRECT ANSWER
+     ================================================== -->
 
 <div class="form-group">
 
-    <label>Correct Answer</label>
+<label>Correct Answer</label>
 
-    <select name="correct_answer" required>
+<select name="correct_answer" required>
 
-        {% for ans in ["A","B","C","D"] %}
+{% for ans in ["A", "B", "C", "D"] %}
 
-        <option value="{{ ans }}"
-            {% if request.form.get("correct_answer", question.correct_answer) == ans %}selected{% endif %}>
-            {{ ans }}
-        </option>
+<option
+    value="{{ ans }}"
+    {% if request.form.get(
+        "correct_answer",
+        question.correct_answer
+    ) == ans %}
+    selected
+    {% endif %}
+>
+    {{ ans }}
+</option>
 
-        {% endfor %}
+{% endfor %}
 
-    </select>
+</select>
 
 </div>
 
+
+<!-- ==================================================
+     EXPLANATION
+     ================================================== -->
 
 <div class="form-group">
 
-    <label>Explanation</label>
+<label>Explanation</label>
 
-    <textarea
-        name="explanation">{{ request.form.get("explanation", question.explanation) }}</textarea>
+<textarea
+    name="explanation"
+>{{ request.form.get(
+    'explanation',
+    question.explanation or ''
+) }}</textarea>
 
 </div>
 
+
+<!-- ==================================================
+     ACTIONS
+     ================================================== -->
 
 <div class="actions">
 
-    <button
-        class="btn btn-primary"
-        type="submit">
-        Update Question
-    </button>
+<button
+    class="btn btn-primary"
+    type="submit"
+>
+    Update Question
+</button>
 
-  <a class="btn btn-secondary"
-   href="{{ url_for(
-       'questions.view_questions',
-       page=page,
-       search=search,
-       filter_topic=filter_topic,
-       filter_subject=filter_subject,
-       filter_difficulty=filter_difficulty
-   ) }}">
+
+<a
+    class="btn btn-secondary"
+    href="{{ url_for(
+        'questions.view_questions',
+        page=page,
+        search=search,
+        filter_topic=filter_topic,
+        filter_subject=filter_subject,
+        filter_difficulty=filter_difficulty
+    ) }}"
+>
     Back / Cancel
 </a>
-
 
 </div>
 
@@ -445,5 +526,3 @@ Organic Chemistry
 </div>
 
 {% endblock %}
-
-

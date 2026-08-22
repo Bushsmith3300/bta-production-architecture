@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Assign Subject</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Segoe UI, Tahoma, Geneva, Verdana, sans-serif;
+            background: #f4f6f9;
+            min-height: 100vh;
+            padding: 30px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 40px auto;
+        }
+
+        .header {
+            margin-bottom: 25px;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            color: #111827;
+            margin-bottom: 6px;
+        }
+
+        .header p {
+            color: #6b7280;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, .08);
+        }
+
+        .admin-info {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 25px;
+        }
+
+        .admin-info .label {
+            color: #6b7280;
+            font-size: 13px;
+            margin-bottom: 5px;
+        }
+
+        .admin-info .name {
+            color: #111827;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .admin-info .username {
+            color: #6b7280;
+            margin-top: 4px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 15px;
+            background: white;
+            cursor: pointer;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, .1);
+        }
+
+        .current-subject {
+            margin-top: 8px;
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .current-subject strong {
+            color: #111827;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 8px;
+            padding: 11px 18px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-save {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-save:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-cancel {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .btn-cancel:hover {
+            background: #d1d5db;
+        }
+
+        .flash {
+            padding: 14px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        .success {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .empty {
+            padding: 15px;
+            background: #fef3c7;
+            color: #92400e;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 600px) {
+
+            body {
+                padding: 15px;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                text-align: center;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+
+        <h1>Assign Subject</h1>
+
+        <p>
+            Assign a subject to this administrator.
+        </p>
+
+    </div>
+
+
+    <!-- FLASH MESSAGES -->
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+
+        {% if messages %}
+
+            {% for category, message in messages %}
+
+                <div class="flash {{ category }}">
+                    {{ message }}
+                </div>
+
+            {% endfor %}
+
+        {% endif %}
+
+    {% endwith %}
+
+
+    <div class="card">
+
+        <!-- ADMIN INFORMATION -->
+
+        <div class="admin-info">
+
+            <div class="label">
+                Administrator
+            </div>
+
+            <div class="name">
+
+                {{ admin.surname }},
+                {{ admin.first_name }}
+
+                {% if admin.other_name %}
+                    {{ admin.other_name }}
+                {% endif %}
+
+            </div>
+
+            <div class="username">
+                @{{ admin.username }}
+            </div>
+
+        </div>
+
+
+        {% if subjects %}
+
+            <form
+                method="POST"
+                action="{{ url_for(
+                    'admin_management.assign_subject',
+                    user_id=admin.id
+                ) }}"
+            >
+
+                <input
+                    type="hidden"
+                    name="csrf_token"
+                    value="{{ csrf_token() }}"
+                >
+
+
+                <div class="form-group">
+
+                    <label for="subject">
+                        Subject
+                    </label>
+
+                    <select
+                        id="subject"
+                        name="subject"
+                        required
+                    >
+
+                        <option value="">
+                            -- Select Subject --
+                        </option>
+
+                        {% for subject in subjects %}
+
+                            <option
+                                value="{{ subject }}"
+                                {% if admin.subject == subject %}
+                                    selected
+                                {% endif %}
+                            >
+                                {{ subject }}
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+
+                    <div class="current-subject">
+
+                        Current subject:
+
+                        {% if admin.subject %}
+                            <strong>{{ admin.subject }}</strong>
+                        {% else %}
+                            <strong>Not assigned</strong>
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+                <div class="actions">
+
+                    <button
+                        type="submit"
+                        class="btn btn-save"
+                    >
+                        Save Subject
+                    </button>
+
+                    <a
+                        href="{{ url_for('admin_management.index') }}"
+                        class="btn btn-cancel"
+                    >
+                        Cancel
+                    </a>
+
+                </div>
+
+            </form>
+
+        {% else %}
+
+            <div class="empty">
+
+                No subjects are currently available in the
+                question bank.
+
+                Add questions with subjects first, then return
+                here to assign a subject.
+
+            </div>
+
+            <a
+                href="{{ url_for('admin_management.index') }}"
+                class="btn btn-cancel"
+            >
+                ← Back to Admin Management
+            </a>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

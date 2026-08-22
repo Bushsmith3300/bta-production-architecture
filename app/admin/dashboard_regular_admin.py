@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, session
 
-from app.utils.decorators import admin_required
+from app.utils.decorators import admin_subject_required, login_required
 
 from app.models import (
     Question,
@@ -20,10 +20,11 @@ regular_admin_bp = Blueprint(
 
 
 @regular_admin_bp.route("/")
-@admin_required
+@admin_subject_required
 def dashboard():
 
-    total_questions = Question.query.count()
+    total_questions = Question.query.filter_by(subject=session.get("subject")
+     ).count()
 
     total_assignments = Assignment.query.count()
 
@@ -69,4 +70,34 @@ def dashboard():
     return render_template(
         "admin/dashboard_regular_admin.html",
         data=dashboard_data
+    )
+
+
+
+@regular_admin_bp.route("/no-subject")
+@login_required
+def no_subject():
+
+    user = User.query.get(
+        session["user_id"]
+    )
+
+    if not user:
+        return redirect(
+            url_for("auth.login")
+        )
+
+    if user.role == "super_admin":
+        return redirect(
+            url_for("dashboard_super_admin.dashboard")
+        )
+
+    if user.role != "admin":
+        return redirect(
+            url_for("dashboard.dashboard")
+        )
+
+    return render_template(
+        "admin/no_subject.html",
+        user=user
     )

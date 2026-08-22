@@ -38,7 +38,7 @@ from app.models import (
 )
 
 from app.utils.decorators import (
-    admin_required
+    admin_subject_required
 )
 
 from app.utils.question_hash import generate_question_hash
@@ -96,7 +96,7 @@ def question_has_dependencies(question_id):
 
 
 @questions_bp.route("/")
-@admin_required
+@admin_subject_required
 def view_questions():
 
     """
@@ -306,7 +306,7 @@ def view_questions():
 # ======================================================
 
 @questions_bp.route("/view/<int:question_id>")
-@admin_required
+@admin_subject_required
 def view_question(question_id):
 
     question = Question.query.get_or_404(question_id)
@@ -357,7 +357,7 @@ def view_question(question_id):
 # ======================================================
 
 @questions_bp.route("/add", methods=["GET", "POST"])
-@admin_required
+@admin_subject_required
 def add_question():
 
     
@@ -664,84 +664,233 @@ def add_question():
             filter_difficulty=filter_difficulty,
             )
 
-
-
 # ======================================================
 # EDIT QUESTION
 # ======================================================
 
 @questions_bp.route("/edit/<int:question_id>", methods=["GET", "POST"])
-@admin_required
+@admin_subject_required
 def edit_question(question_id):
 
     question = Question.query.get_or_404(question_id)
-   
+
+    # --------------------------------------------------
+    # Determine subject
+    # --------------------------------------------------
+    # Regular admin:
+    #   Subject comes from the admin's assigned subject.
+    #
+    # Super admin:
+    #   Subject comes from the question being edited.
+    # --------------------------------------------------
     
+    
+    # --------------------------------------------------
+    # Get subjects from database
+    # --------------------------------------------------
+
+    subjects = (
+        db.session.query(Question.subject)
+        .filter(
+            Question.subject.isnot(None),
+            Question.subject != ""
+        )
+        .distinct()
+        .order_by(Question.subject)
+        .all()
+    )
+
+    subjects = [row[0] for row in subjects]
+
+    # Make sure the current question's subject is included
+    
+    if question.subject and question.subject not in subjects:
+        subjects.insert(0, question.subject)
+    
+       
+
     if session.get("role") == "admin":
         subject = session.get("subject")
     else:
         subject = question.subject
 
-
     # --------------------------------------------------
     # Preserve current page and filters
     # --------------------------------------------------
-    
+
     page = request.args.get("page", 1, type=int)
-    search = request.args.get("search", "", type=str).strip()
-    filter_topic = request.args.get("filter_topic", "", type=str).strip()
-    filter_subject = request.args.get("filter_subject", "", type=str).strip()
-    filter_difficulty = request.args.get("filter_difficulty", "", type=str).strip()
-   
-    
+
+    search = request.args.get(
+        "search",
+        "",
+        type=str
+    ).strip()
+
+    filter_topic = request.args.get(
+        "filter_topic",
+        "",
+        type=str
+    ).strip()
+
+    filter_subject = request.args.get(
+        "filter_subject",
+        "",
+        type=str
+    ).strip()
+
+    filter_difficulty = request.args.get(
+        "filter_difficulty",
+        "",
+        type=str
+    ).strip()
+
     # --------------------------------------------------
     # Permission check
     # --------------------------------------------------
 
     if (
-        session.get("role") == "admin" and question.subject != session.get("subject")
+        session.get("role") == "admin"
+        and question.subject != session.get("subject")
     ):
         flash(
             "You do not have permission to edit this question.",
             "danger"
         )
-        return redirect(url_for("questions.view_questions"))
+
+        return redirect(
+            url_for("questions.view_questions")
+        )
+
+    # ==================================================
+    # GET TOPICS FOR CURRENT QUESTION SUBJECT
+    # ==================================================
+    #
+    # This is important.
+    #
+    # We no longer use a hard-coded Chemistry topic list.
+    # Instead, we get the topics that actually exist in
+    # the database for this question's subject.
+    #
+    # Example:
+    #
+    # Physics question
+    #     -> Physics topics
+    #
+    # Biology question
+    #     -> Biology topics
+    #
+    # Add Maths question
+    #     -> Add Maths topics
+    # ==================================================
+
+    topics = (
+        db.session.query(Question.topic)
+        .filter(
+            Question.subject == question.subject,
+            Question.topic.isnot(None),
+            Question.topic != ""
+        )
+        .distinct()
+        .order_by(Question.topic)
+        .all()
+    )
+
+    topics = [row[0] for row in topics]
+
+    # --------------------------------------------------
+    # Make sure the question's current topic is present
+    # --------------------------------------------------
+    #
+    # This protects against a situation where the topic
+    # exists on this question but is not currently used
+    # by another question.
+    # --------------------------------------------------
+
+    if (
+        question.topic
+        and question.topic not in topics
+    ):
+        topics.insert(0, question.topic)
+
+    # ==================================================
+    # POST
+    # ==================================================
 
     if request.method == "POST":
-        
 
         # --------------------------------------------------
         # Preserve current page and filters
         # --------------------------------------------------
 
-        page = request.form.get("page", 1, type=int)
-        search = request.form.get("search", "", type=str).strip()
-        filter_topic = request.form.get("filter_topic", "", type=str).strip()
-        filter_subject = request.form.get("filter_subject", "", type=str).strip()
-        filter_difficulty = request.form.get("filter_difficulty", "", type=str).strip()
+        page = request.form.get(
+            "page",
+            1,
+            type=int
+        )
+
+        search = request.form.get(
+            "search",
+            "",
+            type=str
+        ).strip()
+
+        filter_topic = request.form.get(
+            "filter_topic",
+            "",
+            type=str
+        ).strip()
+
+        filter_subject = request.form.get(
+            "filter_subject",
+            "",
+            type=str
+        ).strip()
+
+        filter_difficulty = request.form.get(
+            "filter_difficulty",
+            "",
+            type=str
+        ).strip()
 
         # --------------------------------------------------
         # Question ID
         # --------------------------------------------------
 
-        question_id = request.form.get("question_id", "").strip()
+        posted_question_id = request.form.get(
+            "question_id",
+            ""
+        ).strip()
 
         # --------------------------------------------------
         # Subject
         # --------------------------------------------------
 
         if session.get("role") == "admin":
+
+            # Regular admin cannot change subject.
             subject = session.get("subject")
+
         else:
-            subject = request.form.get("subject", "").strip()
+
+            # Super admin can change subject.
+            subject = request.form.get(
+                "subject",
+                ""
+            ).strip()
 
         # --------------------------------------------------
         # Question data
         # --------------------------------------------------
 
-        topic = request.form.get("topic", "").strip()
+        topic = request.form.get(
+            "topic",
+            ""
+        ).strip()
 
-        difficulty = request.form.get("difficulty", "").strip()
+        difficulty = request.form.get(
+            "difficulty",
+            ""
+        ).strip()
 
         question_text = request.form.get(
             "question_text",
@@ -778,103 +927,146 @@ def edit_question(question_id):
             ""
         ).strip()
 
-        # --------------------------------------------------
+        # ==================================================
         # Validation
-        # --------------------------------------------------
+        # ==================================================
 
         if not topic:
-            flash("Topic is required.", "danger")
+
+            flash(
+                "Topic is required.",
+                "danger"
+            )
+
             return redirect(
-               url_for("questions.edit_question",
-               question_id=question.id,    
-               page=page,
-               search=search,
-               filter_topic=filter_topic,
-               filter_subject=filter_subject,
-               filter_difficulty=filter_difficulty,
-           )
-        )
+                url_for(
+                    "questions.edit_question",
+                    question_id=question.id,
+                    page=page,
+                    search=search,
+                    filter_topic=filter_topic,
+                    filter_subject=filter_subject,
+                    filter_difficulty=filter_difficulty,
+                )
+            )
 
         if not subject:
-            flash("Subject is required.", "danger")
-            return redirect(
-               url_for("questions.edit_question",
-               question_id=question.id,
-               page=page,
-               search=search,
-               filter_topic=filter_topic,
-               filter_subject=filter_subject,
-               filter_difficulty=filter_difficulty, )
-        )
 
+            flash(
+                "Subject is required.",
+                "danger"
+            )
+
+            return redirect(
+                url_for(
+                    "questions.edit_question",
+                    question_id=question.id,
+                    page=page,
+                    search=search,
+                    filter_topic=filter_topic,
+                    filter_subject=filter_subject,
+                    filter_difficulty=filter_difficulty,
+                )
+            )
 
         if not question_text:
-            flash("Question text is required.", "danger")
+
+            flash(
+                "Question text is required.",
+                "danger"
+            )
+
             return redirect(
-               url_for("questions.edit_question",
-               question_id=question.id,
-               page=page,
-               search=search,
-               filter_topic=filter_topic,
-               filter_subject=filter_subject,
-               filter_difficulty=filter_difficulty,	
-           )
-        )
+                url_for(
+                    "questions.edit_question",
+                    question_id=question.id,
+                    page=page,
+                    search=search,
+                    filter_topic=filter_topic,
+                    filter_subject=filter_subject,
+                    filter_difficulty=filter_difficulty,
+                )
+            )
 
         if not option_a:
-            flash("Option A is required.", "danger")
-            return redirect(
-               url_for("questions.edit_question",
-               question_id=question.id,
-               page=page,
-               search=search,
-               filter_topic=filter_topic,
-               filter_subject=filter_subject,
-               filter_difficulty=filter_difficulty,
-               )
-        )
 
+            flash(
+                "Option A is required.",
+                "danger"
+            )
+
+            return redirect(
+                url_for(
+                    "questions.edit_question",
+                    question_id=question.id,
+                    page=page,
+                    search=search,
+                    filter_topic=filter_topic,
+                    filter_subject=filter_subject,
+                    filter_difficulty=filter_difficulty,
+                )
+            )
 
         if not option_b:
-            flash("Option B is required.", "danger")
-            return redirect(
-               url_for("questions.edit_question",
-               question_id=question.id,
-               page=page,
-               search=search,
-               filter_topic=filter_topic,
-               filter_subject=filter_subject,
-               filter_difficulty=filter_difficulty,
-               )
-        )
 
+            flash(
+                "Option B is required.",
+                "danger"
+            )
+
+            return redirect(
+                url_for(
+                    "questions.edit_question",
+                    question_id=question.id,
+                    page=page,
+                    search=search,
+                    filter_topic=filter_topic,
+                    filter_subject=filter_subject,
+                    filter_difficulty=filter_difficulty,
+                )
+            )
 
         if not option_c:
-            flash("Option C is required.", "danger")
-            return redirect(
-               url_for("questions.edit_question",
-               question_id=question.id,
-               page=page,
-               search=search,
-               filter_topic=filter_topic,
-               filter_subject=filter_subject,
-               filter_difficulty=filter_difficulty,  
-               )
-        )
 
+            flash(
+                "Option C is required.",
+                "danger"
+            )
+
+            return redirect(
+                url_for(
+                    "questions.edit_question",
+                    question_id=question.id,
+                    page=page,
+                    search=search,
+                    filter_topic=filter_topic,
+                    filter_subject=filter_subject,
+                    filter_difficulty=filter_difficulty,
+                )
+            )
 
         if not option_d:
-            flash("Option D is required.", "danger")
+
+            flash(
+                "Option D is required.",
+                "danger"
+            )
+
             return redirect(
-               url_for("questions.edit_question",
-               question_id=question.id,
-               page=page,
-               search=search,
-               filter_topic=filter_topic,
-               filter_subject=filter_subject,
-               filter_difficulty=filter_difficulty,
-               )
-        )
+                url_for(
+                    "questions.edit_question",
+                    question_id=question.id,
+                    page=page,
+                    search=search,
+                    filter_topic=filter_topic,
+                    filter_subject=filter_subject,
+                    filter_difficulty=filter_difficulty,
+                )
+            )
+
+        # --------------------------------------------------
+        # Check duplicate options
+        # --------------------------------------------------
 
         options = [
             option_a.lower(),
@@ -884,38 +1076,55 @@ def edit_question(question_id):
         ]
 
         if len(set(options)) != 4:
+
             flash(
                 "All options must be different.",
                 "danger"
             )
-            return redirect(
-               url_for("questions.edit_question",
-               question_id=question.id,
-               page=page,
-               search=search,
-               filter_topic=filter_topic,
-               filter_subject=filter_subject,
-               filter_difficulty=filter_difficulty,
-               )
-        )
-                
-            
 
-        if correct_answer not in ["A", "B", "C", "D"]:
+            return redirect(
+                url_for(
+                    "questions.edit_question",
+                    question_id=question.id,
+                    page=page,
+                    search=search,
+                    filter_topic=filter_topic,
+                    filter_subject=filter_subject,
+                    filter_difficulty=filter_difficulty,
+                )
+            )
+
+        # --------------------------------------------------
+        # Validate correct answer
+        # --------------------------------------------------
+
+        if correct_answer not in [
+            "A",
+            "B",
+            "C",
+            "D"
+        ]:
+
             flash(
                 "Correct answer must be A, B, C or D.",
                 "danger"
             )
+
             return redirect(
-               url_for("questions.edit_question",
-               question_id=question.id,
-               page=page,
-               search=search,
-               filter_topic=filter_topic,
-               filter_subject=filter_subject,
-               filter_difficulty=filter_difficulty,
-               )
-        )
+                url_for(
+                    "questions.edit_question",
+                    question_id=question.id,
+                    page=page,
+                    search=search,
+                    filter_topic=filter_topic,
+                    filter_subject=filter_subject,
+                    filter_difficulty=filter_difficulty,
+                )
+            )
+
+        # --------------------------------------------------
+        # Validate difficulty
+        # --------------------------------------------------
 
         if difficulty not in [
             "DOK_1",
@@ -941,9 +1150,9 @@ def edit_question(question_id):
                 )
             )
 
-        # --------------------------------------------------
+        # ==================================================
         # Generate question hash
-        # --------------------------------------------------
+        # ==================================================
 
         question_hash = generate_question_hash(
             topic=topic,
@@ -956,34 +1165,38 @@ def edit_question(question_id):
             correct_answer=correct_answer,
         )
 
-        # --------------------------------------------------
+        # ==================================================
         # Duplicate check
-        # --------------------------------------------------
+        # ==================================================
 
         duplicate = Question.query.filter(
-            Question.question_hash == question_hash, Question.id != question.id).first()
+            Question.question_hash == question_hash,
+            Question.id != question.id
+        ).first()
 
         if duplicate:
+
             flash(
-                f"This question already exists (Question ID: {duplicate.id}).",
+                f"This question already exists "
+                f"(Question ID: {duplicate.id}).",
                 "warning"
             )
+
             return redirect(
-               url_for("questions.edit_question",
-               question_id=question.id,
-               page=page,
-               search=search,
-               filter_topic=filter_topic,
-               filter_subject=filter_subject,
-               filter_difficulty=filter_difficulty,
-               )
-        )
-        
+                url_for(
+                    "questions.edit_question",
+                    question_id=question.id,
+                    page=page,
+                    search=search,
+                    filter_topic=filter_topic,
+                    filter_subject=filter_subject,
+                    filter_difficulty=filter_difficulty,
+                )
+            )
 
-
-        # --------------------------------------------------
+        # ==================================================
         # Update question
-        # --------------------------------------------------
+        # ==================================================
 
         try:
 
@@ -1017,28 +1230,29 @@ def edit_question(question_id):
                     filter_subject=filter_subject,
                     filter_difficulty=filter_difficulty,
                 )
-            ) 
+            )
 
         except IntegrityError:
 
             db.session.rollback()
 
             flash(
-                "Update failed because another question with the same content already exists.",
+                "Update failed because another question "
+                "with the same content already exists.",
                 "warning"
             )
 
             return redirect(
-               url_for("questions.edit_question",
-               question_id=question.id,
-               page=page,
-               search=search,
-               filter_topic=filter_topic,
-               filter_subject=filter_subject,
-               filter_difficulty=filter_difficulty,
-           )
-        )
-                      
+                url_for(
+                    "questions.edit_question",
+                    question_id=question.id,
+                    page=page,
+                    search=search,
+                    filter_topic=filter_topic,
+                    filter_subject=filter_subject,
+                    filter_difficulty=filter_difficulty,
+                )
+            )
 
         except Exception as e:
 
@@ -1049,34 +1263,40 @@ def edit_question(question_id):
                 "danger"
             )
 
-            return redirect(url_for("questions.view_questions",
-                page=page,
-                search=search,
-                filter_topic=filter_topic,
-                filter_subject=filter_subject,
-                filter_difficulty=filter_difficulty,
-            
-               )
+            return redirect(
+                url_for(
+                    "questions.view_questions",
+                    page=page,
+                    search=search,
+                    filter_topic=filter_topic,
+                    filter_subject=filter_subject,
+                    filter_difficulty=filter_difficulty,
+                )
             )
-               
+
+    # ==================================================
+    # GET
+    # ==================================================
 
     return render_template("admin/edit_question.html",
-           question=question,
-           page=page,
-           subject=subject,
-           search=search,
-           filter_topic=filter_topic,
-           filter_subject=filter_subject,
-           filter_difficulty=filter_difficulty,
-       )
-    
+        question=question,
+        page=page,
+        subject=subject,
+        subjects=subjects,
+        topics=topics,
+        search=search,
+        filter_topic=filter_topic,
+        filter_subject=filter_subject,
+        filter_difficulty=filter_difficulty,
+    )
+
 
 # ======================================================
 # DELETE QUESTION
 # ======================================================
 
 @questions_bp.route("/delete/<int:question_id>", methods=["POST"])
-@admin_required
+@admin_subject_required
 def delete_question(question_id):
 
     question = Question.query.get_or_404(question_id)
@@ -1171,7 +1391,7 @@ def delete_question(question_id):
 # ======================================================
 
 @questions_bp.route("/bulk-delete", methods=["POST"])
-@admin_required
+@admin_subject_required
 def bulk_delete_questions():
 
     ids = request.form.getlist("question_ids")
@@ -1297,7 +1517,7 @@ def bulk_delete_questions():
 # ======================================================
 
 @questions_bp.route("/delete-unused", methods=["POST"])
-@admin_required
+@admin_subject_required
 def delete_unused_questions():
 
     # --------------------------------------------------
@@ -1383,7 +1603,7 @@ def delete_unused_questions():
     
     
 @questions_bp.route("/bulk-upload", methods=["GET", "POST"])
-@admin_required
+@admin_subject_required
 def bulk_upload_questions():
     
     # -----------------------------------------
@@ -1795,7 +2015,7 @@ def bulk_upload_questions():
 # ======================================================
 
 @questions_bp.route("/export")
-@admin_required
+@admin_subject_required
 def export_questions():
 
 
