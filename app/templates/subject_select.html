@@ -268,6 +268,28 @@ body {
     box-shadow: 0 12px 30px rgba(250, 204, 21, 0.65);
 }
 
+
+/* ==========================
+   FOOD AND NUTRITION
+========================== */
+
+.subject-links a.food-nutrition {
+    background: linear-gradient(
+        135deg,
+        rgba(245, 158, 11, 0.18),
+        rgba(20, 25, 40, 0.95)
+    );
+    border: 2px solid #ffffff;
+    color: #ffffff;
+}
+
+.subject-links a.food-nutrition:hover {
+    background: #ffffff;
+    border-color: #ffffff;
+    color: #d97706;
+}
+
+
 </style>
 
 </head>
@@ -335,7 +357,7 @@ body {
 		
 		<a href="{{ url_for('dashboard.topic_select', subject='English Language') }}"
            class="english">
-            📘 ENGLISH</sub>
+            📘 ENGLISH
         </a>
 		
 		
@@ -344,6 +366,14 @@ body {
            class="general-science">
             🔬 BTA<sub>GENERAL SCIENCE</sub>
         </a>
+		
+		
+		<a href="{{ url_for('dashboard.topic_select', subject='Food and Nutrition') }}"
+            class="food-nutrition">
+			🍳 Food and Nutrition
+		</a>
+		
+		
 
     </div>
 
