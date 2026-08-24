@@ -237,14 +237,16 @@ body {
 .subject-links a.social-studies {
     background: linear-gradient(
         135deg,
-        rgba(234,88,12,0.18),
-        rgba(20,25,40,0.95)
+        rgba(234, 88, 12, 0.18),
+        rgba(20, 25, 40, 0.95)
     );
-    border: 2px solid #ea580c;
+    border: 2px solid #ffffff;
 }
 
 .subject-links a.social-studies:hover {
-    background: linear-gradient(135deg, #ea580c, #c2410c);
+    background: #ffffff;
+    border: 2px solid #ffffff;
+    color: #111827;
 }
 
 
@@ -318,25 +320,23 @@ body {
 
 
         <a href="{{ url_for('dashboard.topic_select', subject='Social Studies') }}" 
-		   class="Social Studies"> 
+		   class="social-studies"> 
 			🌍 Social Studies
 		</a>
 
 
-
-        <a href="{{ url_for('main.contact') }}"
-           class="english">
-            📘 BTA<sub>ENGLISH</sub>
-        </a>
-        
-		
-		
-		
-		
+	
 		<a href="{{ url_for('dashboard.topic_select', subject='Mathematics') }}" 
 		   class="mathematics"> 
 			➗ Mathematics
 		</a> 
+		
+		
+		
+		<a href="{{ url_for('dashboard.topic_select', subject='English Language') }}"
+           class="english">
+            📘 ENGLISH</sub>
+        </a>
 		
 		
 
