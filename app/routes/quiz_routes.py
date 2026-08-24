@@ -32,14 +32,14 @@ quiz_bp = Blueprint(
 @login_required
 def get_questions(subject, topic):
 
-    subject = subject.strip().title()
-    topic = topic.strip().lower()
+    subject = subject.strip()
+    topic = topic.strip()
 
     questions = (
         Question.query
         .filter(
             Question.subject == subject,
-            Question.topic.ilike(f"%{topic}%")
+            Question.topic == topic
         )
         .order_by(func.random())
         .all()
@@ -61,9 +61,9 @@ def get_questions(subject, topic):
             }
             for q in questions
         ]
-    })
-
-
+    }
+    
+    )
 
 # ---------------- QUIZ PAGE ----------------
 @quiz_bp.route("/quiz/<subject>/<path:topic>")

@@ -147,10 +147,11 @@ footer {
 
 <script>
 function startQuiz(topic) {
-    const cleanTopic = topic.toLowerCase().trim();
+    const cleanTopic = topic.trim();
+    const cleanSubject = "{{ subject }}".trim();
 
     window.location.href =
-        `/quiz/{{ subject }}/${encodeURIComponent(cleanTopic)}`;
+        `/quiz/${encodeURIComponent(cleanSubject)}/${encodeURIComponent(cleanTopic)}`;
 }
 </script>
 
