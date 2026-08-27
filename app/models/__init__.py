@@ -1,4 +1,5 @@
 from .question import Question
+from .subject import Subject
 from .user import User
 from .user_progress import UserProgress
 from .user_history import UserHistory
