@@ -21,6 +21,13 @@ class Question(db.Model):
     explanation = db.Column(db.Text, nullable=True)
 
     subject = db.Column(db.String(50), default="chemistry", nullable=False)
+    
+    subject_id = db.Column(
+    db.Integer,
+    db.ForeignKey("subjects.id"),
+    nullable=True,
+    index=True
+)
 
     difficulty = db.Column(
         db.Enum(
@@ -57,6 +64,11 @@ class Question(db.Model):
     # ======================================
     # RELATIONSHIPS (FIXED)
     # ======================================
+
+    subject_ref = db.relationship(
+    "Subject",
+    back_populates="questions"
+    )
 
     user_history = db.relationship(
         "UserHistory",
