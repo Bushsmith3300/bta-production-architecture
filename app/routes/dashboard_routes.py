@@ -12,6 +12,7 @@ from flask import (
 
 from app.models.user import User
 from app.models.question import Question
+from app.models.subject import Subject
 from app.models.announcement import Announcement
 from app.models.user_history import UserHistory
 from app.models.user_progress import UserProgress
@@ -61,11 +62,21 @@ def subject_select():
 
     user = db.session.get(User, session["user_id"])
 
-    return render_template(
-        "subject_select.html",
-        user=user
+    subjects = (
+        Subject.query
+        .filter_by(is_active=True)
+        .order_by(
+            Subject.display_order,
+            Subject.name
+        )
+        .all()
     )
 
+    return render_template(
+        "subject_select.html",
+        user=user,
+        subjects=subjects
+    )
 
 
 @dashboard_bp.route("/topics/<subject>")

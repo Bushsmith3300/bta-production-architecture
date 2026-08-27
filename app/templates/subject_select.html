@@ -1,16 +1,15 @@
-
 <!DOCTYPE html>
 <html lang="EN-US">
 <head>
-    
+
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Standard Chemistry Questions for Ghanaian SHS Learners!">
   <meta name="author" content="Emmanuel Asiamah Amponsah">
   <meta name="keywords" content="chemistry, past questions, WAEC, teaching assistant, asiamah, learn">
-    
+
   <title>Bush Teaching Assistant</title>
-    
+
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap');
 
@@ -133,7 +132,7 @@ body {
     margin-top: 25px;
 }
 
-/* Base card style */
+/* BASE CARD STYLE */
 .subject-links a {
     background: rgba(20, 25, 40, 0.95);
     padding: 22px;
@@ -147,7 +146,7 @@ body {
     box-shadow: 0 8px 25px rgba(0,0,0,0.5);
 }
 
-/* Shared hover animation */
+/* SHARED HOVER ANIMATION */
 .subject-links a:hover {
     transform: translateY(-4px);
     color: #fff;
@@ -179,7 +178,6 @@ body {
     box-shadow: 0 12px 30px rgba(59,130,246,0.65);
 }
 
-
 /* ==========================
    BIOLOGY
 ========================== */
@@ -192,7 +190,6 @@ body {
     background: linear-gradient(135deg, #14b8a6, #0f766e);
     box-shadow: 0 12px 30px rgba(20,184,166,0.65);
 }
-
 
 /* ==========================
    ENGLISH
@@ -211,7 +208,6 @@ body {
     background: linear-gradient(135deg, #f59e0b, #d97706);
 }
 
-
 /* ==========================
    MATHEMATICS
 ========================== */
@@ -228,7 +224,6 @@ body {
 .subject-links a.mathematics:hover {
     background: linear-gradient(135deg, #a855f7, #7e22ce);
 }
-
 
 /* ==========================
    SOCIAL STUDIES
@@ -249,7 +244,6 @@ body {
     color: #111827;
 }
 
-
 /* ==========================
    GENERAL SCIENCE
 ========================== */
@@ -267,7 +261,6 @@ body {
     background: linear-gradient(135deg, #facc15, #eab308);
     box-shadow: 0 12px 30px rgba(250, 204, 21, 0.65);
 }
-
 
 /* ==========================
    FOOD AND NUTRITION
@@ -289,14 +282,13 @@ body {
     color: #d97706;
 }
 
-
 </style>
 
 </head>
 
 <body>
 
-   <div class="header">
+<div class="header">
     <h2 style="text-align:center;">Hi, {{ user.first_name }} 👋</h2>
 </div>
 
@@ -319,61 +311,17 @@ body {
 
     <div class="subject-links">
 
-        <a href="{{ url_for('dashboard.topic_select', subject='Chemistry') }}"
-           class="chemistry">
-            🧪 Chemistry
+        {% for subject in subjects %}
+
+        <a href="{{ url_for('dashboard.topic_select', subject=subject.name) }}"
+           class="{{ subject.css_class or '' }}">
+
+            {{ subject.icon or '📚' }}
+            {{ subject.name }}
+
         </a>
 
-        <a href="{{ url_for('dashboard.topic_select', subject='Physics') }}"
-           class="physics">
-            ⚛️ Physics
-        </a>
-
-        <a href="{{ url_for('dashboard.topic_select', subject='Biology') }}"
-           class="biology">
-            🌿 Biology
-        </a>
-
-
-        <a href="{{ url_for('dashboard.topic_select', subject='Additional Mathematics') }}" 
-		   class="mathematics"> 
-			∑ Additional Mathematics
-		</a>
-
-
-        <a href="{{ url_for('dashboard.topic_select', subject='Social Studies') }}" 
-		   class="social-studies"> 
-			🌍 Social Studies
-		</a>
-
-
-	
-		<a href="{{ url_for('dashboard.topic_select', subject='Mathematics') }}" 
-		   class="mathematics"> 
-			➗ Mathematics
-		</a> 
-		
-		
-		
-		<a href="{{ url_for('dashboard.topic_select', subject='English Language') }}"
-           class="english">
-            📘 ENGLISH
-        </a>
-		
-		
-
-        <a href="{{ url_for('main.contact') }}"
-           class="general-science">
-            🔬 BTA<sub>GENERAL SCIENCE</sub>
-        </a>
-		
-		
-		<a href="{{ url_for('dashboard.topic_select', subject='Food and Nutrition') }}"
-            class="food-nutrition">
-			🍳 Food and Nutrition
-		</a>
-		
-		
+        {% endfor %}
 
     </div>
 
@@ -392,3 +340,6 @@ body {
         <p>Developed by Emmanuel Asiamah Amponsah</p>
     </div>
 </footer>
+
+</body>
+</html>
