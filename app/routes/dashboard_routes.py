@@ -85,9 +85,21 @@ def topic_select(subject):
 
     user = db.session.get(User, session["user_id"])
 
+    #----Find the Subject record-----
+    
+    selected_subject = (
+        Subject.query
+        .filter(Subject.name == subject)
+        .first_or_404()
+    )
+
+    #----Get topics belonging to this subject-----
+    
     topics = (
         db.session.query(Question.topic)
-        .filter(Question.subject == subject)
+        .filter(
+            Question.subject_id == selected_subject.id
+        )
         .distinct()
         .order_by(Question.topic)
         .all()
@@ -98,7 +110,7 @@ def topic_select(subject):
     return render_template(
         "topic_select.html",
         user=user,
-        subject=subject,
+        subject=selected_subject.name,
         topics=topics
     )
 

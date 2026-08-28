@@ -10,12 +10,10 @@ from flask import (
 )
 
 from sqlalchemy import func
-
 from app.extensions import db
-
 from app.models.question import Question
+from app.models.subject import Subject
 from app.models.user import User
-
 from app.utils.decorators import login_required
 
 
@@ -35,10 +33,18 @@ def get_questions(subject, topic):
     subject = subject.strip()
     topic = topic.strip()
 
+    # Find the Subject record
+    selected_subject = (
+        Subject.query
+        .filter(Subject.name == subject)
+        .first_or_404()
+    )
+
+    # Get questions belonging to this subject and topic
     questions = (
         Question.query
         .filter(
-            Question.subject == subject,
+            Question.subject_id == selected_subject.id,
             Question.topic == topic
         )
         .order_by(func.random())
@@ -61,9 +67,7 @@ def get_questions(subject, topic):
             }
             for q in questions
         ]
-    }
-    
-    )
+    })
 
 # ---------------- QUIZ PAGE ----------------
 @quiz_bp.route("/quiz/<subject>/<path:topic>")
