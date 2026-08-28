@@ -260,12 +260,12 @@ tr:hover{
 
     <a
         href="{{ url_for('questions.add_question',
-            page=questions.page,
-            search=search,
-            topic=topic,
-            subject=subject,
-            difficulty=difficulty
-        ) }}"
+			page=questions.page,
+			search=search,
+			filter_topic=filter_topic,
+			filter_subject=filter_subject,
+			filter_difficulty=filter_difficulty
+				) }}"
         class="btn btn-success">
 
         <i class="fas fa-plus"></i> Add a Question
@@ -288,11 +288,11 @@ tr:hover{
 
     <a
         href="{{ url_for('questions.bulk_upload_questions',
-            page=page,
-            search=search,
-            filter_topic=filter_topic,
-            subject=subject,
-            difficulty=difficulty
+            page=questions.page,
+			search=search,
+			filter_topic=filter_topic,
+			filter_subject=filter_subject,
+			filter_difficulty=filter_difficulty
         ) }}"
         class="btn btn-primary">
 
@@ -303,11 +303,11 @@ tr:hover{
 
     <a
         href="{{ url_for('questions.export_questions',
-            page=page,
-            search=search,
-            filter_topic=filter_topic,
-            subject=subject,
-            difficulty=difficulty
+            page=questions.page,
+			search=search,
+			filter_topic=filter_topic,
+			filter_subject=filter_subject,
+			filter_difficulty=filter_difficulty
         ) }}"
         class="btn btn-info">
 
@@ -626,14 +626,37 @@ Search
     'questions.view_questions',
     page=questions.prev_num,
     search=search,
+    question_id=question_id,
     filter_topic=filter_topic,
-    subject=subject,
-    difficulty=difficulty
+    filter_subject=filter_subject,
+    filter_difficulty=filter_difficulty
 ) }}">
-Previous
+    Previous
 </a>
 
 {% endif %}
+
+
+Page {{ questions.page }} of {{ questions.pages }}
+
+
+{% if questions.has_next %}
+
+<a href="{{ url_for(
+    'questions.view_questions',
+    page=questions.next_num,
+    search=search,
+    question_id=question_id,
+    filter_topic=filter_topic,
+    filter_subject=filter_subject,
+    filter_difficulty=filter_difficulty
+) }}">
+    Next
+</a>
+
+{% endif %}
+
+</div>
 
 
 

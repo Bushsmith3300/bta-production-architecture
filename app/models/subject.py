@@ -67,6 +67,9 @@ class Subject(db.Model):
         onupdate=datetime.utcnow
     )
     
+    # RELATIONSHIPS (FIXED)
+    # ======================================
+    
     questions = db.relationship(
     "Question",
     back_populates="subject_ref"

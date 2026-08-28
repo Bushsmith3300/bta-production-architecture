@@ -30,6 +30,7 @@ from app.extensions import db
 
 from app.models import (
     Question,
+    Subject,
     AssignmentQuestion,
     StudentAnswer,
     UserHistory,
@@ -108,35 +109,130 @@ def view_questions():
     - subject filtering
     - difficulty filtering
 
-    Optimized for large question banks.
+    Uses the Subject model and Question.subject_id.
     """
 
     page = request.args.get("page", 1, type=int)
-    search = request.args.get("search", "", type=str).strip()
-    filter_topic = request.args.get("filter_topic", "", type=str).strip()
-    filter_subject = request.args.get("filter_subject", "", type=str).strip()
-    filter_difficulty = request.args.get("filter_difficulty", "", type=str).strip()
-    
-    
-    question_id = request.args.get("question_id", "", type=int)
 
-   
-    query = Question.query
+    search = request.args.get(
+        "search", "", type=str
+    ).strip()
 
+    filter_topic = request.args.get(
+        "filter_topic", "", type=str
+    ).strip()
 
-    if question_id:
-        query = query.filter(Question.id == question_id)
+    filter_subject = request.args.get(
+        "filter_subject", "", type=str
+    ).strip()
 
+    filter_difficulty = request.args.get(
+        "filter_difficulty", "", type=str
+    ).strip()
 
-    if session.get("role") == "admin":
-
-        query = query.filter(Question.subject == session.get("subject")
+    question_id = request.args.get(
+        "question_id", "", type=int
     )
 
 
+    # ==================================================
+    # SUBJECT CONTEXT
+    # ==================================================
 
-    # ---------------- SEARCH ----------------
+    admin_subject = None
+    selected_subject = None
 
+
+    # --------------------------------------------------
+    # Regular Admin
+    # --------------------------------------------------
+
+    if session.get("role") == "admin":
+
+        admin_subject = (
+            Subject.query
+            .filter(
+                Subject.name == session.get("subject")
+            )
+            .first()
+        )
+
+        if not admin_subject:
+
+            flash(
+                "Your assigned subject could not be found.",
+                "danger"
+            )
+
+            return redirect(
+                url_for("admin.dashboard")
+            )
+
+
+    # --------------------------------------------------
+    # Super Admin selected subject
+    # --------------------------------------------------
+
+    elif filter_subject:
+
+        selected_subject = (
+            Subject.query
+            .filter(
+                Subject.name == filter_subject
+            )
+            .first()
+        )
+
+        if not selected_subject:
+
+            flash(
+                "Selected subject could not be found.",
+                "warning"
+            )
+
+            return redirect(
+                url_for("questions.view_questions")
+            )
+
+
+    # ==================================================
+    # MAIN QUESTION QUERY
+    # ==================================================
+
+    query = Question.query
+
+
+    # --------------------------------------------------
+    # Question ID
+    # --------------------------------------------------
+
+    if question_id:
+
+        query = query.filter(
+            Question.id == question_id
+        )
+
+
+    # --------------------------------------------------
+    # SUBJECT RESTRICTION
+    # --------------------------------------------------
+
+    if session.get("role") == "admin":
+
+        query = query.filter(
+            Question.subject_id == admin_subject.id
+        )
+
+    elif selected_subject:
+
+        query = query.filter(
+            Question.subject_id == selected_subject.id
+        )
+
+
+    # ==================================================
+    # SEARCH
+    # ==================================================
 
     if search:
 
@@ -157,9 +253,9 @@ def view_questions():
         )
 
 
-
-    # ---------------- FILTERS ----------------
-
+    # ==================================================
+    # TOPIC FILTER
+    # ==================================================
 
     if filter_topic:
 
@@ -168,29 +264,30 @@ def view_questions():
         )
 
 
-    if filter_subject and session.get("role") != "admin":
-
-        query = query.filter(Question.subject == filter_subject)
-
+    # ==================================================
+    # DIFFICULTY FILTER
+    # ==================================================
 
     if filter_difficulty:
 
         query = query.filter(
-            Question.difficulty == filter_difficulty)
-            
-           
+            Question.difficulty == filter_difficulty
+        )
 
-    # ---------------- SORTING ----------------
 
+    # ==================================================
+    # SORTING
+    # ==================================================
 
     query = query.order_by(
-        Question.created_at.desc()
+        Question.created_at.desc(),
+        Question.id.desc()
     )
 
 
-
-    # ---------------- PAGINATION ----------------
-
+    # ==================================================
+    # PAGINATION
+    # ==================================================
 
     questions = query.paginate(
         page=page,
@@ -199,106 +296,131 @@ def view_questions():
     )
 
 
-
     # ==================================================
     # STATISTICS
     # ==================================================
 
+    stats_query = Question.query
 
+
+    # Regular Admin statistics
     if session.get("role") == "admin":
 
-        total_questions = Question.query.filter_by(
-            subject=session.get("subject")
-        ).count()
-
-    else:
-
-        total_questions = Question.query.count()
-
-
-
-    if session.get("role") == "admin":
-
-        total_topics = (
-        db.session.query(
-        func.count(
-        func.distinct(Question.topic)
-            )
+        stats_query = stats_query.filter(
+            Question.subject_id == admin_subject.id
         )
-        .filter(
-            Question.subject == session.get("subject")
+
+    # Super Admin selected subject statistics
+    elif selected_subject:
+
+        stats_query = stats_query.filter(
+            Question.subject_id == selected_subject.id
         )
-        .scalar()
-    )
 
 
-    else:
+    total_questions = stats_query.count()
 
-        total_topics = (
-        db.session.query(
+
+    total_topics = (
+        stats_query
+        .with_entities(
             func.count(
                 func.distinct(Question.topic)
             )
         )
         .scalar()
     )
-   
 
 
+    # ==================================================
+    # TOPIC DROPDOWN
+    # ==================================================
+
+    topic_query = db.session.query(
+        Question.topic
+    ).filter(
+        Question.topic.isnot(None),
+        Question.topic != ""
+    )
+
+
+    # Regular Admin topics
     if session.get("role") == "admin":
 
-        topics = (
-            db.session.query(Question.topic)
-            .filter(
-                Question.subject == session.get("subject")
-            )
-            .distinct()
-            .order_by(Question.topic)
-            .all()
+        topic_query = topic_query.filter(
+            Question.subject_id == admin_subject.id
+        )
+
+    # Super Admin selected subject topics
+    elif selected_subject:
+
+        topic_query = topic_query.filter(
+            Question.subject_id == selected_subject.id
         )
 
 
-    else:
+    topics = (
+        topic_query
+        .distinct()
+        .order_by(Question.topic)
+        .all()
+    )
 
-        topics = (
-            db.session.query(Question.topic)
-            .distinct()
-            .order_by(Question.topic)
-            .all()
-        )
-    
+
+    # ==================================================
+    # SUBJECT DROPDOWN
+    # ==================================================
 
     if session.get("role") == "admin":
 
         subjects = [
-            (session.get("subject"),)
+            (admin_subject.name,)
         ]
 
     else:
 
-        subjects = (
-            db.session.query(Question.subject)
-            .distinct()
-            .order_by(Question.subject)
+        subject_records = (
+            Subject.query
+            .order_by(
+                Subject.display_order,
+                Subject.name
+            )
             .all()
         )
 
-    
+        subjects = [
+            (subject.name,)
+            for subject in subject_records
+        ]
 
-    return render_template("admin/view_questions.html",  
-            subjects=subjects,            
-            page=page,                    
-            search=search,
-            questions=questions,
-            total_questions=total_questions,
-            total_topics=total_topics,
-            topics=topics,
-            filter_topic=filter_topic,
-            filter_subject=filter_subject,
-            filter_difficulty=filter_difficulty,    
-        
-        )
 
+    # ==================================================
+    # RENDER
+    # ==================================================
+
+    return render_template(
+        "admin/view_questions.html",
+
+        subjects=subjects,
+
+        page=page,
+
+        search=search,
+
+        questions=questions,
+
+        total_questions=total_questions,
+
+        total_topics=total_topics,
+
+        topics=topics,
+
+        filter_topic=filter_topic,
+
+        filter_subject=filter_subject,
+
+        filter_difficulty=filter_difficulty
+    )
 
 
 # ======================================================
