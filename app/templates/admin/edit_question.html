@@ -121,6 +121,7 @@ small{
 </style>
 {% endblock %}
 
+
 {% block content %}
 
 {% with messages = get_flashed_messages(with_categories=true) %}
@@ -149,6 +150,7 @@ small{
     name="csrf_token"
     value="{{ csrf_token() }}"
 >
+
 
 <!-- ==================================================
      PRESERVE PAGE AND FILTERS
@@ -197,42 +199,6 @@ small{
 
 
 <!-- ==================================================
-     TOPIC
-     ================================================== -->
-
-<div class="form-group">
-
-<label>Topic</label>
-
-<select name="topic" required>
-
-<option value="" disabled>
-    Choose Topic
-</option>
-
-{% for topic_option in topics %}
-
-<option
-    value="{{ topic_option }}"
-    {% if request.form.get("topic", question.topic) == topic_option %}
-    selected
-    {% endif %}
->
-    {{ topic_option }}
-</option>
-
-{% endfor %}
-
-</select>
-
-<small style="color:#6b7280;">
-    The current topic is automatically selected.
-</small>
-
-</div>
-
-
-<!-- ==================================================
      SUBJECT
      ================================================== -->
 
@@ -242,20 +208,25 @@ small{
 
 <label>Subject</label>
 
-<select name="subject" required>
-
-{% for subject_option in subjects %}
-
-<option
-    value="{{ subject_option }}"
-    {% if request.form.get("subject", question.subject) == subject_option %}
-    selected
-    {% endif %}
+<select
+    name="subject"
+    id="subject-select"
+    required
 >
-    {{ subject_option }}
-</option>
 
-{% endfor %}
+    {% for subject_option in subjects %}
+
+    <option
+        value="{{ subject_option.id }}"
+        {% if request.form.get(
+            "subject", current_subject.id)|int == subject_option.id %}
+        selected
+        {% endif %}
+    >
+        {{ subject_option.name }}
+    </option>
+
+    {% endfor %}
 
 </select>
 
@@ -275,7 +246,7 @@ small{
 <input
     type="text"
     name="subject"
-    value="{{ question.subject }}"
+    value="{{ current_subject.name }}"
     readonly
     style="
         background:#f3f4f6;
@@ -294,6 +265,46 @@ small{
 
 
 <!-- ==================================================
+     TOPIC
+     ================================================== -->
+
+<div class="form-group">
+
+<label>Topic</label>
+
+<select
+    name="topic"
+    id="topic-select"
+    required
+>
+
+    <option value="" disabled>
+        Choose Topic
+    </option>
+
+    {% for topic in topics %}
+
+    <option
+        value="{{ topic }}"
+        {% if topic == question.topic %}
+        selected
+        {% endif %}
+    >
+        {{ topic }}
+    </option>
+
+    {% endfor %}
+
+</select>
+
+<small style="color:#6b7280;">
+    The current topic is automatically selected.
+</small>
+
+</div>
+
+
+<!-- ==================================================
      DIFFICULTY
      ================================================== -->
 
@@ -301,7 +312,10 @@ small{
 
 <label>Difficulty</label>
 
-<select name="difficulty" required>
+<select
+    name="difficulty"
+    required
+>
 
 <option
     value=""
@@ -450,7 +464,10 @@ small{
 
 <label>Correct Answer</label>
 
-<select name="correct_answer" required>
+<select
+    name="correct_answer"
+    required
+>
 
 {% for ans in ["A", "B", "C", "D"] %}
 
@@ -525,4 +542,233 @@ small{
 
 </div>
 
+
+<!-- ==================================================
+     SUBJECT → TOPIC DYNAMIC LOADING
+     ================================================== -->
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const subjectSelect =
+        document.getElementById("subject-select");
+
+    const topicSelect =
+        document.getElementById("topic-select");
+
+
+    /*
+     * The Subject dropdown exists only for Super Admin.
+     * Regular Admin has a readonly subject field.
+     */
+    if (!subjectSelect || !topicSelect) {
+        return;
+    }
+
+
+    /*
+     * Remember the topic currently belonging to the
+     * question when the page first loads.
+     */
+    const currentTopic =
+        {{ question.topic|tojson }};
+
+
+    /*
+     * Load topics whenever the Subject changes.
+     */
+    subjectSelect.addEventListener(
+        "change",
+        async function () {
+
+            const subjectId = this.value;
+
+
+            /*
+             * Clear the existing topic list.
+             */
+            topicSelect.innerHTML = "";
+
+
+            /*
+             * No subject selected.
+             */
+            if (!subjectId) {
+
+                const option =
+                    document.createElement("option");
+
+                option.value = "";
+                option.textContent =
+                    "Choose Topic";
+
+                option.disabled = true;
+                option.selected = true;
+
+                topicSelect.appendChild(option);
+
+                return;
+            }
+
+
+            /*
+             * Display loading message.
+             */
+            const loadingOption =
+                document.createElement("option");
+
+            loadingOption.value = "";
+            loadingOption.textContent =
+                "Loading topics...";
+
+            loadingOption.disabled = true;
+            loadingOption.selected = true;
+
+            topicSelect.appendChild(
+                loadingOption
+            );
+
+
+            try {
+
+                const response = await fetch(
+                    `/admin/questions/topics/${subjectId}`
+                );
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "Failed to load topics"
+                    );
+
+                }
+
+
+                const data =
+                    await response.json();
+
+
+                /*
+                 * Remove loading message.
+                 */
+                topicSelect.innerHTML = "";
+
+
+                /*
+                 * No topics available.
+                 */
+                if (
+                    !data.topics ||
+                    data.topics.length === 0
+                ) {
+
+                    const option =
+                        document.createElement("option");
+
+                    option.value = "";
+                    option.textContent =
+                        "No topics available";
+
+                    option.disabled = true;
+                    option.selected = true;
+
+                    topicSelect.appendChild(
+                        option
+                    );
+
+                    return;
+                }
+
+
+                /*
+                 * Add the topics returned by Flask.
+                 */
+                data.topics.forEach(
+                    function (topic) {
+
+                        const option =
+                            document.createElement(
+                                "option"
+                            );
+
+                        option.value = topic;
+                        option.textContent = topic;
+
+
+                        /*
+                         * If the original topic belongs
+                         * to the newly selected subject,
+                         * automatically select it.
+                         */
+                        if (
+                            topic === currentTopic
+                        ) {
+
+                            option.selected = true;
+
+                        }
+
+
+                        topicSelect.appendChild(
+                            option
+                        );
+
+                    }
+                );
+
+
+                /*
+                 * If the original topic does not belong
+                 * to the newly selected subject, select
+                 * the first available topic.
+                 */
+                if (
+                    !data.topics.includes(currentTopic)
+                ) {
+
+                    topicSelect.selectedIndex = 0;
+
+                }
+
+            }
+
+
+            catch (error) {
+
+                console.error(
+                    "Error loading topics:",
+                    error
+                );
+
+
+                topicSelect.innerHTML = "";
+
+
+                const errorOption =
+                    document.createElement("option");
+
+                errorOption.value = "";
+
+                errorOption.textContent =
+                    "Unable to load topics";
+
+                errorOption.disabled = true;
+                errorOption.selected = true;
+
+                topicSelect.appendChild(
+                    errorOption
+                );
+
+            }
+
+        }
+    );
+
+});
+
+</script>
+
 {% endblock %}
+
