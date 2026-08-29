@@ -2,6 +2,7 @@
 
 from flask import (
     Blueprint,
+    jsonify,
     render_template,
     request,
     flash,
@@ -786,6 +787,38 @@ def add_question():
             filter_difficulty=filter_difficulty,
             )
 
+
+# ======================================================
+# GET TOPICS FOR SUBJECT
+# ======================================================
+
+@questions_bp.route("/topics/<int:subject_id>")
+@admin_subject_required
+def get_topics_for_subject(subject_id):
+
+    subject = Subject.query.get_or_404(subject_id)
+
+    topics = (
+        db.session.query(Question.topic)
+        .filter(
+            Question.subject_id == subject.id,
+            Question.topic.isnot(None),
+            Question.topic != ""
+        )
+        .distinct()
+        .order_by(Question.topic)
+        .all()
+    )
+
+    return jsonify({
+        "topics": [
+            topic[0]
+            for topic in topics
+        ]
+    })
+
+
+
 # ======================================================
 # EDIT QUESTION
 # ======================================================
@@ -797,50 +830,14 @@ def edit_question(question_id):
     question = Question.query.get_or_404(question_id)
 
     # --------------------------------------------------
-    # Determine subject
-    # --------------------------------------------------
-    # Regular admin:
-    #   Subject comes from the admin's assigned subject.
-    #
-    # Super admin:
-    #   Subject comes from the question being edited.
-    # --------------------------------------------------
-    
-    
-    # --------------------------------------------------
-    # Get subjects from database
-    # --------------------------------------------------
-
-    subjects = (
-        db.session.query(Question.subject)
-        .filter(
-            Question.subject.isnot(None),
-            Question.subject != ""
-        )
-        .distinct()
-        .order_by(Question.subject)
-        .all()
-    )
-
-    subjects = [row[0] for row in subjects]
-
-    # Make sure the current question's subject is included
-    
-    if question.subject and question.subject not in subjects:
-        subjects.insert(0, question.subject)
-    
-       
-
-    if session.get("role") == "admin":
-        subject = session.get("subject")
-    else:
-        subject = question.subject
-
-    # --------------------------------------------------
     # Preserve current page and filters
     # --------------------------------------------------
 
-    page = request.args.get("page", 1, type=int)
+    page = request.args.get(
+        "page",
+        1,
+        type=int
+    )
 
     search = request.args.get(
         "search",
@@ -866,49 +863,103 @@ def edit_question(question_id):
         type=str
     ).strip()
 
-    # --------------------------------------------------
-    # Permission check
-    # --------------------------------------------------
 
-    if (
-        session.get("role") == "admin"
-        and question.subject != session.get("subject")
-    ):
+    # ==================================================
+    # DETERMINE CURRENT SUBJECT
+    # ==================================================
+
+    current_subject = question.subject_ref
+
+
+    if not current_subject:
+
         flash(
-            "You do not have permission to edit this question.",
+            "This question is not linked to a valid subject.",
             "danger"
         )
 
         return redirect(
-            url_for("questions.view_questions")
+            url_for(
+                "questions.view_questions",
+                page=page,
+                search=search,
+                filter_topic=filter_topic,
+                filter_subject=filter_subject,
+                filter_difficulty=filter_difficulty
+            )
         )
 
+
     # ==================================================
-    # GET TOPICS FOR CURRENT QUESTION SUBJECT
+    # REGULAR ADMIN PERMISSION
     # ==================================================
-    #
-    # This is important.
-    #
-    # We no longer use a hard-coded Chemistry topic list.
-    # Instead, we get the topics that actually exist in
-    # the database for this question's subject.
-    #
-    # Example:
-    #
-    # Physics question
-    #     -> Physics topics
-    #
-    # Biology question
-    #     -> Biology topics
-    #
-    # Add Maths question
-    #     -> Add Maths topics
+
+    if session.get("role") == "admin":
+
+        admin_subject = (
+            Subject.query
+            .filter(
+                Subject.name == session.get("subject")
+            )
+            .first()
+        )
+
+        if not admin_subject:
+
+            flash(
+                "Your assigned subject could not be found.",
+                "danger"
+            )
+
+            return redirect(
+                url_for("questions.view_questions")
+            )
+
+
+        if question.subject_id != admin_subject.id:
+
+            flash(
+                "You do not have permission to edit this question.",
+                "danger"
+            )
+
+            return redirect(
+                url_for(
+                    "questions.view_questions",
+                    page=page,
+                    search=search,
+                    filter_topic=filter_topic,
+                    filter_subject=filter_subject,
+                    filter_difficulty=filter_difficulty
+                )
+            )
+
+
+    # ==================================================
+    # SUBJECT LIST
+    # ==================================================
+
+    subjects = (
+        Subject.query
+        .filter(
+            Subject.is_active.is_(True)
+        )
+        .order_by(
+            Subject.display_order,
+            Subject.name
+        )
+        .all()
+    )
+
+
+    # ==================================================
+    # TOPICS FOR CURRENT SUBJECT
     # ==================================================
 
     topics = (
         db.session.query(Question.topic)
         .filter(
-            Question.subject == question.subject,
+            Question.subject_id == current_subject.id,
             Question.topic.isnot(None),
             Question.topic != ""
         )
@@ -917,22 +968,26 @@ def edit_question(question_id):
         .all()
     )
 
-    topics = [row[0] for row in topics]
+    topics = [
+        row[0]
+        for row in topics
+    ]
+
 
     # --------------------------------------------------
-    # Make sure the question's current topic is present
-    # --------------------------------------------------
-    #
-    # This protects against a situation where the topic
-    # exists on this question but is not currently used
-    # by another question.
+    # Make sure current topic is included
     # --------------------------------------------------
 
     if (
         question.topic
         and question.topic not in topics
     ):
-        topics.insert(0, question.topic)
+
+        topics.insert(
+            0,
+            question.topic
+        )
+
 
     # ==================================================
     # POST
@@ -941,7 +996,7 @@ def edit_question(question_id):
     if request.method == "POST":
 
         # --------------------------------------------------
-        # Preserve current page and filters
+        # Preserve page and filters
         # --------------------------------------------------
 
         page = request.form.get(
@@ -974,35 +1029,68 @@ def edit_question(question_id):
             type=str
         ).strip()
 
-        # --------------------------------------------------
-        # Question ID
-        # --------------------------------------------------
 
-        posted_question_id = request.form.get(
-            "question_id",
-            ""
-        ).strip()
-
-        # --------------------------------------------------
-        # Subject
-        # --------------------------------------------------
+        # ==================================================
+        # SUBJECT
+        # ==================================================
 
         if session.get("role") == "admin":
 
-            # Regular admin cannot change subject.
-            subject = session.get("subject")
+            # ----------------------------------------------
+            # Regular Admin
+            # ----------------------------------------------
+            # Regular Admin cannot change the subject.
+            # Use the subject assigned to the admin.
+            # ----------------------------------------------
+
+            selected_subject = admin_subject
 
         else:
 
-            # Super admin can change subject.
-            subject = request.form.get(
-                "subject",
-                ""
-            ).strip()
+            # ----------------------------------------------
+            # Super Admin
+            # ----------------------------------------------
+            # The form sends Subject.id.
+            # ----------------------------------------------
 
-        # --------------------------------------------------
-        # Question data
-        # --------------------------------------------------
+            subject_id = request.form.get(
+                "subject",
+                type=int
+            )
+
+            selected_subject = (
+                Subject.query
+                .filter(
+                    Subject.id == subject_id,
+                    Subject.is_active.is_(True)
+                )
+                .first()
+            )
+
+
+            if not selected_subject:
+
+                flash(
+                    "Please select a valid subject.",
+                    "danger"
+                )
+
+                return redirect(
+                    url_for(
+                        "questions.edit_question",
+                        question_id=question.id,
+                        page=page,
+                        search=search,
+                        filter_topic=filter_topic,
+                        filter_subject=filter_subject,
+                        filter_difficulty=filter_difficulty
+                    )
+                )
+
+
+        # ==================================================
+        # QUESTION DATA
+        # ==================================================
 
         topic = request.form.get(
             "topic",
@@ -1049,8 +1137,9 @@ def edit_question(question_id):
             ""
         ).strip()
 
+
         # ==================================================
-        # Validation
+        # REQUIRED FIELD VALIDATION
         # ==================================================
 
         if not topic:
@@ -1068,28 +1157,10 @@ def edit_question(question_id):
                     search=search,
                     filter_topic=filter_topic,
                     filter_subject=filter_subject,
-                    filter_difficulty=filter_difficulty,
+                    filter_difficulty=filter_difficulty
                 )
             )
 
-        if not subject:
-
-            flash(
-                "Subject is required.",
-                "danger"
-            )
-
-            return redirect(
-                url_for(
-                    "questions.edit_question",
-                    question_id=question.id,
-                    page=page,
-                    search=search,
-                    filter_topic=filter_topic,
-                    filter_subject=filter_subject,
-                    filter_difficulty=filter_difficulty,
-                )
-            )
 
         if not question_text:
 
@@ -1106,9 +1177,10 @@ def edit_question(question_id):
                     search=search,
                     filter_topic=filter_topic,
                     filter_subject=filter_subject,
-                    filter_difficulty=filter_difficulty,
+                    filter_difficulty=filter_difficulty
                 )
             )
+
 
         if not option_a:
 
@@ -1125,9 +1197,10 @@ def edit_question(question_id):
                     search=search,
                     filter_topic=filter_topic,
                     filter_subject=filter_subject,
-                    filter_difficulty=filter_difficulty,
+                    filter_difficulty=filter_difficulty
                 )
             )
+
 
         if not option_b:
 
@@ -1144,9 +1217,10 @@ def edit_question(question_id):
                     search=search,
                     filter_topic=filter_topic,
                     filter_subject=filter_subject,
-                    filter_difficulty=filter_difficulty,
+                    filter_difficulty=filter_difficulty
                 )
             )
+
 
         if not option_c:
 
@@ -1163,9 +1237,10 @@ def edit_question(question_id):
                     search=search,
                     filter_topic=filter_topic,
                     filter_subject=filter_subject,
-                    filter_difficulty=filter_difficulty,
+                    filter_difficulty=filter_difficulty
                 )
             )
+
 
         if not option_d:
 
@@ -1182,19 +1257,20 @@ def edit_question(question_id):
                     search=search,
                     filter_topic=filter_topic,
                     filter_subject=filter_subject,
-                    filter_difficulty=filter_difficulty,
+                    filter_difficulty=filter_difficulty
                 )
             )
 
-        # --------------------------------------------------
-        # Check duplicate options
-        # --------------------------------------------------
+
+        # ==================================================
+        # OPTION UNIQUENESS VALIDATION
+        # ==================================================
 
         options = [
-            option_a.lower(),
-            option_b.lower(),
-            option_c.lower(),
-            option_d.lower()
+            option_a.lower().strip(),
+            option_b.lower().strip(),
+            option_c.lower().strip(),
+            option_d.lower().strip()
         ]
 
         if len(set(options)) != 4:
@@ -1212,13 +1288,14 @@ def edit_question(question_id):
                     search=search,
                     filter_topic=filter_topic,
                     filter_subject=filter_subject,
-                    filter_difficulty=filter_difficulty,
+                    filter_difficulty=filter_difficulty
                 )
             )
 
-        # --------------------------------------------------
-        # Validate correct answer
-        # --------------------------------------------------
+
+        # ==================================================
+        # CORRECT ANSWER VALIDATION
+        # ==================================================
 
         if correct_answer not in [
             "A",
@@ -1240,13 +1317,14 @@ def edit_question(question_id):
                     search=search,
                     filter_topic=filter_topic,
                     filter_subject=filter_subject,
-                    filter_difficulty=filter_difficulty,
+                    filter_difficulty=filter_difficulty
                 )
             )
 
-        # --------------------------------------------------
-        # Validate difficulty
-        # --------------------------------------------------
+
+        # ==================================================
+        # DIFFICULTY VALIDATION
+        # ==================================================
 
         if difficulty not in [
             "DOK_1",
@@ -1256,7 +1334,7 @@ def edit_question(question_id):
         ]:
 
             flash(
-                "Invalid difficulty level. Choose DOK_1, DOK_2, DOK_3 or DOK_4.",
+                "Invalid difficulty level.",
                 "danger"
             )
 
@@ -1268,17 +1346,66 @@ def edit_question(question_id):
                     search=search,
                     filter_topic=filter_topic,
                     filter_subject=filter_subject,
-                    filter_difficulty=filter_difficulty,
+                    filter_difficulty=filter_difficulty
                 )
             )
 
+
         # ==================================================
-        # Generate question hash
+        # VALIDATE TOPIC BELONGS TO SELECTED SUBJECT
+        # ==================================================
+
+        valid_topic = (
+            db.session.query(Question.id)
+            .filter(
+                Question.subject_id == selected_subject.id,
+                Question.topic == topic
+            )
+            .first()
+        )
+
+
+        # --------------------------------------------------
+        # Allow the question's existing topic when editing
+        # --------------------------------------------------
+
+        if not valid_topic:
+
+            if (
+                selected_subject.id == question.subject_id
+                and topic == question.topic
+            ):
+
+                valid_topic = True
+
+
+        if not valid_topic:
+
+            flash(
+                "Please select a valid topic for the selected subject.",
+                "danger"
+            )
+
+            return redirect(
+                url_for(
+                    "questions.edit_question",
+                    question_id=question.id,
+                    page=page,
+                    search=search,
+                    filter_topic=filter_topic,
+                    filter_subject=filter_subject,
+                    filter_difficulty=filter_difficulty
+                )
+            )
+
+
+        # ==================================================
+        # GENERATE QUESTION HASH
         # ==================================================
 
         question_hash = generate_question_hash(
             topic=topic,
-            subject=subject,
+            subject=selected_subject.name,
             question_text=question_text,
             option_a=option_a,
             option_b=option_b,
@@ -1287,19 +1414,25 @@ def edit_question(question_id):
             correct_answer=correct_answer,
         )
 
+
         # ==================================================
-        # Duplicate check
+        # DUPLICATE CHECK
         # ==================================================
 
-        duplicate = Question.query.filter(
-            Question.question_hash == question_hash,
-            Question.id != question.id
-        ).first()
+        duplicate = (
+            Question.query
+            .filter(
+                Question.question_hash == question_hash,
+                Question.id != question.id
+            )
+            .first()
+        )
+
 
         if duplicate:
 
             flash(
-                f"This question already exists "
+                f"Another question with the same content already exists "
                 f"(Question ID: {duplicate.id}).",
                 "warning"
             )
@@ -1312,19 +1445,40 @@ def edit_question(question_id):
                     search=search,
                     filter_topic=filter_topic,
                     filter_subject=filter_subject,
-                    filter_difficulty=filter_difficulty,
+                    filter_difficulty=filter_difficulty
                 )
             )
 
+
         # ==================================================
-        # Update question
+        # UPDATE QUESTION
         # ==================================================
 
         try:
 
+            # ----------------------------------------------
+            # Update relational Subject
+            # ----------------------------------------------
+
+            question.subject_id = selected_subject.id
+
+
+            # ----------------------------------------------
+            # Keep legacy subject field synchronized
+            # during migration stage.
+            # ----------------------------------------------
+
+            question.subject = selected_subject.name
+
+
+            # ----------------------------------------------
+            # Update question data
+            # ----------------------------------------------
+
             question.topic = topic
-            question.subject = subject
+
             question.difficulty = difficulty
+
             question.question_text = question_text
 
             question.option_a = option_a
@@ -1333,15 +1487,20 @@ def edit_question(question_id):
             question.option_d = option_d
 
             question.correct_answer = correct_answer
+
             question.explanation = explanation
+
             question.question_hash = question_hash
 
+
             db.session.commit()
+
 
             flash(
                 "Question updated successfully.",
                 "success"
             )
+
 
             return redirect(
                 url_for(
@@ -1350,9 +1509,10 @@ def edit_question(question_id):
                     search=search,
                     filter_topic=filter_topic,
                     filter_subject=filter_subject,
-                    filter_difficulty=filter_difficulty,
+                    filter_difficulty=filter_difficulty
                 )
             )
+
 
         except IntegrityError:
 
@@ -1372,9 +1532,10 @@ def edit_question(question_id):
                     search=search,
                     filter_topic=filter_topic,
                     filter_subject=filter_subject,
-                    filter_difficulty=filter_difficulty,
+                    filter_difficulty=filter_difficulty
                 )
             )
+
 
         except Exception as e:
 
@@ -1387,30 +1548,43 @@ def edit_question(question_id):
 
             return redirect(
                 url_for(
-                    "questions.view_questions",
+                    "questions.edit_question",
+                    question_id=question.id,
                     page=page,
                     search=search,
                     filter_topic=filter_topic,
                     filter_subject=filter_subject,
-                    filter_difficulty=filter_difficulty,
+                    filter_difficulty=filter_difficulty
                 )
             )
+
 
     # ==================================================
     # GET
     # ==================================================
 
-    return render_template("admin/edit_question.html",
+    return render_template(
+        "admin/edit_question.html",
+
         question=question,
-        page=page,
-        subject=subject,
+
         subjects=subjects,
+
         topics=topics,
+
+        current_subject=current_subject,
+
+        page=page,
+
         search=search,
+
         filter_topic=filter_topic,
+
         filter_subject=filter_subject,
+
         filter_difficulty=filter_difficulty,
     )
+
 
 
 # ======================================================

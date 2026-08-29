@@ -4,6 +4,7 @@ from app.utils.decorators import admin_subject_required, login_required
 
 from app.models import (
     Question,
+    Subject,
     User,
     Assignment,
     AssignmentQuestion,
@@ -23,8 +24,31 @@ regular_admin_bp = Blueprint(
 @admin_subject_required
 def dashboard():
 
-    total_questions = Question.query.filter_by(subject=session.get("subject")
-     ).count()
+    # ======================================================
+    # GET ADMIN'S ASSIGNED SUBJECT
+    # ======================================================
+
+    admin_subject = (
+        Subject.query
+        .filter_by(
+            name=session.get("subject")
+        )
+        .first()
+    )
+
+
+    # ======================================================
+    # COUNT QUESTIONS FOR ASSIGNED SUBJECT
+    # ======================================================
+
+    total_questions = (
+        Question.query
+        .filter(
+            Question.subject_id == admin_subject.id
+        )
+        .count()
+    )
+    
 
     total_assignments = Assignment.query.count()
 
@@ -69,7 +93,7 @@ def dashboard():
 
     return render_template(
         "admin/dashboard_regular_admin.html",
-        data=dashboard_data
+        data=dashboard_data,
     )
 
 
