@@ -1586,7 +1586,6 @@ def edit_question(question_id):
     )
 
 
-
 # ======================================================
 # DELETE QUESTION
 # ======================================================
@@ -1597,33 +1596,83 @@ def delete_question(question_id):
 
     question = Question.query.get_or_404(question_id)
 
+    # --------------------------------------------------
+    # Preserve current page and filters
+    # --------------------------------------------------
+
     page = request.form.get("page", 1, type=int)
     search = request.form.get("search", "")
-    question_id = request.form.get("question_id", type=int)
     filter_topic = request.form.get("filter_topic", "")
     filter_subject = request.form.get("filter_subject", "")
     filter_difficulty = request.form.get("filter_difficulty", "")
-    
 
-    if (
-        session.get("role") == "admin" and question.subject != session.get("subject")
-    ):
-        flash(
-            "You do not have permission to delete this question.",
-            "danger"
+
+    # ==================================================
+    # REGULAR ADMIN AUTHORIZATION
+    # ==================================================
+
+    if session.get("role") == "admin":
+
+        admin_subject = (
+            Subject.query
+            .filter(
+                Subject.name == session.get("subject"),
+                Subject.is_active.is_(True)
+            )
+            .first()
         )
 
-        return redirect(url_for(
-            "questions.view_questions",
-            page=page,
-            search=search,
-            filter_topic=filter_topic,
-            filter_subject=filter_subject,
-            filter_difficulty=filter_difficulty,
-        )
 
-        )
- 
+        # --------------------------------------------------
+        # Assigned subject could not be found
+        # --------------------------------------------------
+
+        if not admin_subject:
+
+            flash(
+                "Your assigned subject could not be found.",
+                "danger"
+            )
+
+            return redirect(
+                url_for(
+                    "questions.view_questions",
+                    page=page,
+                    search=search,
+                    filter_topic=filter_topic,
+                    filter_subject=filter_subject,
+                    filter_difficulty=filter_difficulty,
+                )
+            )
+
+
+        # --------------------------------------------------
+        # Prevent Regular Admin from deleting a question
+        # belonging to another subject.
+        # --------------------------------------------------
+
+        if question.subject_id != admin_subject.id:
+
+            flash(
+                "You do not have permission to delete this question.",
+                "danger"
+            )
+
+            return redirect(
+                url_for(
+                    "questions.view_questions",
+                    page=page,
+                    search=search,
+                    filter_topic=filter_topic,
+                    filter_subject=filter_subject,
+                    filter_difficulty=filter_difficulty,
+                )
+            )
+
+
+    # ==================================================
+    # CHECK QUESTION DEPENDENCIES
+    # ==================================================
 
     if question_has_dependencies(question.id):
 
@@ -1633,14 +1682,20 @@ def delete_question(question_id):
         )
 
         return redirect(
-            url_for("questions.view_questions",
-            page=page,
-            search=search,
-            filter_topic=filter_topic,
-            filter_subject=filter_subject,
-            filter_difficulty=filter_difficulty, 
+            url_for(
+                "questions.view_questions",
+                page=page,
+                search=search,
+                filter_topic=filter_topic,
+                filter_subject=filter_subject,
+                filter_difficulty=filter_difficulty,
+            )
         )
-        )
+
+
+    # ==================================================
+    # DELETE QUESTION
+    # ==================================================
 
     try:
 
@@ -1653,6 +1708,7 @@ def delete_question(question_id):
             "success"
         )
 
+
     except IntegrityError:
 
         db.session.rollback()
@@ -1661,6 +1717,7 @@ def delete_question(question_id):
             "This question cannot be deleted because it is referenced elsewhere.",
             "warning"
         )
+
 
     except Exception as e:
 
@@ -1671,16 +1728,22 @@ def delete_question(question_id):
             "danger"
         )
 
+
+    # ==================================================
+    # RETURN TO QUESTION LIST
+    # ==================================================
+
     return redirect(
-        url_for("questions.view_questions",
+        url_for(
+            "questions.view_questions",
             page=page,
             search=search,
             filter_topic=filter_topic,
             filter_subject=filter_subject,
             filter_difficulty=filter_difficulty,
-         )       
-        ) 
-    
+        )
+    )
+
 
 # ======================================================
 # BULK DELETE
@@ -1704,6 +1767,10 @@ def bulk_delete_questions():
     filter_difficulty = request.form.get("filter_difficulty", "")
 
 
+    # ==================================================
+    # NO QUESTIONS SELECTED
+    # ==================================================
+
     if not ids:
 
         flash(
@@ -1722,61 +1789,174 @@ def bulk_delete_questions():
             )
         )
 
+
     deleted = 0
     skipped = 0
+
+
+    # ==================================================
+    # GET REGULAR ADMIN'S SUBJECT
+    # ==================================================
+
+    admin_subject = None
+
+    if session.get("role") == "admin":
+
+        admin_subject = (
+            Subject.query
+            .filter(
+                Subject.name == session.get("subject"),
+                Subject.is_active.is_(True)
+            )
+            .first()
+        )
+
+        # --------------------------------------------------
+        # Assigned subject could not be found
+        # --------------------------------------------------
+
+        if not admin_subject:
+
+            flash(
+                "Your assigned subject could not be found.",
+                "danger"
+            )
+
+            return redirect(
+                url_for(
+                    "questions.view_questions",
+                    page=page,
+                    search=search,
+                    filter_topic=filter_topic,
+                    filter_subject=filter_subject,
+                    filter_difficulty=filter_difficulty,
+                )
+            )
+
+
+    # ==================================================
+    # PROCESS SELECTED QUESTIONS
+    # ==================================================
 
     try:
 
         for question_id in ids:
 
+            # --------------------------------------------------
+            # Validate question ID
+            # --------------------------------------------------
 
             try:
+
                 question_id = int(question_id)
 
-            except ValueError:
+            except (ValueError, TypeError):
+
                 print(" -> Invalid ID")
+
                 skipped += 1
+
                 continue
 
-            question = db.session.get(Question, question_id)
+
+            # --------------------------------------------------
+            # Get question
+            # --------------------------------------------------
+
+            question = db.session.get(
+                Question,
+                question_id
+            )
+
 
             if not question:
+
                 print(" -> Question not found")
+
                 skipped += 1
+
                 continue
+
+
+            # ==================================================
+            # REGULAR ADMIN AUTHORIZATION
+            # ==================================================
 
             if (
                 session.get("role") == "admin"
-                and question.subject != session.get("subject")
+                and question.subject_id != admin_subject.id
             ):
+
                 print(" -> Unauthorized")
+
                 skipped += 1
+
                 continue
+
+
+            # ==================================================
+            # CHECK QUESTION DEPENDENCIES
+            # ==================================================
 
             if question_has_dependencies(question.id):
+
                 print(" -> Has dependencies")
+
                 skipped += 1
+
                 continue
 
+
+            # ==================================================
+            # DELETE QUESTION
+            # ==================================================
+
             print(" -> Deleting")
+
             db.session.delete(question)
+
             deleted += 1
 
-        print(f"\nDeleted={deleted}, Skipped={skipped}")
+
+        print(
+            f"\nDeleted={deleted}, Skipped={skipped}"
+        )
+
+
+        # ==================================================
+        # COMMIT CHANGES
+        # ==================================================
 
         db.session.commit()
 
+
+        # ==================================================
+        # SUCCESS MESSAGE
+        # ==================================================
+
         if deleted:
+
             flash(
                 f"{deleted} question(s) deleted successfully.",
                 "success"
             )
 
+
+        # ==================================================
+        # SKIPPED MESSAGE
+        # ==================================================
+
         if skipped:
+
             flash(
                 f"{skipped} question(s) were skipped because they were invalid, unauthorized, not found, or already in use.",
                 "warning"
             )
+
+
+    # ==================================================
+    # DATABASE INTEGRITY ERROR
+    # ==================================================
 
     except IntegrityError:
 
@@ -1787,6 +1967,11 @@ def bulk_delete_questions():
             "warning"
         )
 
+
+    # ==================================================
+    # GENERAL ERROR
+    # ==================================================
+
     except Exception as e:
 
         db.session.rollback()
@@ -1795,6 +1980,11 @@ def bulk_delete_questions():
             f"Error: {e}",
             "danger"
         )
+
+
+    # ==================================================
+    # RETURN TO QUESTION LIST
+    # ==================================================
 
     return redirect(
         url_for(
@@ -1806,6 +1996,7 @@ def bulk_delete_questions():
             filter_difficulty=filter_difficulty,
         )
     )
+
 
 
 # ======================================================
@@ -1825,41 +2016,126 @@ def delete_unused_questions():
     topic = request.form.get("topic", "")
     filter_topic = request.form.get("filter_topic", "")
     filter_subject = request.form.get("filter_subject", "")
-    question_id = request.args.get("question_id", type=int)
+    question_id = request.form.get("question_id", type=int)
     filter_difficulty = request.form.get("filter_difficulty", "")
-   
+
 
     deleted = 0
 
+
+    # ==================================================
+    # GET QUESTIONS AVAILABLE TO CURRENT ADMIN
+    # ==================================================
+
     if session.get("role") == "admin":
 
-        questions = Question.query.filter_by(
-            subject=session.get("subject")
-        ).all()
+        # --------------------------------------------------
+        # Resolve the Regular Admin's assigned Subject
+        # --------------------------------------------------
+
+        admin_subject = (
+            Subject.query
+            .filter(
+                Subject.name == session.get("subject"),
+                Subject.is_active.is_(True)
+            )
+            .first()
+        )
+
+
+        # --------------------------------------------------
+        # Assigned subject could not be found
+        # --------------------------------------------------
+
+        if not admin_subject:
+
+            flash(
+                "Your assigned subject could not be found.",
+                "danger"
+            )
+
+            return redirect(
+                url_for(
+                    "questions.view_questions",
+                    page=page,
+                    search=search,
+                    filter_topic=filter_topic,
+                    filter_subject=filter_subject,
+                    filter_difficulty=filter_difficulty,
+                )
+            )
+
+
+        # --------------------------------------------------
+        # Only retrieve questions belonging to the
+        # Regular Admin's assigned Subject
+        # --------------------------------------------------
+
+        questions = (
+            Question.query
+            .filter(
+                Question.subject_id == admin_subject.id
+            )
+            .all()
+        )
+
 
     else:
 
+        # --------------------------------------------------
+        # Super Admin can access all questions
+        # --------------------------------------------------
+
         questions = Question.query.all()
+
+
+    # ==================================================
+    # DELETE UNUSED QUESTIONS
+    # ==================================================
 
     try:
 
         for question in questions:
+
+            # --------------------------------------------------
+            # Do not delete questions already being used
+            # --------------------------------------------------
 
             if question_has_dependencies(
                 question.id
             ):
                 continue
 
+
+            # --------------------------------------------------
+            # Delete unused question
+            # --------------------------------------------------
+
             db.session.delete(question)
 
             deleted += 1
 
+
+        # --------------------------------------------------
+        # Commit deletions
+        # --------------------------------------------------
+
         db.session.commit()
+
+
+        # --------------------------------------------------
+        # Success message
+        # --------------------------------------------------
 
         flash(
             f"{deleted} unused question(s) deleted successfully.",
             "success"
         )
+
+
+    # ==================================================
+    # DATABASE INTEGRITY ERROR
+    # ==================================================
 
     except IntegrityError:
 
@@ -1870,6 +2146,11 @@ def delete_unused_questions():
             "warning"
         )
 
+
+    # ==================================================
+    # GENERAL ERROR
+    # ==================================================
+
     except Exception as e:
 
         db.session.rollback()
@@ -1879,6 +2160,11 @@ def delete_unused_questions():
             "danger"
         )
 
+
+    # ==================================================
+    # RETURN TO QUESTION LIST
+    # ==================================================
+
     return redirect(
         url_for(
             "questions.view_questions",
@@ -1886,105 +2172,157 @@ def delete_unused_questions():
             search=search,
             question_id=question_id,
             filter_topic=filter_topic,
-            subject=subject,
-            difficulty=difficulty
+            filter_subject=filter_subject,
+            filter_difficulty=filter_difficulty,
         )
     )
-    
-    
+
 
 # ======================================================
 # BULK QUESTIONS UPLOAD
 # ======================================================
-    
-    
+
 @questions_bp.route("/bulk-upload", methods=["GET", "POST"])
 @admin_subject_required
 def bulk_upload_questions():
-    
-    # -----------------------------------------
-    # State preservation after GET
-    # -----------------------------------------
 
-    page = request.args.get("page", 1, type=int)
-    search = request.args.get("search", "")
-    filter_topic = request.args.get("filter_topic", "")
-    filter_subject = request.args.get("filter_subject", "")
-    filter_difficulty = request.args.get("filter_difficulty", "")
+    # ==================================================
+    # STATE PRESERVATION
+    # ==================================================
+
+    page = request.args.get(
+        "page",
+        1,
+        type=int
+    )
+
+    search = request.args.get(
+        "search",
+        "",
+        type=str
+    )
+
+    filter_topic = request.args.get(
+        "filter_topic",
+        "",
+        type=str
+    )
+
+    filter_subject = request.args.get(
+        "filter_subject",
+        "",
+        type=str
+    )
+
+    filter_difficulty = request.args.get(
+        "filter_difficulty",
+        "",
+        type=str
+    )
+
+
+    # ==================================================
+    # POST REQUEST
+    # ==================================================
 
     if request.method == "POST":
-        
-        # -----------------------------------------
-        # State preservation after POST
-        # -----------------------------------------
-        
-        page = request.form.get("page", 1, type=int)
-        search = request.form.get("search", "")
-        filter_topic = request.form.get("filter_topic", "")
-        filter_subject = request.form.get("filter_subject", "")
-        filter_difficulty = request.form.get("filter_difficulty", "") 
 
-        # -----------------------------------------
-        # Uploaded file
-        # -----------------------------------------
+        # --------------------------------------------------
+        # State preservation after POST
+        # --------------------------------------------------
+
+        page = request.form.get(
+            "page",
+            1,
+            type=int
+        )
+
+        search = request.form.get(
+            "search",
+            ""
+        )
+
+        filter_topic = request.form.get(
+            "filter_topic",
+            ""
+        )
+
+        filter_subject = request.form.get(
+            "filter_subject",
+            ""
+        )
+
+        filter_difficulty = request.form.get(
+            "filter_difficulty",
+            ""
+        )
+
+
+        # ==================================================
+        # GET UPLOADED FILE
+        # ==================================================
 
         file = request.files.get("file")
 
+
         if not file or file.filename == "":
-            
-            flash("Please select a JSON file.", "warning")
-            
-            return redirect(url_for(
-                        "questions.bulk_upload_questions",
-                        page=page,
-                        search=search,
-                        filter_topic=filter_topic,
-                        filter_subject=filter_subject,
-                        filter_difficulty=filter_difficulty,
-                    )
+
+            flash(
+                "Please select a JSON file.",
+                "warning"
+            )
+
+            return redirect(
+                url_for(
+                    "questions.bulk_upload_questions",
+                    page=page,
+                    search=search,
+                    filter_topic=filter_topic,
+                    filter_subject=filter_subject,
+                    filter_difficulty=filter_difficulty,
                 )
+            )
 
 
         if not file.filename.lower().endswith(".json"):
-            
-            flash("Only JSON files are allowed.", "danger")
-            
-            return redirect(url_for(
-                        "questions.bulk_upload_questions",
-                        page=page,
-                        search=search,
-                        filter_topic=filter_topic,
-                        filter_subject=filter_subject,
-                        filter_difficulty=filter_difficulty,
-                    )
-                )
 
+            flash(
+                "Only JSON files are allowed.",
+                "danger"
+            )
+
+            return redirect(
+                url_for(
+                    "questions.bulk_upload_questions",
+                    page=page,
+                    search=search,
+                    filter_topic=filter_topic,
+                    filter_subject=filter_subject,
+                    filter_difficulty=filter_difficulty,
+                )
+            )
+
+
+        # ==================================================
+        # READ JSON FILE
+        # ==================================================
 
         try:
 
             questions = json.load(file)
-            
-            
+
+
+            # --------------------------------------------------
+            # JSON must contain a list
+            # --------------------------------------------------
+
             if not isinstance(questions, list):
-                
-                flash("JSON must contain a list of questions.", "danger")
-                
-                return redirect(url_for(
-                        "questions.bulk_upload_questions",
-                        page=page,
-                        search=search,
-                        filter_topic=filter_topic,
-                        filter_subject=filter_subject,
-                        filter_difficulty=filter_difficulty,
-                    )
+
+                flash(
+                    "JSON must contain a list of questions.",
+                    "danger"
                 )
 
-            
-                 
-            if not questions:
-                
-                flash("The uploaded JSON file contains no questions.", "warning")
-                
                 return redirect(
                     url_for(
                         "questions.bulk_upload_questions",
@@ -1995,69 +2333,240 @@ def bulk_upload_questions():
                         filter_difficulty=filter_difficulty,
                     )
                 )
-            
 
-            
 
-            # -----------------------------------------
-            # Upload statistics variables
-            # -----------------------------------------
+            # --------------------------------------------------
+            # JSON must not be empty
+            # --------------------------------------------------
+
+            if not questions:
+
+                flash(
+                    "The uploaded JSON file contains no questions.",
+                    "warning"
+                )
+
+                return redirect(
+                    url_for(
+                        "questions.bulk_upload_questions",
+                        page=page,
+                        search=search,
+                        filter_topic=filter_topic,
+                        filter_subject=filter_subject,
+                        filter_difficulty=filter_difficulty,
+                    )
+                )
+
+
+            # ==================================================
+            # UPLOAD STATISTICS
+            # ==================================================
 
             added = 0
             duplicates = 0
             invalid = 0
             errors = 0
+
             total = len(questions)
 
 
-            # -----------------------------------------
-            # Load all existing hashes once
-            # -----------------------------------------
+            # ==================================================
+            # LOAD EXISTING QUESTION HASHES
+            # ==================================================
 
-            existing_hashes = {row[0]
-            for row in db.session.query(Question.question_hash)
-            .filter(Question.question_hash.isnot(None)).all()
-
+            existing_hashes = {
+                row[0]
+                for row in (
+                    db.session
+                    .query(Question.question_hash)
+                    .filter(
+                        Question.question_hash.isnot(None)
+                    )
+                    .all()
+                )
             }
-            
-            # -----------------------------------------
-            # Process questions
-            # -----------------------------------------
 
+
+            # ==================================================
+            # RESOLVE REGULAR ADMIN SUBJECT
+            # ==================================================
+
+            admin_subject = None
+
+
+            if session.get("role") == "admin":
+
+                admin_subject = (
+                    Subject.query
+                    .filter(
+                        Subject.name == session.get("subject"),
+                        Subject.is_active.is_(True)
+                    )
+                    .first()
+                )
+
+
+                # --------------------------------------------------
+                # Assigned subject does not exist
+                # --------------------------------------------------
+
+                if not admin_subject:
+
+                    flash(
+                        "Your assigned subject could not be found. Contact Super-Administrator (Bush).",
+                        "danger"
+                    )
+
+                    return redirect(
+                        url_for(
+                            "questions.bulk_upload_questions",
+                            page=page,
+                            search=search,
+                            filter_topic=filter_topic,
+                            filter_subject=filter_subject,
+                            filter_difficulty=filter_difficulty,
+                        )
+                    )
+
+
+            # ==================================================
+            # PROCESS QUESTIONS
+            # ==================================================
 
             for item in questions:
 
+                # --------------------------------------------------
+                # Each item must be an object/dictionary
+                # --------------------------------------------------
+
                 if not isinstance(item, dict):
+
                     invalid += 1
+
                     continue
 
-                topic = str(item.get("topic") or "").strip()
-                question_subject = str(item.get("subject") or "").strip()
-                question_difficulty = str(item.get("difficulty") or "").strip()
-                question_text = str(item.get("question_text") or "").strip()
-                option_a = str(item.get("option_a") or "").strip()
-                option_b = str(item.get("option_b") or "").strip()
-                option_c = str(item.get("option_c") or "").strip()
-                option_d = str(item.get("option_d") or "").strip()
-                correct_answer = str(item.get("correct_answer") or "").strip().upper()
-                explanation = str(item.get("explanation") or "").strip()
+
+                # ==================================================
+                # READ QUESTION DATA
+                # ==================================================
+
+                topic = str(
+                    item.get("topic") or ""
+                ).strip()
 
 
-                # -----------------------------------------
-                # Restrict normal admins
-                # -----------------------------------------
+                json_subject = str(
+                    item.get("subject") or ""
+                ).strip()
+
+
+                question_difficulty = str(
+                    item.get("difficulty") or ""
+                ).strip()
+
+
+                question_text = str(
+                    item.get("question_text") or ""
+                ).strip()
+
+
+                option_a = str(
+                    item.get("option_a") or ""
+                ).strip()
+
+
+                option_b = str(
+                    item.get("option_b") or ""
+                ).strip()
+
+
+                option_c = str(
+                    item.get("option_c") or ""
+                ).strip()
+
+
+                option_d = str(
+                    item.get("option_d") or ""
+                ).strip()
+
+
+                correct_answer = str(
+                    item.get("correct_answer") or ""
+                ).strip().upper()
+
+
+                explanation = str(
+                    item.get("explanation") or ""
+                ).strip()
+
+
+                # ==================================================
+                # DETERMINE SUBJECT
+                # ==================================================
+
+                # --------------------------------------------------
+                # Regular Admin
+                #
+                # The JSON subject is ignored.
+                # Questions are ALWAYS assigned to the admin's
+                # assigned Subject model record.
+                # --------------------------------------------------
 
                 if session.get("role") == "admin":
-                    question_subject = session.get("subject")
+
+                    question_subject = admin_subject.name
+
+                    subject_id = admin_subject.id
+
+
+                # --------------------------------------------------
+                # Super Admin
+                #
+                # Subject comes from the JSON file and must exist
+                # in the Subject model.
+                # --------------------------------------------------
+
+                else:
+
+                    question_subject = json_subject
+
 
                     if not question_subject:
-                        flash("Your account has no assigned subject. Contact Super-Administrator (Bush)", "danger")
-                        return redirect(url_for("questions.bulk_upload_questions"))
-                                        
-                                        
-                # -----------------------------------------
-                # Required fields
-                # -----------------------------------------
+
+                        invalid += 1
+
+                        continue
+
+
+                    selected_subject = (
+                        Subject.query
+                        .filter(
+                            Subject.name == question_subject,
+                            Subject.is_active.is_(True)
+                        )
+                        .first()
+                    )
+
+
+                    if not selected_subject:
+
+                        invalid += 1
+
+                        current_app.logger.warning(
+                            f"Bulk upload skipped question because "
+                            f"subject does not exist: "
+                            f"{question_subject}"
+                        )
+
+                        continue
+
+
+                    subject_id = selected_subject.id
+
+
+                # ==================================================
+                # REQUIRED FIELDS
+                # ==================================================
 
                 if not all([
                     topic,
@@ -2070,8 +2579,15 @@ def bulk_upload_questions():
                     option_d,
                     correct_answer
                 ]):
+
                     invalid += 1
-                    continue   
+
+                    continue
+
+
+                # ==================================================
+                # VALIDATE OPTIONS
+                # ==================================================
 
                 options = [
                     option_a.lower(),
@@ -2082,9 +2598,15 @@ def bulk_upload_questions():
 
 
                 if len(set(options)) != 4:
-                    invalid += 1
-                    continue    
 
+                    invalid += 1
+
+                    continue
+
+
+                # ==================================================
+                # VALIDATE CORRECT ANSWER
+                # ==================================================
 
                 if correct_answer not in [
                     "A",
@@ -2092,9 +2614,15 @@ def bulk_upload_questions():
                     "C",
                     "D"
                 ]:
-                    invalid += 1
-                    continue         
 
+                    invalid += 1
+
+                    continue
+
+
+                # ==================================================
+                # VALIDATE DIFFICULTY
+                # ==================================================
 
                 if question_difficulty not in [
                     "DOK_1",
@@ -2102,9 +2630,15 @@ def bulk_upload_questions():
                     "DOK_3",
                     "DOK_4"
                 ]:
-                    invalid += 1
-                    continue      
 
+                    invalid += 1
+
+                    continue
+
+
+                # ==================================================
+                # GENERATE QUESTION HASH
+                # ==================================================
 
                 question_hash = generate_question_hash(
                     topic=topic,
@@ -2115,82 +2649,133 @@ def bulk_upload_questions():
                     option_c=option_c,
                     option_d=option_d,
                     correct_answer=correct_answer,
-                )                     
-                
-                
+                )
+
+
+                # ==================================================
+                # DUPLICATE CHECK
+                # ==================================================
+
                 if question_hash in existing_hashes:
+
                     duplicates += 1
+
                     continue
 
-                    
+
+                # ==================================================
+                # CREATE QUESTION
+                # ==================================================
+
                 question = Question(
+
                     topic=topic,
+
+                    # --------------------------------------------------
+                    # Keep legacy subject column synchronized
+                    # --------------------------------------------------
+
                     subject=question_subject,
+
+                    # --------------------------------------------------
+                    # New Subject model relationship
+                    # --------------------------------------------------
+
+                    subject_id=subject_id,
+
                     difficulty=question_difficulty,
+
                     question_text=question_text,
+
                     option_a=option_a,
+
                     option_b=option_b,
+
                     option_c=option_c,
+
                     option_d=option_d,
+
                     correct_answer=correct_answer,
+
                     explanation=explanation,
+
                     question_hash=question_hash,
+
                 )
+
+
+                # ==================================================
+                # SAVE QUESTION
+                # ==================================================
 
                 try:
 
                     with db.session.begin_nested():
 
                         db.session.add(question)
-                        
+
                         db.session.flush()
-                        
-                    existing_hashes.add(question_hash)    
+
+
+                    existing_hashes.add(
+                        question_hash
+                    )
+
 
                     added += 1
 
 
                 except SQLAlchemyError:
-                    
-                    
+
                     current_app.logger.exception(
-                    f"Failed to import question. "
-                    f"Subject={question_subject}, "
-                    f"Topic={topic}, "
-                    f"Question={question_text}")
+                        f"Failed to import question. "
+                        f"Subject={question_subject}, "
+                        f"Topic={topic}, "
+                        f"Question={question_text}"
+                    )
 
                     errors += 1
 
                     continue
 
-                                                                                       
+
+            # ==================================================
+            # COMMIT ALL QUESTIONS
+            # ==================================================
+
             try:
+
                 db.session.commit()
 
 
             except SQLAlchemyError:
-                
+
                 db.session.rollback()
-                
-                current_app.logger.exception("Bulk upload database commit failed.")
 
-                flash("A database error occurred while saving the uploaded questions. Please try again.",
-                      "danger")
+                current_app.logger.exception(
+                    "Bulk upload database commit failed."
+                )
 
-                return redirect(url_for(
-                    "questions.bulk_upload_questions",
-                    page=page,
-                    search=search,
-                    filter_topic=filter_topic,
-                    filter_subject=filter_subject,
-                    filter_difficulty=filter_difficulty,
+                flash(
+                    "A database error occurred while saving the uploaded questions. Please try again.",
+                    "danger"
                 )
-                
+
+                return redirect(
+                    url_for(
+                        "questions.bulk_upload_questions",
+                        page=page,
+                        search=search,
+                        filter_topic=filter_topic,
+                        filter_subject=filter_subject,
+                        filter_difficulty=filter_difficulty,
+                    )
                 )
-                
-            # -----------------------------------------
-            # Log upload summary
-            # -----------------------------------------
+
+
+            # ==================================================
+            # LOG UPLOAD SUMMARY
+            # ==================================================
 
             current_app.logger.info(
                 f"Bulk upload completed. "
@@ -2200,18 +2785,25 @@ def bulk_upload_questions():
                 f"Invalid={invalid}, "
                 f"Errors={errors}"
             )
- 
 
-            flash(f"Processed {total} questions.", "info")
-            
-        
+
+            # ==================================================
+            # FLASH RESULTS
+            # ==================================================
+
+            flash(
+                f"Processed {total} questions.",
+                "info"
+            )
+
+
             flash(
                 f"{added} question(s) imported successfully.",
                 "success"
             )
 
-            if duplicates:
 
+            if duplicates:
 
                 flash(
                     f"{duplicates} duplicate question(s) skipped.",
@@ -2224,7 +2816,7 @@ def bulk_upload_questions():
                 flash(
                     f"{invalid} invalid question(s) skipped.",
                     "warning"
-                )       
+                )
 
 
             if errors:
@@ -2232,26 +2824,28 @@ def bulk_upload_questions():
                 flash(
                     f"{errors} question(s) could not be saved.",
                     "warning"
-                )  
-                            
-                        
-            return redirect(url_for(
-
-                    "questions.view_questions",
-
-                    page=page,
-
-                    search=search,
-
-                    filter_topic=filter_topic,
-
-                    filter_subject=filter_subject,
-                    
-                    filter_difficulty=filter_difficulty,
                 )
 
-            ) 
 
+            # ==================================================
+            # RETURN TO QUESTION LIST
+            # ==================================================
+
+            return redirect(
+                url_for(
+                    "questions.view_questions",
+                    page=page,
+                    search=search,
+                    filter_topic=filter_topic,
+                    filter_subject=filter_subject,
+                    filter_difficulty=filter_difficulty,
+                )
+            )
+
+
+        # ==================================================
+        # INVALID JSON
+        # ==================================================
 
         except json.JSONDecodeError:
 
@@ -2261,40 +2855,51 @@ def bulk_upload_questions():
                 "Invalid JSON file.",
                 "danger"
             )
-            
-            
-            return redirect(url_for(
-                "questions.bulk_upload_questions",
-                page=page,
-                search=search,
-                filter_topic=filter_topic,
-                filter_subject=filter_subject,
-                filter_difficulty=filter_difficulty, 
-                )
-            )
-            
 
-        except Exception as e:
-                db.session.rollback()
-
-                current_app.logger.exception("Unexpected bulk upload error.")
-
-                flash(
-                    f"Error reading file: {e}",
-                    "danger"
-                )
-                        
-                return redirect(url_for(
+            return redirect(
+                url_for(
                     "questions.bulk_upload_questions",
                     page=page,
                     search=search,
                     filter_topic=filter_topic,
                     filter_subject=filter_subject,
                     filter_difficulty=filter_difficulty,
-               )
-             )
-            
-             
+                )
+            )
+
+
+        # ==================================================
+        # UNEXPECTED ERROR
+        # ==================================================
+
+        except Exception as e:
+
+            db.session.rollback()
+
+            current_app.logger.exception(
+                "Unexpected bulk upload error."
+            )
+
+            flash(
+                f"Error reading file: {e}",
+                "danger"
+            )
+
+            return redirect(
+                url_for(
+                    "questions.bulk_upload_questions",
+                    page=page,
+                    search=search,
+                    filter_topic=filter_topic,
+                    filter_subject=filter_subject,
+                    filter_difficulty=filter_difficulty,
+                )
+            )
+
+
+    # ==================================================
+    # GET REQUEST
+    # ==================================================
 
     return render_template(
         "admin/bulk_upload.html",
@@ -2303,8 +2908,9 @@ def bulk_upload_questions():
         filter_topic=filter_topic,
         filter_subject=filter_subject,
         filter_difficulty=filter_difficulty,
-    )    
-    
+    )
+
+
     
 # ======================================================
 # EXPORT QUESTIONS
@@ -2314,69 +2920,244 @@ def bulk_upload_questions():
 @admin_subject_required
 def export_questions():
 
+    # ==================================================
+    # PRESERVE FILTERS
+    # ==================================================
 
-    # -----------------------------------------
-    # Preserve filters (optional)
-    # -----------------------------------------
+    page = request.args.get(
+        "page",
+        1,
+        type=int
+    )
 
-    page = request.args.get("page", 1, type=int)
-    search = request.args.get("search", "")
-    filter_topic = request.args.get("filter_topic", "")
-    subject = request.args.get("subject", "")
-    difficulty = request.args.get("difficulty", "")
+    search = request.args.get(
+        "search",
+        "",
+        type=str
+    ).strip()
+
+    filter_topic = request.args.get(
+        "filter_topic",
+        "",
+        type=str
+    ).strip()
+
+    filter_subject = request.args.get(
+        "filter_subject",
+        "",
+        type=str
+    ).strip()
+
+    filter_difficulty = request.args.get(
+        "filter_difficulty",
+        "",
+        type=str
+    ).strip()
+
+
+    # ==================================================
+    # BASE QUERY
+    # ==================================================
 
     query = Question.query
 
-    # -----------------------------------------
-    # Restrict normal admins
-    # -----------------------------------------
+
+    # ==================================================
+    # SUBJECT CONTEXT
+    # ==================================================
+
+    admin_subject = None
+    selected_subject = None
+
+
+    # --------------------------------------------------
+    # REGULAR ADMIN
+    # --------------------------------------------------
 
     if session.get("role") == "admin":
 
-        subject = session.get("subject")
+        admin_subject = (
+            Subject.query
+            .filter(
+                Subject.name == session.get("subject"),
+                Subject.is_active.is_(True)
+            )
+            .first()
+        )
 
-        query = query.filter_by(
-            subject=subject
-    )
+
+        if not admin_subject:
+
+            flash(
+                "Your assigned subject could not be found.",
+                "danger"
+            )
+
+            return redirect(
+                url_for(
+                    "questions.view_questions",
+                    page=page,
+                    search=search,
+                    filter_topic=filter_topic,
+                    filter_subject=filter_subject,
+                    filter_difficulty=filter_difficulty
+                )
+            )
+
+
+        # --------------------------------------------------
+        # Restrict Regular Admin to assigned subject
+        # --------------------------------------------------
+
+        query = query.filter(
+            Question.subject_id == admin_subject.id
+        )
+
+
+        # --------------------------------------------------
+        # Use assigned subject name for filename
+        # --------------------------------------------------
+
+        export_subject = admin_subject.name
+
+
+    # --------------------------------------------------
+    # SUPER ADMIN
+    # --------------------------------------------------
 
     else:
 
-        if subject:
-           query = query.filter_by(subject=subject)
+        export_subject = filter_subject
+
+
+        # --------------------------------------------------
+        # Optional Subject filter
+        # --------------------------------------------------
+
+        if filter_subject:
+
+            selected_subject = (
+                Subject.query
+                .filter(
+                    Subject.name == filter_subject,
+                    Subject.is_active.is_(True)
+                )
+                .first()
+            )
+
+
+            if not selected_subject:
+
+                flash(
+                    "Selected subject could not be found.",
+                    "warning"
+                )
+
+                return redirect(
+                    url_for(
+                        "questions.view_questions",
+                        page=page,
+                        search=search,
+                        filter_topic=filter_topic,
+                        filter_subject=filter_subject,
+                        filter_difficulty=filter_difficulty
+                    )
+                )
+
+
+            query = query.filter(
+                Question.subject_id == selected_subject.id
+            )
+
+
+    # ==================================================
+    # SEARCH
+    # ==================================================
+
+    if search:
+
+        query = query.filter(
+            or_(
+                Question.question_text.ilike(
+                    f"%{search}%"
+                ),
+
+                Question.topic.ilike(
+                    f"%{search}%"
+                ),
+
+                Question.explanation.ilike(
+                    f"%{search}%"
+                )
+            )
+        )
+
+
+    # ==================================================
+    # TOPIC FILTER
+    # ==================================================
 
     if filter_topic:
-        query = query.filter_by(topic=filter_topic)
 
-    if difficulty:
-        query = query.filter_by(difficulty=difficulty)
+        query = query.filter(
+            Question.topic == filter_topic
+        )
 
 
-    questions = query.order_by(Question.topic, Question.id).all()
+    # ==================================================
+    # DIFFICULTY FILTER
+    # ==================================================
 
-    # -----------------------------------------
-    # Nothing to export
-    # -----------------------------------------
+    if filter_difficulty:
+
+        query = query.filter(
+            Question.difficulty == filter_difficulty
+        )
+
+
+    # ==================================================
+    # GET QUESTIONS
+    # ==================================================
+
+    questions = (
+        query
+        .order_by(
+            Question.topic,
+            Question.id
+        )
+        .all()
+    )
+
+
+    # ==================================================
+    # NOTHING TO EXPORT
+    # ==================================================
 
     if not questions:
+
         flash(
             "No questions found to export.",
             "warning"
         )
 
         return redirect(
-        url_for(
-            "questions.view_questions",
-            page=page,
-            search=search,
-            filter_topic=filter_topic,
-            subject=subject,
-            difficulty=difficulty,
+            url_for(
+                "questions.view_questions",
+                page=page,
+                search=search,
+                filter_topic=filter_topic,
+                filter_subject=filter_subject,
+                filter_difficulty=filter_difficulty
+            )
         )
-    )
 
 
+    # ==================================================
+    # BUILD EXPORT DATA
+    # ==================================================
 
     data = []
+
 
     for question in questions:
 
@@ -2384,7 +3165,11 @@ def export_questions():
 
             "topic": question.topic,
 
-            "subject": question.subject,
+            "subject": (
+                question.subject_ref.name
+                if question.subject_ref
+                else ""
+            ),
 
             "difficulty": question.difficulty,
 
@@ -2404,40 +3189,81 @@ def export_questions():
 
         })
 
+
+    # ==================================================
+    # CONVERT TO JSON
+    # ==================================================
+
     json_data = json.dumps(
         data,
         indent=4,
         ensure_ascii=False
     )
 
-    # -----------------------------------------
-    # Generate filename
-    # -----------------------------------------
 
-    today = datetime.now().strftime("%Y-%m-%d")
+    # ==================================================
+    # GENERATE FILENAME
+    # ==================================================
+
+    today = datetime.now().strftime(
+        "%Y-%m-%d"
+    )
+
 
     filename_parts = []
 
-    if subject:
-        filename_parts.append(subject.lower().replace(" ", "_"))
+
+    if export_subject:
+
+        filename_parts.append(
+            export_subject
+            .lower()
+            .replace(" ", "_")
+        )
+
 
     if filter_topic:
-        filename_parts.append(filter_topic.lower())
 
-    if difficulty:
-        filename_parts.append(difficulty.lower())
+        filename_parts.append(
+            filter_topic
+            .lower()
+            .replace(" ", "_")
+        )
+
+
+    if filter_difficulty:
+
+        filename_parts.append(
+            filter_difficulty
+            .lower()
+        )
+
 
     if filename_parts:
-        filename = "_".join(filename_parts)
+
+        filename = "_".join(
+            filename_parts
+        )
+
     else:
+
         filename = "all_questions"
 
-    filename = f"{filename}_{today}.json"
 
+    filename = (
+        f"{filename}_{today}.json"
+    )
+
+
+    # ==================================================
+    # DOWNLOAD JSON FILE
+    # ==================================================
 
     return send_file(
 
-        BytesIO(json_data.encode("utf-8")),
+        BytesIO(
+            json_data.encode("utf-8")
+        ),
 
         mimetype="application/json",
 
@@ -2446,5 +3272,6 @@ def export_questions():
         download_name=filename
 
     )
-        
+
+
         
