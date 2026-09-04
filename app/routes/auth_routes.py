@@ -134,7 +134,7 @@ def register():
         db.session.commit()
 
         flash(
-            "Registration successful",
+            "Congratulations! Your Account is successfully created.",
             "success"
         )
 
