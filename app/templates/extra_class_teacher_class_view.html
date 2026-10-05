@@ -1,0 +1,609 @@
+{% extends "extra_class_teacher_base.html" %}
+
+{% block title %}
+    View Class
+{% endblock %}
+
+{% block content %}
+
+<style>
+    .class-view-header {
+        margin-bottom: 24px;
+    }
+
+    .class-view-header-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 20px;
+    }
+
+    .class-view-header h1 {
+        margin: 0 0 7px;
+        color: #3b0d18;
+        font-size: 29px;
+        font-weight: 800;
+    }
+
+    .class-view-header p {
+        margin: 0;
+        color: #777;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    .class-name {
+        margin-top: 7px;
+        color: #7a1f35;
+        font-size: 17px;
+        font-weight: 800;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 9px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .header-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 14px;
+        border-radius: 9px;
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+    .header-btn.back {
+        background: #f3f4f6;
+        color: #374151;
+    }
+
+    .header-btn.manage {
+        background: #7a1f35;
+        color: #fff;
+    }
+
+    .class-banner {
+        background: linear-gradient(135deg, #3b0d18, #7a1f35);
+        color: #fff;
+        border-radius: 16px;
+        padding: 23px;
+        margin-bottom: 18px;
+    }
+
+    .class-banner small {
+        display: block;
+        opacity: .75;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+        font-size: 10px;
+        font-weight: 800;
+        margin-bottom: 6px;
+    }
+
+    .class-banner h2 {
+        margin: 0 0 7px;
+        font-size: 24px;
+    }
+
+    .class-banner p {
+        margin: 0;
+        font-size: 12px;
+        opacity: .9;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        padding: 5px 10px;
+        margin-top: 12px;
+        border-radius: 20px;
+        background: rgba(255,255,255,.14);
+        font-size: 10px;
+        font-weight: 900;
+        text-transform: uppercase;
+    }
+
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+        margin-bottom: 20px;
+    }
+
+    .summary-card {
+        background: #fff;
+        border: 1px solid #eee;
+        border-radius: 13px;
+        padding: 18px;
+        box-shadow: 0 6px 18px rgba(0,0,0,.04);
+    }
+
+    .summary-label {
+        color: #888;
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: .4px;
+        margin-bottom: 8px;
+    }
+
+    .summary-value {
+        color: #3b0d18;
+        font-size: 21px;
+        font-weight: 800;
+    }
+
+    .summary-card.paid .summary-value {
+        color: #166534;
+    }
+
+    .summary-card.outstanding .summary-value {
+        color: #991b1b;
+    }
+
+    .summary-card.pending .summary-value {
+        color: #92400e;
+    }
+
+    .section-card {
+        background: #fff;
+        border: 1px solid #eee;
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 18px;
+        box-shadow: 0 6px 18px rgba(0,0,0,.035);
+    }
+
+    .section-card h3 {
+        margin: 0 0 5px;
+        color: #3b0d18;
+        font-size: 17px;
+    }
+
+    .section-card p {
+        margin: 0;
+        color: #777;
+        font-size: 12px;
+    }
+
+    .detail-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 13px;
+        margin-top: 18px;
+    }
+
+    .detail-item {
+        padding: 14px;
+        border-radius: 10px;
+        background: #fafafa;
+        border: 1px solid #eee;
+    }
+
+    .detail-label {
+        display: block;
+        color: #888;
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        margin-bottom: 5px;
+    }
+
+    .detail-value {
+        color: #333;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .quick-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 18px;
+    }
+
+    .quick-card {
+        display: block;
+        padding: 16px;
+        border: 1px solid #eee;
+        border-radius: 12px;
+        text-decoration: none;
+        color: #3b0d18;
+        background: #fff;
+        transition: .2s ease;
+    }
+
+    .quick-card:hover {
+        transform: translateY(-2px);
+        border-color: #e8c4cf;
+        background: #fffafa;
+    }
+
+    .quick-icon {
+        font-size: 22px;
+        margin-bottom: 8px;
+    }
+
+    .quick-title {
+        display: block;
+        font-size: 13px;
+        font-weight: 900;
+    }
+
+    .quick-description {
+        display: block;
+        margin-top: 4px;
+        color: #777;
+        font-size: 11px;
+        line-height: 1.45;
+    }
+
+    @media (max-width: 900px) {
+        .summary-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .quick-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 700px) {
+        .class-view-header-top {
+            flex-direction: column;
+        }
+
+        .header-actions {
+            width: 100%;
+            justify-content: flex-start;
+        }
+
+        .summary-grid,
+        .detail-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .class-view-header h1 {
+            font-size: 25px;
+        }
+    }
+</style>
+
+
+<div class="class-view-header">
+
+    <div class="class-view-header-top">
+
+        <div>
+
+            <h1>
+                View Class
+            </h1>
+
+            <p>
+                View the current status and financial summary
+                of your Extra Class.
+            </p>
+
+            <div class="class-name">
+                {{ extra_subject.subject.name }}
+            </div>
+
+        </div>
+
+
+        <div class="header-actions">
+
+            <a
+                href="{{ url_for('extra_class_teacher.teacher_dashboard') }}"
+                class="header-btn back"
+            >
+                ← Back to Dashboard
+            </a>
+
+
+            <a
+                href="{{ url_for(
+                    'extra_class_teacher.manage_class',
+                    class_id=extra_subject.id
+                ) }}"
+                class="header-btn manage"
+            >
+                Manage Class
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<div class="class-banner">
+
+    <small>
+        Class Overview
+    </small>
+
+    <h2>
+        {{ extra_subject.subject.name }}
+    </h2>
+
+    <p>
+        Teacher Code:
+        {{ teacher.teacher_code }}
+
+        ·
+
+        Monthly Fee:
+        GH¢ {{ "%.2f"|format(extra_subject.monthly_fee or 0) }}
+    </p>
+
+    <span class="status-badge">
+
+        {% if extra_subject.is_active %}
+            Active Class
+        {% else %}
+            Inactive Class
+        {% endif %}
+
+    </span>
+
+</div>
+
+
+<div class="summary-grid">
+
+    <div class="summary-card">
+
+        <div class="summary-label">
+            Students
+        </div>
+
+        <div class="summary-value">
+            {{ student_count }}
+        </div>
+
+    </div>
+
+
+    <div class="summary-card">
+
+        <div class="summary-label">
+            Enrollments
+        </div>
+
+        <div class="summary-value">
+            {{ enrollment_count }}
+        </div>
+
+    </div>
+
+
+    <div class="summary-card paid">
+
+        <div class="summary-label">
+            Amount Received
+        </div>
+
+        <div class="summary-value">
+            GH¢ {{ "%.2f"|format(paid_amount) }}
+        </div>
+
+    </div>
+
+
+    <div class="summary-card outstanding">
+
+        <div class="summary-label">
+            Outstanding
+        </div>
+
+        <div class="summary-value">
+            GH¢ {{ "%.2f"|format(outstanding) }}
+        </div>
+
+    </div>
+
+</div>
+
+
+<div class="section-card">
+
+    <h3>
+        Class Information
+    </h3>
+
+    <p>
+        Current information for your assigned Extra Class.
+    </p>
+
+
+    <div class="detail-grid">
+
+        <div class="detail-item">
+
+            <span class="detail-label">
+                Subject
+            </span>
+
+            <span class="detail-value">
+                {{ extra_subject.subject.name }}
+            </span>
+
+        </div>
+
+
+        <div class="detail-item">
+
+            <span class="detail-label">
+                Monthly Fee
+            </span>
+
+            <span class="detail-value">
+                GH¢ {{ "%.2f"|format(extra_subject.monthly_fee or 0) }}
+            </span>
+
+        </div>
+
+
+        <div class="detail-item">
+
+            <span class="detail-label">
+                Current Semester
+            </span>
+
+            <span class="detail-value">
+
+                {% if current_semester %}
+
+                    {{ current_semester.name }}
+
+                {% else %}
+
+                    No active semester
+
+                {% endif %}
+
+            </span>
+
+        </div>
+
+
+        <div class="detail-item">
+
+            <span class="detail-label">
+                Successful Payments
+            </span>
+
+            <span class="detail-value">
+                {{ successful_payment_count }}
+            </span>
+
+        </div>
+
+
+        <div class="detail-item">
+
+            <span class="detail-label">
+                Pending Payment Amount
+            </span>
+
+            <span class="detail-value">
+                GH¢ {{ "%.2f"|format(pending_amount) }}
+            </span>
+
+        </div>
+
+
+        <div class="detail-item">
+
+            <span class="detail-label">
+                Total Fees Recorded
+            </span>
+
+            <span class="detail-value">
+                GH¢ {{ "%.2f"|format(total_fees) }}
+            </span>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<div class="section-card">
+
+    <h3>
+        Class Sections
+    </h3>
+
+    <p>
+        Open the section you want to work with.
+    </p>
+
+
+    <div class="quick-grid">
+
+
+        <a
+            href="{{ url_for(
+                'extra_class_teacher.class_students',
+                class_id=extra_subject.id
+            ) }}"
+            class="quick-card"
+        >
+
+            <div class="quick-icon">
+                👨‍🎓
+            </div>
+
+            <span class="quick-title">
+                Students
+            </span>
+
+            <span class="quick-description">
+                View and manage students enrolled in this class.
+            </span>
+
+        </a>
+
+
+        <a
+            href="{{ url_for(
+                'extra_class_teacher.class_fees',
+                class_id=extra_subject.id
+            ) }}"
+            class="quick-card"
+        >
+
+            <div class="quick-icon">
+                💰
+            </div>
+
+            <span class="quick-title">
+                Fees
+            </span>
+
+            <span class="quick-description">
+                View student fee records and outstanding balances.
+            </span>
+
+        </a>
+
+
+        <a
+            href="{{ url_for(
+                'extra_class_teacher.class_payments',
+                class_id=extra_subject.id
+            ) }}"
+            class="quick-card"
+        >
+
+            <div class="quick-icon">
+                💳
+            </div>
+
+            <span class="quick-title">
+                Payments
+            </span>
+
+            <span class="quick-description">
+                View successful, pending and failed payments.
+            </span>
+
+        </a>
+
+
+    </div>
+
+</div>
+
+
+{% endblock %}

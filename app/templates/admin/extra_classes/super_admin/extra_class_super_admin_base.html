@@ -1,0 +1,1688 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>
+        {% block title %}
+            Extra Classes Super Admin | BTA
+        {% endblock %}
+    </title>
+
+
+    <!-- =====================================================
+         BOOTSTRAP
+    ====================================================== -->
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+
+    <!-- =====================================================
+         BOOTSTRAP ICONS
+    ====================================================== -->
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+        rel="stylesheet"
+    >
+
+
+    <!-- =====================================================
+         POPPINS
+    ====================================================== -->
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+
+    <!-- =====================================================
+         SUPER ADMIN BASE CSS
+    ====================================================== -->
+
+    <style>
+
+        /* =====================================================
+           GLOBAL
+        ====================================================== */
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100%;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f7f7f8;
+            color: #2d2d2d;
+        }
+
+
+        /* =====================================================
+           SIDEBAR
+        ====================================================== */
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+
+            width: 250px;
+            height: 100vh;
+
+            background: linear-gradient(
+                180deg,
+                #5c0008 0%,
+                #3a0005 100%
+            );
+
+            color: #ffffff;
+
+            z-index: 1000;
+
+            display: flex;
+            flex-direction: column;
+
+            box-shadow:
+                5px 0 20px rgba(0, 0, 0, 0.18);
+
+            transition:
+                transform 0.3s ease;
+        }
+
+
+        /* =====================================================
+           BRAND
+        ====================================================== */
+
+        .brand {
+            height: 78px;
+
+            display: flex;
+            align-items: center;
+
+            padding: 0 22px;
+
+            border-bottom:
+                1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        .brand-icon {
+            width: 43px;
+            height: 43px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 10px;
+
+            background:
+                rgba(255, 255, 255, 0.15);
+
+            margin-right: 12px;
+
+            color: #ffffff;
+
+            font-size: 21px;
+
+            box-shadow:
+                inset 0 0 0 1px
+                rgba(255, 255, 255, 0.08);
+        }
+
+        .brand-text {
+            line-height: 1.2;
+        }
+
+        .brand-title {
+            color: #ffffff;
+
+            font-size: 20px;
+            font-weight: 800;
+
+            letter-spacing: 0.6px;
+        }
+
+        .brand-subtitle {
+            color:
+                rgba(255, 255, 255, 0.88);
+
+            font-size: 10px;
+            font-weight: 500;
+
+            text-transform: uppercase;
+
+            letter-spacing: 1px;
+
+            margin-top: 4px;
+        }
+
+
+        /* =====================================================
+           SIDEBAR NAVIGATION
+        ====================================================== */
+
+        .sidebar-nav {
+            padding: 18px 12px;
+
+            overflow-y: auto;
+
+            flex: 1;
+        }
+
+        .nav-section-title {
+            color:
+                rgba(255, 255, 255, 0.72);
+
+            font-size: 10px;
+            font-weight: 700;
+
+            text-transform: uppercase;
+
+            letter-spacing: 1.3px;
+
+            padding: 11px 14px 7px;
+
+            margin-top: 5px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+
+            color:
+                rgba(255, 255, 255, 0.94);
+
+            text-decoration: none;
+
+            padding: 11px 14px;
+
+            border-radius: 9px;
+
+            margin-bottom: 4px;
+
+            font-size: 13px;
+            font-weight: 500;
+
+            transition:
+                background 0.2s ease,
+                color 0.2s ease,
+                transform 0.2s ease;
+        }
+
+        .nav-link i {
+            width: 25px;
+
+            margin-right: 10px;
+
+            color:
+                rgba(255, 255, 255, 0.96);
+
+            font-size: 16px;
+        }
+
+        .nav-link:hover {
+            color: #ffffff;
+
+            background:
+                rgba(255, 255, 255, 0.15);
+
+            transform:
+                translateX(2px);
+        }
+
+        .nav-link:hover i {
+            color: #ffffff;
+        }
+
+        .nav-link.active {
+            color: #ffffff;
+
+            background: linear-gradient(
+                90deg,
+                rgba(255, 255, 255, 0.23),
+                rgba(255, 255, 255, 0.11)
+            );
+
+            box-shadow:
+                inset 4px 0 0 #ff4058,
+                0 2px 8px rgba(0, 0, 0, 0.10);
+
+            font-weight: 700;
+        }
+
+        .nav-link.active i {
+            color: #ffffff;
+        }
+
+        .nav-divider {
+            height: 1px;
+
+            background:
+                rgba(255, 255, 255, 0.16);
+
+            margin: 13px 8px;
+        }
+
+
+        /* =====================================================
+           SIDEBAR FOOTER
+        ====================================================== */
+
+        .sidebar-footer {
+            padding: 14px 12px;
+
+            border-top:
+                1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        .sidebar-footer .nav-link {
+            margin-bottom: 0;
+        }
+
+
+        /* =====================================================
+           MAIN WRAPPER
+        ====================================================== */
+
+        .main-wrapper {
+            margin-left: 250px;
+
+            min-height: 100vh;
+
+            display: flex;
+            flex-direction: column;
+        }
+
+
+        /* =====================================================
+           TOPBAR
+        ====================================================== */
+
+        .topbar {
+            min-height: 78px;
+
+            background: linear-gradient(
+                90deg,
+                #5a0007 0%,
+                #970015 100%
+            );
+
+            color: #ffffff;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 0 28px;
+
+            box-shadow:
+                0 3px 14px rgba(0, 0, 0, 0.18);
+
+            position: sticky;
+
+            top: 0;
+
+            z-index: 900;
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+
+            gap: 14px;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+
+            border: none;
+
+            background: transparent;
+
+            color: #ffffff;
+
+            font-size: 25px;
+
+            padding: 4px;
+
+            cursor: pointer;
+        }
+
+        .topbar-title h1 {
+            margin: 0;
+
+            color: #ffffff;
+
+            font-size: 21px;
+
+            font-weight: 700;
+
+            letter-spacing: 0.2px;
+        }
+
+        .topbar-title p {
+            margin: 4px 0 0;
+
+            color:
+                rgba(255, 255, 255, 0.92);
+
+            font-size: 11px;
+
+            font-weight: 400;
+        }
+
+
+        /* =====================================================
+           TOPBAR RIGHT
+        ====================================================== */
+
+        .topbar-right {
+            display: flex;
+
+            align-items: center;
+
+            gap: 18px;
+        }
+
+
+        /* =====================================================
+           INVESTING IN BRIGHTER FUTURES
+        ====================================================== */
+
+        .topbar-message {
+            color: #ffffff;
+
+            font-size: 18px;
+
+            font-weight: 700;
+
+            letter-spacing: 0.4px;
+
+            white-space: nowrap;
+
+            text-shadow:
+                0 1px 3px rgba(0, 0, 0, 0.25);
+        }
+
+
+        /* =====================================================
+           NOTIFICATION
+        ====================================================== */
+
+        .notification {
+            position: relative;
+
+            width: 39px;
+            height: 39px;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 50%;
+
+            background:
+                rgba(255, 255, 255, 0.14);
+
+            color: #ffffff;
+
+            cursor: pointer;
+
+            transition:
+                background 0.2s ease;
+        }
+
+        .notification:hover {
+            background:
+                rgba(255, 255, 255, 0.22);
+        }
+
+        .notification i {
+            font-size: 17px;
+        }
+
+        .notification-badge {
+            position: absolute;
+
+            top: -2px;
+            right: -1px;
+
+            min-width: 17px;
+            height: 17px;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 50%;
+
+            background: #ff304f;
+
+            color: #ffffff;
+
+            border: 2px solid #75000e;
+
+            font-size: 8px;
+
+            font-weight: 700;
+        }
+
+
+        /* =====================================================
+           ADMIN PROFILE
+        ====================================================== */
+
+        .admin-profile {
+            display: flex;
+
+            align-items: center;
+
+            gap: 10px;
+        }
+
+        .admin-avatar {
+            width: 39px;
+            height: 39px;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 50%;
+
+            background:
+                rgba(255, 255, 255, 0.17);
+
+            color: #ffffff;
+
+            font-size: 16px;
+
+            box-shadow:
+                inset 0 0 0 1px
+                rgba(255, 255, 255, 0.08);
+        }
+
+        .admin-info {
+            line-height: 1.25;
+        }
+
+        .admin-name {
+            color: #ffffff;
+
+            font-size: 12px;
+
+            font-weight: 700;
+        }
+
+        .admin-role {
+            color:
+                rgba(255, 255, 255, 0.87);
+
+            font-size: 9px;
+
+            font-weight: 500;
+
+            text-transform: uppercase;
+
+            letter-spacing: 0.7px;
+        }
+
+
+        /* =====================================================
+           PAGE HEADER
+        ====================================================== */
+
+        .page-header {
+            padding: 25px 28px 0;
+
+            display: flex;
+
+            align-items: flex-end;
+
+            justify-content: space-between;
+
+            gap: 20px;
+        }
+
+        .page-heading h2 {
+            margin: 0;
+
+            color: #3a0005;
+
+            font-size: 23px;
+
+            font-weight: 700;
+        }
+
+        .page-heading p {
+            margin: 5px 0 0;
+
+            color: #666666;
+
+            font-size: 12px;
+
+            font-weight: 400;
+        }
+
+        .page-actions {
+            display: flex;
+
+            align-items: center;
+
+            gap: 8px;
+
+            flex-wrap: wrap;
+        }
+
+
+        /* =====================================================
+           BUTTONS
+        ====================================================== */
+
+        .btn-super-red {
+            border: none;
+
+            background: linear-gradient(
+                135deg,
+                #a80016 0%,
+                #d90028 100%
+            );
+
+            color: #ffffff;
+
+            padding: 10px 17px;
+
+            border-radius: 8px;
+
+            font-size: 12px;
+
+            font-weight: 700;
+
+            text-decoration: none;
+
+            display: inline-flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            gap: 7px;
+
+            box-shadow:
+                0 3px 9px
+                rgba(120, 0, 13, 0.20);
+
+            transition:
+                transform 0.2s ease,
+                box-shadow 0.2s ease;
+        }
+
+        .btn-super-red:hover {
+            color: #ffffff;
+
+            background: linear-gradient(
+                135deg,
+                #900012 0%,
+                #c90024 100%
+            );
+
+            transform:
+                translateY(-1px);
+
+            box-shadow:
+                0 6px 16px
+                rgba(120, 0, 13, 0.28);
+        }
+
+        .btn-super-outline {
+            border: 1px solid #d5d5d5;
+
+            background: #ffffff;
+
+            color: #555555;
+
+            padding: 9px 15px;
+
+            border-radius: 8px;
+
+            font-size: 12px;
+
+            font-weight: 600;
+
+            text-decoration: none;
+
+            display: inline-flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            gap: 7px;
+
+            transition: all 0.2s ease;
+        }
+
+        .btn-super-outline:hover {
+            border-color: #b00018;
+
+            color: #b00018;
+
+            background: #fff7f8;
+        }
+
+
+        /* =====================================================
+           FLASH MESSAGES
+        ====================================================== */
+
+        .flash-container {
+            padding: 20px 28px 0;
+        }
+
+        .flash-container .alert {
+            border-radius: 9px;
+
+            border: none;
+
+            font-size: 12px;
+
+            margin-bottom: 10px;
+        }
+
+
+        /* =====================================================
+           PAGE CONTENT
+        ====================================================== */
+
+        .page-content {
+            padding: 25px 28px 35px;
+
+            flex: 1;
+        }
+
+
+        /* =====================================================
+           FOOTER
+        ====================================================== */
+
+        .page-footer {
+            background: linear-gradient(
+                90deg,
+                #390005 0%,
+                #5c0008 50%,
+                #6d0009 100%
+            );
+
+            color:
+                rgba(255, 255, 255, 0.92);
+
+            min-height: 58px;
+
+            padding: 12px 28px;
+
+            font-size: 10px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 20px;
+
+            border-top:
+                1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .footer-left {
+            display: flex;
+
+            align-items: center;
+
+            gap: 7px;
+
+            white-space: nowrap;
+        }
+
+        .footer-left strong {
+            color: #ffffff;
+
+            font-size: 11px;
+
+            font-weight: 800;
+        }
+
+        .footer-separator {
+            color:
+                rgba(255, 255, 255, 0.48);
+        }
+
+        .footer-center {
+            color: #ffffff;
+
+            font-size: 13px;
+
+            font-weight: 700;
+
+            letter-spacing: 0.35px;
+
+            text-align: center;
+
+            white-space: nowrap;
+
+            text-shadow:
+                0 1px 2px rgba(0, 0, 0, 0.20);
+        }
+
+        .footer-right {
+            color:
+                rgba(255, 255, 255, 0.92);
+
+            font-size: 10px;
+
+            font-weight: 400;
+
+            text-align: right;
+
+            white-space: nowrap;
+        }
+
+        .footer-right strong {
+            color: #ffffff;
+
+            font-size: 11px;
+
+            font-weight: 700;
+        }
+
+
+        /* =====================================================
+           MOBILE OVERLAY
+        ====================================================== */
+
+        .sidebar-overlay {
+            display: none;
+
+            position: fixed;
+
+            inset: 0;
+
+            background:
+                rgba(0, 0, 0, 0.48);
+
+            z-index: 999;
+        }
+
+
+        /* =====================================================
+           TABLET
+        ====================================================== */
+
+        @media (max-width: 1100px) {
+
+            .sidebar {
+                width: 225px;
+            }
+
+            .main-wrapper {
+                margin-left: 225px;
+            }
+
+            .topbar-message {
+                font-size: 15px;
+            }
+
+        }
+
+
+        /* =====================================================
+           MOBILE
+        ====================================================== */
+
+        @media (max-width: 850px) {
+
+            .sidebar {
+                transform:
+                    translateX(-100%);
+
+                width: 250px;
+            }
+
+            .sidebar.show {
+                transform:
+                    translateX(0);
+            }
+
+            .sidebar-overlay.show {
+                display: block;
+            }
+
+            .main-wrapper {
+                margin-left: 0;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .page-header {
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+
+            .page-content {
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+
+            .flash-container {
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+
+            .topbar-message {
+                display: none;
+            }
+
+        }
+
+
+        /* =====================================================
+           SMALL MOBILE
+        ====================================================== */
+
+        @media (max-width: 600px) {
+
+            .topbar {
+                padding: 0 15px;
+            }
+
+            .admin-info {
+                display: none;
+            }
+
+            .page-header {
+                align-items: flex-start;
+
+                flex-direction: column;
+            }
+
+            .page-actions {
+                width: 100%;
+            }
+
+            .page-actions .btn-super-red,
+            .page-actions .btn-super-outline {
+                flex: 1;
+            }
+
+            .page-footer {
+                flex-direction: column;
+
+                justify-content: center;
+
+                text-align: center;
+
+                gap: 7px;
+
+                padding: 15px 20px;
+            }
+
+            .footer-left,
+            .footer-center,
+            .footer-right {
+                justify-content: center;
+
+                text-align: center;
+
+                white-space: normal;
+            }
+
+            .footer-center {
+                font-size: 12px;
+            }
+
+        }
+
+    </style>
+
+
+    <!-- =====================================================
+         CHILD PAGE CSS
+    ====================================================== -->
+
+    {% block extra_css %}
+    {% endblock %}
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside
+        class="sidebar"
+        id="superAdminSidebar"
+    >
+
+
+        <!-- BRAND -->
+
+        <div class="brand">
+
+            <div class="brand-icon">
+
+                <i class="bi bi-mortarboard-fill"></i>
+
+            </div>
+
+
+            <div class="brand-text">
+
+                <div class="brand-title">
+                    BTA
+                </div>
+
+                <div class="brand-subtitle">
+                    Extra Classes
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- NAVIGATION -->
+
+        <nav class="sidebar-nav">
+
+
+            <!-- OVERVIEW -->
+
+            <div class="nav-section-title">
+                Overview
+            </div>
+
+
+            <!-- DASHBOARD -->
+
+            <a
+				href="{{ url_for('extra_class.super_admin_dashboard') }}"
+				class="nav-link
+				{% if request.endpoint == 'extra_class.super_admin_dashboard' %}
+					active
+				{% endif %}"
+			>
+				<i class="bi bi-grid-1x2-fill"></i>
+
+				<span>
+					Dashboard
+				</span>
+			</a>
+
+
+
+            <!-- MANAGEMENT -->
+
+            <div class="nav-section-title">
+                Management
+            </div>
+
+
+            <!-- PARENTS -->
+
+			<a
+				href="{{ url_for('extra_class.super_admin_parents') }}"
+				class="nav-link
+				{% if request.endpoint in (
+					'extra_class.super_admin_parents'
+				) %}
+					active
+				{% endif %}"
+			>
+
+				<i class="bi bi-people-fill"></i>
+
+				<span>
+					Parents
+				</span>
+
+		    </a>
+
+
+            <!-- STUDENTS -->
+
+        
+
+			<a
+				href="{{ url_for('extra_class.super_admin_students') }}"
+				class="nav-link
+				{% if request.endpoint in (
+					'extra_class.super_admin_students'
+				) %}
+					active
+				{% endif %}"
+			>
+
+				<i class="bi bi-person-vcard-fill"></i>
+
+				<span>
+					Students
+				</span>
+
+			</a>
+
+
+            <!-- TEACHERS -->
+
+            <a
+                href="{{ url_for('extra_class.teachers') }}"
+                class="nav-link
+                {% if request.endpoint in (
+                    'extra_class.teachers',
+                    'extra_class.add_teacher',
+                    'extra_class.edit_teacher',
+                    'extra_class.view_teacher',
+                    'extra_class.toggle_teacher_status'
+                ) %}
+                    active
+                {% endif %}"
+            >
+
+                <i class="bi bi-person-workspace"></i>
+
+                <span>
+                    Teachers
+                </span>
+
+            </a>
+
+
+            <!-- SUBJECTS -->
+
+            <a
+                href="{{ url_for('extra_class.subjects') }}"
+                class="nav-link
+                {% if request.endpoint in (
+                    'extra_class.subjects',
+                    'extra_class.add_subject',
+                    'extra_class.edit_subject',
+                    'extra_class.view_subject'
+                ) %}
+                    active
+                {% endif %}"
+            >
+
+                <i class="bi bi-book-fill"></i>
+
+                <span>
+                    Subjects
+                </span>
+
+            </a>
+
+
+            <!-- FINANCE & ENROLLMENT -->
+
+            <div class="nav-section-title">
+                Finance &amp; Enrollment
+            </div>
+
+
+            <!-- ENROLLMENTS -->
+
+            <a
+                href="{{ url_for('extra_class.enrollments') }}"
+                class="nav-link
+                {% if request.endpoint in (
+                    'extra_class.enrollments',
+                    'extra_class.add_enrollment',
+                    'extra_class.edit_enrollment',
+                    'extra_class.view_enrollment'
+                ) %}
+                    active
+                {% endif %}"
+            >
+
+                <i class="bi bi-person-check-fill"></i>
+
+                <span>
+                    Enrollments
+                </span>
+
+            </a>
+
+
+            <!-- MONTHLY FEES -->
+
+            <a
+                href="#"
+                class="nav-link
+                {% if request.endpoint in (
+                    'extra_class.fees',
+                    'extra_class.view_fee'
+                ) %}
+                    active
+                {% endif %}"
+            >
+
+                <i class="bi bi-receipt-cutoff"></i>
+
+                <span>
+                    Monthly Fees
+                </span>
+
+            </a>
+
+
+            <!-- PAYMENTS -->
+
+            <a
+                href="{{ url_for('extra_class.payments') }}"
+                class="nav-link
+                {% if request.endpoint in (
+                    'extra_class.payments',
+                    'extra_class.view_payment'
+                ) %}
+                    active
+                {% endif %}"
+            >
+
+                <i class="bi bi-credit-card-fill"></i>
+
+                <span>
+                    Payments
+                </span>
+
+            </a>
+
+
+            <!-- TEACHER SETTLEMENTS -->
+
+            <a
+                href="{{ url_for('extra_class.settlements') }}"
+                class="nav-link
+                {% if request.endpoint in (
+                    'extra_class.settlements',
+                    'extra_class.view_settlement'
+                ) %}
+                    active
+                {% endif %}"
+            >
+
+                <i class="bi bi-cash-stack"></i>
+
+                <span>
+                    Teacher Settlements
+                </span>
+
+            </a>
+
+
+            <!-- DIVIDER -->
+
+            <div class="nav-divider"></div>
+
+
+            <!-- BACK TO BTA -->
+
+            <a
+                href="{{ url_for('main.index') }}"
+                class="nav-link"
+            >
+
+                <i class="bi bi-arrow-left-circle-fill"></i>
+
+                <span>
+                    Back to BTA
+                </span>
+
+            </a>
+
+        </nav>
+
+
+        <!-- SIDEBAR FOOTER -->
+
+        <div class="sidebar-footer">
+
+            <a
+                href="{{ url_for('auth.logout') }}"
+                class="nav-link"
+            >
+
+                <i class="bi bi-box-arrow-right"></i>
+
+                <span>
+                    Logout
+                </span>
+
+            </a>
+
+        </div>
+
+    </aside>
+
+
+
+    <!-- =====================================================
+         MOBILE OVERLAY
+    ====================================================== -->
+
+    <div
+        class="sidebar-overlay"
+        id="sidebarOverlay"
+        onclick="closeSidebar()"
+    ></div>
+
+
+
+    <!-- =====================================================
+         MAIN WRAPPER
+    ====================================================== -->
+
+    <div class="main-wrapper">
+
+
+        <!-- =================================================
+             TOPBAR
+        ================================================== -->
+
+        <header class="topbar">
+
+
+            <div class="topbar-left">
+
+
+                <!-- MOBILE MENU -->
+
+                <button
+                    type="button"
+                    class="mobile-menu-btn"
+                    onclick="toggleSidebar()"
+                    aria-label="Open navigation"
+                >
+
+                    <i class="bi bi-list"></i>
+
+                </button>
+
+
+                <!-- PAGE TITLE -->
+
+                <div class="topbar-title">
+
+                    <h1>
+
+                        {% block page_title %}
+                            Extra Classes Super Admin
+                        {% endblock %}
+
+                    </h1>
+
+
+                    <p>
+
+                        {% block page_subtitle %}
+                            Manage the complete Extra Classes system.
+                        {% endblock %}
+
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- TOPBAR RIGHT -->
+
+            <div class="topbar-right">
+
+
+                <!-- INVESTING MESSAGE -->
+
+                <div class="topbar-message">
+                    Investing in Brighter Futures
+                </div>
+
+
+                <!-- NOTIFICATION -->
+
+                <div class="notification">
+
+                    <i class="bi bi-bell-fill"></i>
+
+                    <span class="notification-badge">
+                        0
+                    </span>
+
+                </div>
+
+
+                <!-- ADMIN PROFILE -->
+
+                <div class="admin-profile">
+
+                    <div class="admin-avatar">
+
+                        <i class="bi bi-shield-lock-fill"></i>
+
+                    </div>
+
+
+                    <div class="admin-info">
+
+                        <div class="admin-name">
+                            Super Admin
+                        </div>
+
+                        <div class="admin-role">
+                            Extra Classes
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+
+        <!-- =================================================
+             PAGE HEADER
+        ================================================== -->
+
+        <div class="page-header">
+
+
+            <div class="page-heading">
+
+                <h2>
+
+                    {% block header_heading %}
+                    {% endblock %}
+
+                </h2>
+
+
+                <p>
+
+                    {% block header_description %}
+                    {% endblock %}
+
+                </p>
+
+            </div>
+
+
+            <div class="page-actions">
+
+                {% block page_actions %}
+                {% endblock %}
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             FLASH MESSAGES
+        ================================================== -->
+
+        {% with messages =
+            get_flashed_messages(with_categories=true)
+        %}
+
+            {% if messages %}
+
+                <div class="flash-container">
+
+                    {% for category, message in messages %}
+
+                        <div
+                            class="alert
+                            {% if category == 'success' %}
+                                alert-success
+                            {% elif category == 'danger' %}
+                                alert-danger
+                            {% elif category == 'warning' %}
+                                alert-warning
+                            {% else %}
+                                alert-info
+                            {% endif %}
+                            alert-dismissible fade show"
+                            role="alert"
+                        >
+
+                            {{ message }}
+
+
+                            <button
+                                type="button"
+                                class="btn-close"
+                                data-bs-dismiss="alert"
+                                aria-label="Close"
+                            ></button>
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            {% endif %}
+
+        {% endwith %}
+
+
+
+        <!-- =================================================
+             PAGE CONTENT
+        ================================================== -->
+
+        <main class="page-content">
+
+            {% block content %}
+            {% endblock %}
+
+        </main>
+
+
+
+        <!-- =================================================
+             FOOTER
+        ================================================== -->
+
+        <footer class="page-footer">
+
+
+            <!-- LEFT -->
+
+            <div class="footer-left">
+
+                <strong>
+                    BTA
+                </strong>
+
+                <span class="footer-separator">
+                    |
+                </span>
+
+                <span>
+                    Extra Classes Payment System
+                </span>
+
+            </div>
+
+
+            <!-- CENTRE -->
+
+            <div class="footer-center">
+
+                Investing in Brighter Futures
+
+            </div>
+
+
+            <!-- RIGHT -->
+
+            <div class="footer-right">
+
+                Developed by
+
+                <strong>
+                    Emmanuel Asiamah Amponsah
+                </strong>
+
+            </div>
+
+        </footer>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         BOOTSTRAP JAVASCRIPT
+    ====================================================== -->
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    ></script>
+
+
+
+    <!-- =====================================================
+         SIDEBAR JAVASCRIPT
+    ====================================================== -->
+
+    <script>
+
+        function toggleSidebar() {
+
+            const sidebar =
+                document.getElementById(
+                    'superAdminSidebar'
+                );
+
+            const overlay =
+                document.getElementById(
+                    'sidebarOverlay'
+                );
+
+            sidebar.classList.toggle('show');
+
+            overlay.classList.toggle('show');
+
+        }
+
+
+        function closeSidebar() {
+
+            const sidebar =
+                document.getElementById(
+                    'superAdminSidebar'
+                );
+
+            const overlay =
+                document.getElementById(
+                    'sidebarOverlay'
+                );
+
+            sidebar.classList.remove('show');
+
+            overlay.classList.remove('show');
+
+        }
+
+
+        /*
+         * Close sidebar after clicking
+         * a navigation link on mobile.
+         */
+
+        document
+            .querySelectorAll(
+                '.sidebar .nav-link'
+            )
+            .forEach(
+                function(link) {
+
+                    link.addEventListener(
+                        'click',
+                        function() {
+
+                            if (
+                                window.innerWidth <= 850
+                            ) {
+
+                                closeSidebar();
+
+                            }
+
+                        }
+                    );
+
+                }
+            );
+
+
+        /*
+         * Reset sidebar when returning
+         * to desktop screen size.
+         */
+
+        window.addEventListener(
+            'resize',
+            function() {
+
+                if (
+                    window.innerWidth > 850
+                ) {
+
+                    closeSidebar();
+
+                }
+
+            }
+        );
+
+    </script>
+
+
+    <!-- =====================================================
+         CHILD PAGE JAVASCRIPT
+    ====================================================== -->
+
+    {% block extra_scripts %}
+    {% endblock %}
+
+</body>
+
+</html>

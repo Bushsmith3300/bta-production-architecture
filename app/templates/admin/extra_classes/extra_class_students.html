@@ -1,0 +1,616 @@
+{% extends "admin/extra_classes/extra_class_admin_base.html" %}
+
+{% block title %}
+    Extra Class Students | BTA
+{% endblock %}
+
+
+{% block page_title %}
+    Extra Class Students
+{% endblock %}
+
+
+{% block page_subtitle %}
+    Manage students registered for extra classes.
+{% endblock %}
+
+
+
+{% block page_actions %}
+
+<a
+	href="{{ url_for('extra_class.add_student') }}"
+	class="btn btn-primary"
+	>
+
+	<i class="bi bi-person-plus me-1"></i>
+
+	Add Student
+
+</a>
+
+{% endblock %}
+
+{% block extra_css %}
+
+
+<style>
+
+    /* =====================================================
+       CONTENT CARD
+    ===================================================== */
+
+    .content-card {
+        background: white;
+        border-radius: 14px;
+        padding: 22px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+
+    /* =====================================================
+       SEARCH
+    ===================================================== */
+
+    .search-box {
+        max-width: 350px;
+    }
+
+
+    /* =====================================================
+       STUDENT AVATAR
+    ===================================================== */
+
+    .student-avatar {
+        width: 40px;
+        height: 40px;
+
+        border-radius: 50%;
+
+        background: #e8f0fe;
+        color: #1565c0;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        font-weight: 700;
+    }
+
+
+    .student-name {
+        font-weight: 600;
+        color: #1f2937;
+    }
+
+
+    .student-code {
+        font-size: 13px;
+        color: #6b7280;
+    }
+
+
+    /* =====================================================
+       STATUS
+    ===================================================== */
+
+    .badge-active {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+
+    .badge-inactive {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+
+    /* =====================================================
+       TABLE
+    ===================================================== */
+
+    .table th {
+        color: #6b7280;
+        font-size: 13px;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+
+    .table td {
+        vertical-align: middle;
+    }
+
+
+    /* =====================================================
+       EMPTY STATE
+    ===================================================== */
+
+    .empty-state {
+        padding: 60px 20px;
+        text-align: center;
+        color: #6b7280;
+    }
+
+
+    .empty-state i {
+        font-size: 48px;
+        margin-bottom: 15px;
+        color: #9ca3af;
+    }
+
+</style>
+
+{% endblock %}
+
+
+
+{% block content %}
+
+
+
+<!-- =====================================================
+     CONTENT CARD
+====================================================== -->
+
+<div class="content-card">
+
+
+    <!-- =================================================
+         SEARCH / HEADER
+    ================================================== -->
+
+    <div
+        class="d-flex justify-content-between align-items-center flex-wrap mb-4"
+    >
+
+        <div>
+
+            <h5 class="mb-1">
+                Students
+            </h5>
+
+            <p class="text-muted mb-0">
+                View and manage registered students.
+            </p>
+
+        </div>
+
+
+        <div class="search-box mt-3 mt-md-0">
+
+            <div class="input-group">
+
+                <span class="input-group-text">
+
+                    <i class="bi bi-search"></i>
+
+                </span>
+
+
+                <input
+                    type="text"
+                    id="studentSearch"
+                    class="form-control"
+                    placeholder="Search students..."
+                >
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =================================================
+         STUDENTS TABLE
+    ================================================== -->
+
+    {% if students %}
+
+        <div class="table-responsive">
+
+            <table
+                class="table table-hover align-middle"
+                id="studentsTable"
+            >
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Student
+                        </th>
+
+                        <th>
+                            Student Code
+                        </th>
+
+                        <th>
+                            School
+                        </th>
+
+                        <th>
+                            Class
+                        </th>
+
+                        <th>
+                            Phone
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                        <th class="text-end">
+                            Actions
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for student in students %}
+
+                        <tr>
+
+
+                            <!-- =================================
+                                 STUDENT
+                            ================================== -->
+
+                            <td>
+
+                                <div
+                                    class="d-flex align-items-center gap-3"
+                                >
+
+                                    <div class="student-avatar">
+
+                                        {{ student.first_name[0]|upper }}
+
+                                    </div>
+
+
+                                    <div>
+
+                                        <div class="student-name">
+
+                                            {{ student.first_name }}
+                                            {{ student.other_name or '' }}
+                                            {{ student.surname }}
+
+                                        </div>
+
+
+                                        <div class="student-code">
+
+                                            {% if student.email %}
+
+                                                {{ student.email }}
+
+                                            {% else %}
+
+                                                No email
+
+                                            {% endif %}
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </td>
+
+
+                            <!-- =================================
+                                 STUDENT CODE
+                            ================================== -->
+
+                            <td>
+
+                                <span class="student-code">
+
+                                    {{ student.student_code }}
+
+                                </span>
+
+                            </td>
+
+
+                            <!-- =================================
+                                 SCHOOL
+                            ================================== -->
+
+                            <td>
+
+                                {% if student.school %}
+
+                                    {{ student.school }}
+
+                                {% else %}
+
+                                    <span class="text-muted">
+                                        —
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- =================================
+                                 CLASS
+                            ================================== -->
+
+                            <td>
+
+                                {% if student.class_name %}
+
+                                    {{ student.class_name }}
+
+                                {% else %}
+
+                                    <span class="text-muted">
+                                        —
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- =================================
+                                 PHONE
+                            ================================== -->
+
+                            <td>
+
+                                {% if student.phone %}
+
+                                    {{ student.phone }}
+
+                                {% else %}
+
+                                    <span class="text-muted">
+                                        —
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- =================================
+                                 STATUS
+                            ================================== -->
+
+                            <td>
+
+                                {% if student.is_active %}
+
+                                    <span
+                                        class="badge badge-active rounded-pill px-3 py-2"
+                                    >
+                                        Active
+                                    </span>
+
+                                {% else %}
+
+                                    <span
+                                        class="badge badge-inactive rounded-pill px-3 py-2"
+                                    >
+                                        Inactive
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- =================================
+                                 ACTIONS
+                            ================================== -->
+
+                            <td class="text-end">
+
+                                <div class="btn-group">
+
+
+                                    <!-- VIEW -->
+
+                                    <a
+                                        href="{{ url_for(
+                                            'extra_class.view_student',
+                                            student_id=student.id
+                                        ) }}"
+                                        class="btn btn-sm btn-outline-primary"
+                                        title="View student"
+                                    >
+
+                                        <i class="bi bi-eye"></i>
+
+                                    </a>
+
+
+                                    <!-- EDIT -->
+
+                                    <a
+                                        href="{{ url_for(
+                                            'extra_class.edit_student',
+                                            student_id=student.id
+                                        ) }}"
+                                        class="btn btn-sm btn-outline-secondary"
+                                        title="Edit student"
+                                    >
+
+                                        <i class="bi bi-pencil"></i>
+
+                                    </a>
+
+
+                                    <!-- ACTIVATE / DEACTIVATE -->
+
+                                    <form
+                                        method="POST"
+                                        action="{{ url_for(
+                                            'extra_class.toggle_student_status',
+                                            student_id=student.id
+                                        ) }}"
+                                        class="d-inline"
+                                        onsubmit="return confirm(
+                                            'Are you sure you want to {{ "deactivate" if student.is_active else "activate" }} {{ student.first_name }} {{ student.surname }}?'
+                                        );"
+                                    >
+
+                                        <input
+                                            type="hidden"
+                                            name="csrf_token"
+                                            value="{{ csrf_token() }}"
+                                        >
+
+
+                                        <button
+                                            type="submit"
+                                            class="btn btn-sm {{ 'btn-outline-danger' if student.is_active else 'btn-outline-success' }}"
+                                            title="{{ 'Deactivate student' if student.is_active else 'Activate student' }}"
+                                        >
+
+                                            <i
+                                                class="bi {{ 'bi-person-dash' if student.is_active else 'bi-person-check' }}"
+                                            ></i>
+
+                                        </button>
+
+                                    </form>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+    {% else %}
+
+
+        <!-- =================================================
+             EMPTY STATE
+        ================================================== -->
+
+        <div class="empty-state">
+
+            <i class="bi bi-mortarboard"></i>
+
+
+            <h5>
+                No Students Yet
+            </h5>
+
+
+            <p class="mb-4">
+
+                No students have been registered for Extra Classes.
+
+            </p>
+
+
+            <a
+                href="{{ url_for('extra_class.add_student') }}"
+                class="btn btn-primary"
+            >
+
+                <i class="bi bi-person-plus me-1"></i>
+
+                Add First Student
+
+            </a>
+
+        </div>
+
+    {% endif %}
+
+
+</div>
+
+
+{% endblock %}
+
+
+
+{% block extra_scripts %}
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        const searchInput =
+            document.getElementById("studentSearch");
+
+        const table =
+            document.getElementById("studentsTable");
+
+
+        if (!searchInput || !table) {
+            return;
+        }
+
+
+        searchInput.addEventListener(
+            "input",
+            function () {
+
+                const searchValue =
+                    this.value
+                    .toLowerCase()
+                    .trim();
+
+
+                const rows =
+                    table.querySelectorAll(
+                        "tbody tr"
+                    );
+
+
+                rows.forEach(
+                    function (row) {
+
+                        const text =
+                            row.textContent
+                            .toLowerCase();
+
+
+                        row.style.display =
+                            text.includes(searchValue)
+                                ? ""
+                                : "none";
+
+                    }
+                );
+
+            }
+        );
+
+    }
+);
+
+</script>
+
+{% endblock %}

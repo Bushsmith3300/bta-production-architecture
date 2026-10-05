@@ -1,0 +1,1213 @@
+{% extends "extra_class_teacher_base.html" %}
+
+{% block title %}Complete Student Registration{% endblock %}
+
+{% block page_heading %}Complete Student Registration{% endblock %}
+
+{% block extra_css %}
+
+/* =========================================================
+   ENROLLMENT PAGE
+   Matches the supplied Add Student page / Teacher Portal
+   ========================================================= */
+
+.enroll-page {
+    max-width: 1050px;
+    margin: 0 auto;
+    padding-bottom: 40px;
+    color: var(--text);
+}
+
+/* =========================================================
+   REGISTRATION PROGRESS
+   ========================================================= */
+
+.enroll-page .registration-progress {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 5px auto 30px;
+    max-width: 720px;
+}
+
+.enroll-page .progress-step {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.enroll-page .progress-circle {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 50%;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.enroll-page .progress-step.completed .progress-circle,
+.enroll-page .progress-step.active .progress-circle {
+    background: var(--maroon);
+    color: var(--white);
+    box-shadow: 0 4px 12px rgba(127, 29, 29, 0.22);
+}
+
+.enroll-page .progress-label {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.enroll-page .progress-step.completed .progress-label,
+.enroll-page .progress-step.active .progress-label {
+    color: var(--maroon);
+}
+
+.enroll-page .progress-line {
+    width: 75px;
+    height: 2px;
+    margin: 0 14px;
+    background: var(--border);
+}
+
+.enroll-page .progress-line.completed {
+    background: #c98f8f;
+}
+
+/* =========================================================
+   PAGE HEADER
+   ========================================================= */
+
+.enroll-page .page-header {
+    margin-bottom: 25px;
+}
+
+.enroll-page .page-header h1 {
+    margin: 0 0 7px;
+    color: var(--text);
+    font-size: 28px;
+    font-weight: 800;
+}
+
+.enroll-page .page-header p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* =========================================================
+   CLASS CONTEXT
+   ========================================================= */
+
+.enroll-page .class-context {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 22px;
+    flex-wrap: wrap;
+}
+
+.enroll-page .context-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 13px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    color: var(--maroon);
+    font-size: 12px;
+    font-weight: 800;
+    box-shadow: 0 2px 7px rgba(15, 23, 42, 0.03);
+}
+
+.enroll-page .context-separator {
+    color: #a0a8b5;
+    font-size: 12px;
+}
+
+/* =========================================================
+   STUDENT SUMMARY
+   ========================================================= */
+
+.enroll-page .student-summary {
+    margin-bottom: 22px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: 0 7px 20px rgba(15, 23, 42, 0.05);
+    overflow: hidden;
+}
+
+.enroll-page .student-summary-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 20px 22px;
+    background: linear-gradient(135deg, #fff7f7, #ffffff);
+    border-bottom: 1px solid var(--border);
+}
+
+.enroll-page .student-avatar {
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--primary-light);
+    border: 1px solid #fecaca;
+    border-radius: 11px;
+    color: var(--maroon);
+    font-size: 20px;
+}
+
+.enroll-page .student-summary-title {
+    margin: 0 0 5px;
+    color: var(--text);
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.enroll-page .student-summary-subtitle {
+    margin: 0;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.enroll-page .student-details {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+    padding: 20px 22px;
+}
+
+.enroll-page .student-detail {
+    padding: 15px;
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+}
+
+.enroll-page .student-detail-label {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .6px;
+    text-transform: uppercase;
+}
+
+.enroll-page .student-detail-value {
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.enroll-page .student-code {
+    display: inline-flex;
+    align-items: center;
+    padding: 7px 10px;
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+    border-radius: 7px;
+    color: #9a3412;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: .4px;
+}
+
+/* =========================================================
+   INFORMATION CARD
+   ========================================================= */
+
+.enroll-page .info-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+    margin-bottom: 22px;
+    padding: 14px 16px;
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--maroon);
+    border-radius: 9px;
+}
+
+.enroll-page .info-icon {
+    flex-shrink: 0;
+    color: var(--maroon);
+    font-size: 16px;
+}
+
+.enroll-page .info-card h3 {
+    margin: 0 0 5px;
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.enroll-page .info-card p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.65;
+}
+
+/* =========================================================
+   MAIN FORM CARD
+   ========================================================= */
+
+.enroll-page .form-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+    padding: 25px;
+}
+
+/* =========================================================
+   FORM SECTIONS
+   ========================================================= */
+
+.enroll-page .form-section {
+    margin-bottom: 28px;
+}
+
+.enroll-page .section-heading {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 17px;
+}
+
+.enroll-page .section-heading-icon {
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--primary-light);
+    border: 1px solid #fecaca;
+    border-radius: 9px;
+    color: var(--maroon);
+    font-size: 15px;
+}
+
+.enroll-page .section-heading h2 {
+    margin: 0;
+    color: var(--text);
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.enroll-page .section-heading p {
+    margin: 3px 0 0;
+    color: var(--muted);
+    font-size: 11px;
+}
+
+/* =========================================================
+   READ-ONLY CLASS INFORMATION
+   ========================================================= */
+
+.enroll-page .class-info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.enroll-page .readonly-field {
+    padding: 15px;
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+}
+
+.enroll-page .readonly-label {
+    display: block;
+    margin-bottom: 7px;
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .6px;
+    text-transform: uppercase;
+}
+
+.enroll-page .readonly-value {
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.enroll-page .readonly-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--maroon);
+}
+
+/* =========================================================
+   CLASS PLACEMENT FORM
+   ========================================================= */
+
+.enroll-page .placement-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.enroll-page .form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.enroll-page .form-label {
+    margin-bottom: 7px;
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.enroll-page .required {
+    color: var(--maroon);
+}
+
+.enroll-page .form-control {
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 46px;
+    padding: 11px 13px;
+    background: var(--white);
+    border: 1px solid #d7dce3;
+    border-radius: 9px;
+    outline: none;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 13px;
+    transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+}
+
+.enroll-page .form-control::placeholder {
+    color: #a3acb9;
+}
+
+.enroll-page .form-control:hover {
+    border-color: #b8c0cb;
+}
+
+.enroll-page .form-control:focus {
+    background: var(--white);
+    border-color: var(--maroon);
+    box-shadow: 0 0 0 3px rgba(127, 29, 29, .08);
+}
+
+.enroll-page select.form-control option {
+    background: #ffffff;
+    color: var(--text);
+}
+
+.enroll-page .form-help {
+    margin-top: 7px;
+    color: var(--muted);
+    font-size: 10px;
+    line-height: 1.55;
+}
+
+/* =========================================================
+   CONFIRMATION
+   ========================================================= */
+
+.enroll-page .confirmation-panel {
+    margin-top: 25px;
+    padding: 14px 16px;
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--maroon);
+    border-radius: 9px;
+}
+
+.enroll-page .confirmation-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+    color: var(--maroon);
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.enroll-page .confirmation-panel p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.65;
+}
+
+.enroll-page .confirmation-panel strong {
+    color: var(--text);
+}
+
+/* =========================================================
+   FORM ACTION
+   ========================================================= */
+
+.enroll-page .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+}
+
+.enroll-page .btn-submit {
+    min-height: 45px;
+    padding: 11px 21px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: linear-gradient(135deg, var(--maroon), var(--maroon-dark));
+    border: none;
+    border-radius: 9px;
+    color: var(--white);
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(127, 29, 29, .16);
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.enroll-page .btn-submit:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 7px 18px rgba(127, 29, 29, .23);
+}
+
+/* =========================================================
+   BOTTOM NAVIGATION
+   ========================================================= */
+
+.enroll-page .bottom-navigation {
+    display: flex;
+    justify-content: center;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+}
+
+.enroll-page .back-to-class {
+    min-height: 42px;
+    padding: 9px 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    color: var(--maroon);
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 700;
+    transition: background .2s ease, border-color .2s ease, color .2s ease, transform .2s ease;
+}
+
+.enroll-page .back-to-class:hover {
+    background: var(--primary-light);
+    border-color: #fecaca;
+    color: var(--maroon-dark);
+    transform: translateY(-1px);
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 700px) {
+    .enroll-page .registration-progress {
+        justify-content: flex-start;
+        overflow-x: auto;
+        padding: 0 5px 8px;
+    }
+
+    .enroll-page .progress-line {
+        width: 40px;
+        margin: 0 8px;
+    }
+
+    .enroll-page .progress-label {
+        font-size: 11px;
+    }
+
+    .enroll-page .student-details,
+    .enroll-page .class-info-grid,
+    .enroll-page .placement-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .enroll-page .form-card {
+        padding: 20px;
+    }
+
+    .enroll-page .form-actions {
+        justify-content: stretch;
+    }
+
+    .enroll-page .btn-submit {
+        width: 100%;
+    }
+}
+
+@media (max-width: 450px) {
+    .enroll-page {
+        padding-bottom: 25px;
+    }
+
+    .enroll-page .page-header h1 {
+        font-size: 23px;
+    }
+
+    .enroll-page .student-summary-header {
+        gap: 10px;
+        padding: 17px;
+    }
+
+    .enroll-page .student-details {
+        padding: 16px;
+    }
+
+    .enroll-page .form-card {
+        padding: 16px;
+    }
+
+    .enroll-page .back-to-class {
+        width: 100%;
+    }
+}
+
+
+
+/* =========================================================
+   MONTHLY FEE GENERATION
+   ========================================================= */
+
+.fee-generation-card {
+    margin: 24px 0;
+    padding: 24px;
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+    background: linear-gradient(135deg, rgba(255,190,80,.12), rgba(255,255,255,.07));
+    border: 1px solid rgba(255,190,80,.30);
+    border-radius: 18px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.12);
+}
+
+.fee-generation-icon {
+    width: 52px; height: 52px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(255,190,80,.15);
+    border: 1px solid rgba(255,190,80,.25);
+    border-radius: 13px; font-size: 25px;
+}
+
+.fee-generation-content { flex: 1; }
+.fee-generation-content h3 { margin: 0 0 7px; color: #fff; font-size: 19px; font-weight: 800; }
+.fee-generation-content > p { margin: 0 0 18px; color: rgba(255,255,255,.68); font-size: 13px; line-height: 1.65; }
+
+.fee-info {
+    display: grid; grid-template-columns: repeat(4,minmax(0,1fr));
+    gap: 10px; margin-bottom: 18px;
+}
+
+.fee-info-item {
+    padding: 12px; background: rgba(0,0,0,.18);
+    border: 1px solid rgba(255,255,255,.08); border-radius: 10px;
+}
+
+.fee-info-label { display: block; margin-bottom: 5px; color: rgba(255,255,255,.48); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; }
+.fee-info-value { color: #fff; font-size: 14px; font-weight: 800; }
+.fee-info-value.money { color: #ffd36b; }
+
+.btn-generate-fees {
+    min-height: 46px; padding: 11px 20px;
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    background: linear-gradient(135deg,#ffbd4a,#e89516);
+    border: none; border-radius: 10px; color: #241600;
+    font-family: inherit; font-size: 13px; font-weight: 900; cursor: pointer;
+    box-shadow: 0 8px 22px rgba(232,149,22,.20);
+}
+
+.btn-generate-fees:hover { transform: translateY(-1px); box-shadow: 0 10px 28px rgba(232,149,22,.30); }
+
+@media (max-width: 800px) { .fee-info { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 700px) {
+    .fee-generation-card { flex-direction: column; }
+    .btn-generate-fees { width: 100%; }
+}
+@media (max-width: 450px) { .fee-info { grid-template-columns: 1fr; } }
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="enroll-page">
+
+
+    <!-- =====================================================
+         STEP PROGRESS
+         ===================================================== -->
+
+    <div class="registration-progress">
+
+        <div class="progress-step completed">
+
+            <div class="progress-circle">
+                ✓
+            </div>
+
+            <div class="progress-label">
+                Add Student
+            </div>
+
+        </div>
+
+
+        <div class="progress-line completed"></div>
+
+
+        <div class="progress-step active">
+
+            <div class="progress-circle">
+                2
+            </div>
+
+            <div class="progress-label">
+                Complete Registration
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         PAGE HEADER
+         ===================================================== -->
+
+    <div class="page-header">
+
+        <h1>
+            Complete Student Registration
+        </h1>
+
+        <p>
+            The student's information is shown below.
+            Complete the academic details to add the student
+            to your class.
+        </p>
+
+    </div>
+
+
+    <!-- =====================================================
+         STUDENT SUMMARY
+         ===================================================== -->
+
+    <div class="student-summary">
+
+        <div class="student-summary-header">
+
+            <div class="student-avatar">
+                👨‍🎓
+            </div>
+
+            <div>
+
+                <h2 class="student-summary-title">
+                    Student Being Added
+                </h2>
+
+                <p class="student-summary-subtitle">
+                    Confirm the student information before completing registration.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="student-details">
+
+            <div class="student-detail">
+                <span class="student-detail-label">Student Name</span>
+                <div class="student-detail-value">
+                    {{ student.first_name }}
+                    {% if student.other_name %}{{ student.other_name }} {% endif %}
+                    {{ student.surname }}
+                </div>
+            </div>
+
+            <div class="student-detail">
+                <span class="student-detail-label">Student Code</span>
+                <div class="student-detail-value">
+                    <span class="student-code">{{ student.student_code }}</span>
+                </div>
+            </div>
+
+            <div class="student-detail">
+                <span class="student-detail-label">School</span>
+                <div class="student-detail-value">{{ student.school or "Not provided" }}</div>
+            </div>
+
+            <div class="student-detail">
+                <span class="student-detail-label">Phone</span>
+                <div class="student-detail-value">{{ student.phone or "Not provided" }}</div>
+            </div>
+
+            <div class="student-detail">
+                <span class="student-detail-label">Email</span>
+                <div class="student-detail-value">{{ student.email or "Not provided" }}</div>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         INFORMATION CARD
+         ===================================================== -->
+
+    <div class="info-card">
+
+        <div class="info-icon">
+            ℹ️
+        </div>
+
+        <div>
+
+            <h3>
+                Almost done
+            </h3>
+
+            <p>
+                Complete the student's academic information below.
+                Once you submit this form, the student will be added
+                to your class.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         MONTHLY FEE GENERATION
+         ===================================================== -->
+
+    {% if existing_enrollment and existing_enrollment.status == "ACTIVE" %}
+
+        <div class="fee-generation-card">
+
+            <div class="fee-generation-icon">💰</div>
+
+            <div class="fee-generation-content">
+
+                <h3>Monthly Fee Generation</h3>
+
+                <p>
+                    This student is already enrolled in your class.
+                    Click the button below to generate the monthly fee
+                    records for this enrollment.
+                </p>
+
+                <div class="fee-info">
+
+                    <div class="fee-info-item">
+                        <span class="fee-info-label">Monthly Fee</span>
+                        <span class="fee-info-value money">
+                            GH¢{{ "%.2f"|format(extra_subject.monthly_fee|float) }}
+                        </span>
+                    </div>
+
+                    <div class="fee-info-item">
+                        <span class="fee-info-label">Semester</span>
+                        <span class="fee-info-value">
+                            {{ existing_enrollment.term.name }}
+                        </span>
+                    </div>
+
+                    <div class="fee-info-item">
+                        <span class="fee-info-label">Start Date</span>
+                        <span class="fee-info-value">
+                            {{ existing_enrollment.start_date.strftime("%d %b %Y") }}
+                        </span>
+                    </div>
+
+                    <div class="fee-info-item">
+                        <span class="fee-info-label">End Date</span>
+                        <span class="fee-info-value">
+                            {{ existing_enrollment.end_date.strftime("%d %b %Y") }}
+                        </span>
+                    </div>
+
+                </div>
+
+                <form
+                    method="POST"
+                    action="{{ url_for(
+                        'extra_class_teacher.generate_teacher_monthly_fees',
+                        enrollment_id=existing_enrollment.id
+                    ) }}"
+                    onsubmit="return confirm('Generate monthly fee records for this enrollment?');"
+                >
+
+                    <input
+                        type="hidden"
+                        name="csrf_token"
+                        value="{{ csrf_token() }}"
+                    >
+
+                    <button type="submit" class="btn-generate-fees">
+                        💰 Generate Monthly Fees
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    {% endif %}
+
+
+    <!-- =====================================================
+         ENROLLMENT FORM
+         ===================================================== -->
+
+    {% if not existing_enrollment or existing_enrollment.status != "ACTIVE" %}
+
+    <form
+        method="POST"
+        class="form-card"
+        id="enrollmentForm"
+    >
+
+        <!-- CSRF -->
+
+        <input
+            type="hidden"
+            name="csrf_token"
+            value="{{ csrf_token() }}"
+        >
+
+
+        <!-- =================================================
+             CLASS PLACEMENT
+             ================================================= -->
+
+        <div class="form-section">
+
+            <div class="section-heading">
+                <div class="section-heading-icon">🎓</div>
+                <div>
+                    <h2>Class Placement</h2>
+                    <p>Select the student's semester, form, class and start date.</p>
+                </div>
+            </div>
+
+            <div class="placement-grid">
+
+                <div class="form-group">
+                    <label for="term_id" class="form-label">
+                        Semester <span class="required">*</span>
+                    </label>
+                    <select id="term_id" name="term_id" class="form-control" required>
+                        <option value="">Select semester</option>
+                        {% for semester in semesters %}
+                            <option value="{{ semester.id }}"
+                                {% if form_data is defined and form_data.term_id|string == semester.id|string %}selected{% endif %}>
+                                {{ semester.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <div class="form-help">
+                        Select the semester in which the student is joining your class.
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="form" class="form-label">
+                        Form <span class="required">*</span>
+                    </label>
+                    <select id="form" name="form" class="form-control" required>
+                        <option value="">Select form</option>
+                        <option value="FORM 1" {% if form_data is defined and form_data.form == "FORM 1" %}selected{% endif %}>FORM 1</option>
+                        <option value="FORM 2" {% if form_data is defined and form_data.form == "FORM 2" %}selected{% endif %}>FORM 2</option>
+                        <option value="FORM 3" {% if form_data is defined and form_data.form == "FORM 3" %}selected{% endif %}>FORM 3</option>
+                    </select>
+                    <div class="form-help">
+                        Select the student's current SHS form.
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="class_name" class="form-label">
+                        Class <span class="required">*</span>
+                    </label>
+                    <input type="text" id="class_name" name="class_name"
+                           class="form-control"
+                           placeholder="e.g. 1A, 2 Science A, 3 General Arts"
+                           maxlength="100"
+                           value="{{ form_data.class_name if form_data is defined and form_data.class_name is defined else '' }}"
+                           required>
+                    <div class="form-help">
+                        Enter the student's school class or class name.
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="start_date" class="form-label">
+                        Start Date <span class="required">*</span>
+                    </label>
+                    <input type="date" id="start_date" name="start_date"
+                           class="form-control"
+                           value="{{ form_data.start_date if form_data is defined and form_data.start_date is defined else '' }}"
+                           required>
+                    <div class="form-help">
+                        Choose the date the student starts attending your class.
+                        The date must fall within the selected semester.
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+
+        <!-- =================================================
+             FINAL CONFIRMATION
+             ================================================= -->
+
+        <div class="confirmation-panel">
+
+            <div class="confirmation-title">
+
+                ✓ Ready to add this student?
+
+            </div>
+
+
+            <p>
+                <strong>
+                    {{ student.first_name }}
+                    {% if student.other_name %}{{ student.other_name }} {% endif %}
+                    {{ student.surname }}
+                </strong>
+                will be added to your class using the semester, form,
+                class and start date selected above.
+            </p>
+
+        </div>
+
+
+        <!-- =================================================
+             SUBMIT ACTION
+             ================================================= -->
+
+        <div class="form-actions">
+
+            <button
+                type="submit"
+                class="btn-submit"
+            >
+
+                ✓ Add Student to Class
+
+            </button>
+
+        </div>
+
+
+    </form>
+
+    {% endif %}
+
+
+    <!-- =====================================================
+         BACK TO CLASS
+         IMPORTANT: OUTSIDE THE FORM AND AT PAGE BOTTOM
+         ===================================================== -->
+
+    <div class="bottom-navigation">
+
+        <a
+            href="{{ url_for(
+                'extra_class_teacher.manage_class',
+                class_id=extra_subject.id
+            ) }}"
+            class="back-to-class"
+        >
+
+            ← Back to My Class
+
+        </a>
+
+    </div>
+
+
+</div>
+
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const enrollmentForm =
+        document.getElementById("enrollmentForm");
+
+    const termSelect =
+        document.getElementById("term_id");
+
+    const formSelect =
+        document.getElementById("form");
+
+    const classInput =
+        document.getElementById("class_name");
+
+    const startDateInput =
+        document.getElementById("start_date");
+
+
+    /*
+     * Subtle visual feedback when fields
+     * have been completed.
+     */
+
+    function markSelected(element) {
+
+        if (!element) {
+            return;
+        }
+
+        if (element.value) {
+
+            element.style.borderColor =
+                "#7f1d1d";
+
+        } else {
+
+            element.style.borderColor =
+                "#d7dce3";
+
+        }
+
+    }
+
+
+    if (termSelect) {
+
+        termSelect.addEventListener(
+            "change",
+            function () {
+
+                markSelected(termSelect);
+
+            }
+        );
+
+    }
+
+
+    if (formSelect) {
+
+        formSelect.addEventListener(
+            "change",
+            function () {
+
+                markSelected(formSelect);
+
+            }
+        );
+
+    }
+
+
+    if (classInput) {
+
+        classInput.addEventListener(
+            "input",
+            function () {
+
+                markSelected(classInput);
+
+            }
+        );
+
+    }
+
+
+    if (startDateInput) {
+
+        startDateInput.addEventListener(
+            "change",
+            function () {
+
+                markSelected(startDateInput);
+
+            }
+        );
+
+    }
+
+
+    /*
+     * Final confirmation.
+     */
+
+    if (enrollmentForm) {
+
+        enrollmentForm.addEventListener(
+            "submit",
+            function (event) {
+
+                if (!termSelect.value) {
+                    return;
+                }
+
+                const selectedSemester =
+                    termSelect.options[
+                        termSelect.selectedIndex
+                    ].text;
+
+                const confirmed = window.confirm(
+                    "Add this student to your class for " +
+                    selectedSemester +
+                    "?"
+                );
+
+                if (!confirmed) {
+
+                    event.preventDefault();
+
+                }
+
+            }
+        );
+
+    }
+
+});
+
+</script>
+
+{% endblock %}

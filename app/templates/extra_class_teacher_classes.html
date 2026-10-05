@@ -1,0 +1,756 @@
+{% extends "extra_class_teacher_base.html" %}
+
+{% block title %}My Classes{% endblock %}
+
+
+{% block extra_css %}
+
+/* =========================================================
+   PAGE HEADER
+   ========================================================= */
+
+.page-header {
+    margin-bottom: 28px;
+}
+
+.page-header h1 {
+    margin: 0 0 8px;
+    font-size: 30px;
+    font-weight: 800;
+    color: var(--text);
+}
+
+.page-header p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 15px;
+}
+
+
+/* =========================================================
+   CLASS GRID
+   ========================================================= */
+
+.classes-grid {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(320px, 1fr)
+    );
+    gap: 24px;
+}
+
+
+/* =========================================================
+   CLASS CARD
+   ========================================================= */
+
+.class-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.class-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 32px rgba(15, 23, 42, 0.10);
+}
+
+
+/* =========================================================
+   CLASS CARD HEADER
+   ========================================================= */
+
+.class-card-header {
+    padding: 22px;
+    background: linear-gradient(
+        135deg,
+        var(--maroon),
+        var(--maroon-dark)
+    );
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.class-card-header::after {
+    content: "";
+    position: absolute;
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    right: -35px;
+    top: -50px;
+    background: rgba(255, 255, 255, 0.08);
+    pointer-events: none;
+}
+
+.class-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.15);
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 14px;
+}
+
+.status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #86efac;
+    flex-shrink: 0;
+}
+
+.class-card-header h2 {
+    margin: 0 0 6px;
+    font-size: 24px;
+    font-weight: 800;
+    position: relative;
+    z-index: 1;
+}
+
+.class-code {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 13px;
+    position: relative;
+    z-index: 1;
+}
+
+
+/* =========================================================
+   CLASS CARD BODY
+   ========================================================= */
+
+.class-card-body {
+    padding: 22px;
+}
+
+
+/* =========================================================
+   MONTHLY FEE
+   ========================================================= */
+
+.fee-highlight {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 12px;
+    background: var(--primary-light);
+    border: 1px solid #fecaca;
+}
+
+.fee-label {
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 600;
+}
+
+.fee-period {
+    margin-top: 3px;
+    font-size: 12px;
+    color: var(--muted);
+}
+
+.fee-value {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--maroon);
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   CLASS INFORMATION GRID
+   ========================================================= */
+
+.class-info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+.info-box {
+    padding: 14px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: #fafafa;
+}
+
+.info-icon {
+    font-size: 18px;
+    margin-bottom: 8px;
+}
+
+.info-label {
+    display: block;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 4px;
+}
+
+.info-value {
+    display: block;
+    color: var(--text);
+    font-size: 16px;
+    font-weight: 800;
+    word-break: break-word;
+}
+
+.outstanding {
+    color: var(--maroon);
+}
+
+
+/* =========================================================
+   SEMESTER
+   ========================================================= */
+
+.semester-box {
+    padding: 15px;
+    border-radius: 12px;
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+    margin-bottom: 20px;
+}
+
+.semester-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #9a3412;
+    font-size: 13px;
+    font-weight: 800;
+    margin-bottom: 7px;
+}
+
+.semester-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: #431407;
+    margin-bottom: 4px;
+}
+
+.semester-dates {
+    color: #7c2d12;
+    font-size: 12px;
+}
+
+.no-semester {
+    padding: 15px;
+    border-radius: 12px;
+    background: #f8fafc;
+    border: 1px dashed var(--border);
+    color: var(--muted);
+    font-size: 13px;
+    margin-bottom: 20px;
+}
+
+
+/* =========================================================
+   CLASS ACTIONS
+   ========================================================= */
+
+.class-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 11px 14px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 700;
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+    cursor: pointer;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+.btn-primary {
+    color: white;
+    background: var(--maroon);
+}
+
+.btn-primary:hover {
+    background: var(--maroon-dark);
+}
+
+.btn-secondary {
+    color: var(--maroon);
+    background: var(--primary-light);
+    border: 1px solid #fecaca;
+}
+
+.btn-secondary:hover {
+    background: #fee2e2;
+}
+
+
+/* =========================================================
+   EMPTY STATE
+   ========================================================= */
+
+.empty-state {
+    background: var(--white);
+    border: 1px dashed var(--border);
+    border-radius: 18px;
+    padding: 60px 25px;
+    text-align: center;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+}
+
+.empty-icon {
+    width: 70px;
+    height: 70px;
+    margin: 0 auto 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 18px;
+    background: var(--primary-light);
+    font-size: 32px;
+}
+
+.empty-state h2 {
+    margin: 0 0 8px;
+    font-size: 21px;
+    color: var(--text);
+}
+
+.empty-state p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   PHONE + TABLET
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+    .classes-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .page-header {
+        margin-bottom: 22px;
+    }
+
+    .page-header h1 {
+        font-size: 26px;
+    }
+
+    .page-header p {
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    .class-card-body {
+        padding: 18px;
+    }
+
+    .class-card-header {
+        padding: 20px;
+    }
+
+    .fee-highlight {
+        padding: 14px;
+    }
+
+    .fee-value {
+        font-size: 20px;
+    }
+}
+
+
+/* =========================================================
+   SMALL PHONE
+   ========================================================= */
+
+@media (max-width: 450px) {
+
+    .page-header h1 {
+        font-size: 23px;
+    }
+
+    .class-card-header h2 {
+        font-size: 21px;
+    }
+
+    .class-info-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    .info-box {
+        padding: 12px;
+    }
+
+    .info-icon {
+        font-size: 16px;
+    }
+
+    .info-label {
+        font-size: 10px;
+    }
+
+    .info-value {
+        font-size: 14px;
+    }
+
+    .fee-highlight {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .fee-value {
+        font-size: 21px;
+    }
+
+    .class-actions {
+        flex-direction: column;
+    }
+
+    .btn {
+        width: 100%;
+    }
+
+    .empty-state {
+        padding: 45px 20px;
+    }
+}
+
+{% endblock %}
+
+
+{% block content %}
+
+<!-- =====================================================
+     PAGE HEADER
+     ===================================================== -->
+
+<div class="page-header">
+
+    <h1>
+        My Classes
+    </h1>
+
+    <p>
+        Manage your Extra Classes subject, students,
+        semester and monthly fees.
+    </p>
+
+</div>
+
+
+<!-- =====================================================
+     CLASSES
+     ===================================================== -->
+
+{% if class_data %}
+
+<div class="classes-grid">
+
+    {% for item in class_data %}
+
+        {% set extra_subject = item.subject %}
+
+        <div class="class-card">
+
+            <!-- =========================================
+                 CARD HEADER
+                 ========================================= -->
+
+            <div class="class-card-header">
+
+                <div class="class-status">
+
+                    <span class="status-dot"></span>
+
+                    {% if extra_subject.is_active %}
+                        Active Class
+                    {% else %}
+                        Inactive Class
+                    {% endif %}
+
+                </div>
+
+                <h2>
+                    {{ extra_subject.subject.name }}
+                </h2>
+
+                <p class="class-code">
+                    Teacher Code:
+                    {{ teacher.teacher_code }}
+                </p>
+
+            </div>
+
+
+            <!-- =========================================
+                 CARD BODY
+                 ========================================= -->
+
+            <div class="class-card-body">
+
+
+                <!-- =====================================
+                     MONTHLY FEE
+                     ===================================== -->
+
+                <div class="fee-highlight">
+
+                    <div>
+
+                        <div class="fee-label">
+                            Monthly Fee
+                        </div>
+
+                        <div class="fee-period">
+                            Per student
+                        </div>
+
+                    </div>
+
+                    <div class="fee-value">
+                        GH₵ {{ "%.2f"|format(
+                            extra_subject.monthly_fee|float
+                        ) }}
+                    </div>
+
+                </div>
+
+
+                <!-- =====================================
+                     CLASS STATISTICS
+                     ===================================== -->
+
+                <div class="class-info-grid">
+
+
+                    <!-- STUDENTS -->
+
+                    <div class="info-box">
+
+                        <div class="info-icon">
+                            👨‍🎓
+                        </div>
+
+                        <span class="info-label">
+                            Students
+                        </span>
+
+                        <span class="info-value">
+                            {{ item.student_count }}
+                        </span>
+
+                    </div>
+
+
+                    <!-- ENROLLMENTS -->
+
+                    <div class="info-box">
+
+                        <div class="info-icon">
+                            👥
+                        </div>
+
+                        <span class="info-label">
+                            Enrollments
+                        </span>
+
+                        <span class="info-value">
+                            {{ item.enrollment_count }}
+                        </span>
+
+                    </div>
+
+
+                    <!-- OUTSTANDING -->
+
+                    <div class="info-box">
+
+                        <div class="info-icon">
+                            💵
+                        </div>
+
+                        <span class="info-label">
+                            Outstanding
+                        </span>
+
+                        <span class="info-value outstanding">
+                            GH₵ {{ "%.2f"|format(
+                                item.outstanding|float
+                            ) }}
+                        </span>
+
+                    </div>
+
+
+                    <!-- STATUS -->
+
+                    <div class="info-box">
+
+                        <div class="info-icon">
+                            📚
+                        </div>
+
+                        <span class="info-label">
+                            Status
+                        </span>
+
+                        <span class="info-value">
+
+                            {% if extra_subject.is_active %}
+                                Active
+                            {% else %}
+                                Inactive
+                            {% endif %}
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =====================================
+                     CURRENT SEMESTER
+                     ===================================== -->
+
+                {% if item.semester %}
+
+                    <div class="semester-box">
+
+                        <div class="semester-title">
+                            📅 Current Semester
+                        </div>
+
+                        <div class="semester-name">
+                            {{ item.semester.name }}
+                        </div>
+
+                        <div class="semester-dates">
+
+                            {{ item.semester.start_date.strftime(
+                                "%d %b %Y"
+                            ) }}
+
+                            –
+
+                            {{ item.semester.end_date.strftime(
+                                "%d %b %Y"
+                            ) }}
+
+                        </div>
+
+                    </div>
+
+                {% else %}
+
+                    <div class="no-semester">
+
+                        📅 No active semester has been created
+                        for this class yet.
+
+                    </div>
+
+                {% endif %}
+
+
+                <!-- =====================================
+                     ACTIONS
+                     ===================================== -->
+
+                <div class="class-actions">
+
+                    <a
+						href="{{ url_for(
+							'extra_class_teacher.manage_class',
+							class_id=extra_subject.id
+						) }}"
+						class="btn btn-primary"
+					>
+						👁 View Class
+					</a>
+					
+					
+                    <a
+						href="{{ url_for(
+							'extra_class_teacher.manage_class',
+							class_id=extra_subject.id
+						) }}"
+						class="btn btn-secondary"
+					>
+						⚙ Manage
+					</a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    {% endfor %}
+
+</div>
+
+
+{% else %}
+
+
+<!-- =====================================================
+     EMPTY STATE
+     ===================================================== -->
+
+<div class="empty-state">
+
+    <div class="empty-icon">
+        📚
+    </div>
+
+    <h2>
+        No Classes Assigned
+    </h2>
+
+    <p>
+        You currently do not have an active Extra Classes
+        subject assigned to your teacher account.
+    </p>
+
+</div>
+
+{% endif %}
+
+{% endblock %}

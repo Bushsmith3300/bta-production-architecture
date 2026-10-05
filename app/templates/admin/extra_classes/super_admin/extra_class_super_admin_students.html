@@ -1,0 +1,920 @@
+{% extends "admin/extra_classes/super_admin/extra_class_super_admin_base.html" %}
+
+{% block title %}Students | Extra Classes Super Admin{% endblock %}
+
+{% block page_title %}
+    Students Management
+{% endblock %}
+
+{% block page_subtitle %}
+    Manage students enrolled in the Extra Classes system.
+{% endblock %}
+
+{% block header_heading %}
+    Students
+{% endblock %}
+
+{% block header_description %}
+    Manage student records, status and Extra Classes information.
+{% endblock %}
+
+{% block page_actions %}
+
+    <a
+        href="{{ url_for('extra_class.super_admin_add_student') }}"
+        class="btn-super-red"
+    >
+        <i class="bi bi-person-plus-fill"></i>
+        Add Student
+    </a>
+
+{% endblock %}
+
+
+{% block extra_css %}
+
+<style>
+
+    /* =====================================================
+       STUDENT STATISTICS
+    ====================================================== */
+
+    .stats-grid {
+        display: grid;
+
+        grid-template-columns:
+            repeat(3, 1fr);
+
+        gap: 18px;
+
+        margin-bottom: 25px;
+    }
+
+
+    .stat-card {
+        background: #ffffff;
+
+        border-radius: 12px;
+
+        padding: 20px;
+
+        box-shadow:
+            0 4px 15px
+            rgba(0, 0, 0, 0.07);
+
+        border-left:
+            5px solid #b00018;
+    }
+
+
+    .stat-card h3 {
+        margin: 0 0 7px;
+
+        font-size: 12px;
+
+        color: #777777;
+
+        text-transform: uppercase;
+
+        letter-spacing: 0.6px;
+
+        font-weight: 700;
+    }
+
+
+    .stat-number {
+        font-size: 28px;
+
+        font-weight: 800;
+
+        color: #5c0008;
+    }
+
+
+    /* =====================================================
+       TABLE CARD
+    ====================================================== */
+
+    .table-card {
+        background: #ffffff;
+
+        border-radius: 12px;
+
+        box-shadow:
+            0 4px 15px
+            rgba(0, 0, 0, 0.07);
+
+        overflow: hidden;
+    }
+
+
+    .table-card-header {
+        padding: 18px 20px;
+
+        border-bottom:
+            1px solid #eeeeee;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: space-between;
+
+        gap: 15px;
+    }
+
+
+    .table-card-header h3 {
+        margin: 0;
+
+        color: #5c0008;
+
+        font-size: 18px;
+
+        font-weight: 700;
+    }
+
+
+    .record-count {
+        color: #777777;
+
+        font-size: 11px;
+    }
+
+
+    /* =====================================================
+       TABLE
+    ====================================================== */
+
+    .table-wrapper {
+        width: 100%;
+
+        overflow-x: auto;
+    }
+
+
+    .students-table {
+        width: 100%;
+
+        border-collapse: collapse;
+
+        min-width: 1100px;
+    }
+
+
+    .students-table th {
+        background: #faf1f2;
+
+        color: #5c0008;
+
+        font-size: 11px;
+
+        font-weight: 700;
+
+        text-align: left;
+
+        padding: 14px 15px;
+
+        white-space: nowrap;
+
+        border-bottom:
+            1px solid #eeeeee;
+    }
+
+
+    .students-table td {
+        padding: 14px 15px;
+
+        border-bottom:
+            1px solid #eeeeee;
+
+        color: #444444;
+
+        font-size: 12px;
+
+        vertical-align: middle;
+    }
+
+
+    .students-table tbody tr:hover {
+        background: #fff8f9;
+    }
+
+
+    /* =====================================================
+       STUDENT NAME
+    ====================================================== */
+
+    .student-name {
+        color: #5c0008;
+
+        font-size: 13px;
+
+        font-weight: 700;
+    }
+
+
+    .student-id {
+        color: #999999;
+
+        font-size: 10px;
+
+        margin-top: 2px;
+    }
+
+
+    /* =====================================================
+       STUDENT CODE
+    ====================================================== */
+
+    .student-code {
+        display: inline-block;
+
+        padding: 5px 8px;
+
+        background: #f8e9eb;
+
+        color: #8d0010;
+
+        border-radius: 6px;
+
+        font-size: 10px;
+
+        font-weight: 700;
+
+        letter-spacing: 0.3px;
+
+        white-space: nowrap;
+    }
+
+
+    /* =====================================================
+       SCHOOL / CLASS
+    ====================================================== */
+
+    .school-name {
+        font-weight: 600;
+
+        color: #444444;
+    }
+
+
+    .class-name {
+        color: #666666;
+    }
+
+
+    /* =====================================================
+       STATUS
+    ====================================================== */
+
+    .status-badge {
+        display: inline-flex;
+
+        align-items: center;
+
+        gap: 5px;
+
+        padding: 5px 10px;
+
+        border-radius: 20px;
+
+        font-size: 10px;
+
+        font-weight: 700;
+    }
+
+
+    .status-active {
+        background: #e8f7ed;
+
+        color: #16743a;
+    }
+
+
+    .status-inactive {
+        background: #fbe9eb;
+
+        color: #a00015;
+    }
+
+
+    .status-dot {
+        width: 6px;
+
+        height: 6px;
+
+        border-radius: 50%;
+
+        background: currentColor;
+    }
+
+
+    /* =====================================================
+       ACTIONS
+    ====================================================== */
+
+    .actions {
+        display: flex;
+
+        align-items: center;
+
+        gap: 6px;
+
+        flex-wrap: wrap;
+    }
+
+
+    .action-btn {
+        border: none;
+
+        text-decoration: none;
+
+        display: inline-flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        gap: 5px;
+
+        padding: 7px 10px;
+
+        border-radius: 6px;
+
+        font-size: 10px;
+
+        font-weight: 700;
+
+        cursor: pointer;
+
+        transition:
+            all 0.2s ease;
+    }
+
+
+    .view-btn {
+        background: #f1f1f1;
+
+        color: #444444;
+    }
+
+
+    .view-btn:hover {
+        background: #e5e5e5;
+
+        color: #222222;
+    }
+
+
+    .edit-btn {
+        background: #fff0f2;
+
+        color: #a00015;
+    }
+
+
+    .edit-btn:hover {
+        background: #fbe0e4;
+
+        color: #850012;
+    }
+
+
+    .activate-btn {
+        background: #e8f7ed;
+
+        color: #16743a;
+    }
+
+
+    .activate-btn:hover {
+        background: #d8f0df;
+
+        color: #105c2d;
+    }
+
+
+    .deactivate-btn {
+        background: #fff0f2;
+
+        color: #a00015;
+    }
+
+
+    .deactivate-btn:hover {
+        background: #fbe0e4;
+
+        color: #850012;
+    }
+
+
+    .actions form {
+        margin: 0;
+
+        padding: 0;
+    }
+
+
+    /* =====================================================
+       EMPTY STATE
+    ====================================================== */
+
+    .empty-state {
+        text-align: center;
+
+        padding: 60px 20px;
+
+        color: #777777;
+    }
+
+
+    .empty-state-icon {
+        width: 65px;
+
+        height: 65px;
+
+        margin: 0 auto 15px;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        border-radius: 50%;
+
+        background: #faf1f2;
+
+        color: #b00018;
+
+        font-size: 27px;
+    }
+
+
+    .empty-state h3 {
+        margin: 0 0 7px;
+
+        color: #5c0008;
+
+        font-size: 18px;
+    }
+
+
+    .empty-state p {
+        margin: 0 0 18px;
+
+        font-size: 12px;
+    }
+
+
+    /* =====================================================
+       RESPONSIVE
+    ====================================================== */
+
+    @media (max-width: 900px) {
+
+        .stats-grid {
+            grid-template-columns:
+                1fr;
+        }
+
+    }
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+
+<!-- =====================================================
+     STATISTICS
+====================================================== -->
+
+<div class="stats-grid">
+
+
+    <!-- TOTAL -->
+
+    <div class="stat-card">
+
+        <h3>
+            Total Students
+        </h3>
+
+        <div class="stat-number">
+
+            {{ students|length }}
+
+        </div>
+
+    </div>
+
+
+    <!-- ACTIVE -->
+
+    <div class="stat-card">
+
+        <h3>
+            Active Students
+        </h3>
+
+        <div class="stat-number">
+
+            {{ students
+                |selectattr('is_active', 'equalto', true)
+                |list
+                |length
+            }}
+
+        </div>
+
+    </div>
+
+
+    <!-- INACTIVE -->
+
+    <div class="stat-card">
+
+        <h3>
+            Inactive Students
+        </h3>
+
+        <div class="stat-number">
+
+            {{ students
+                |selectattr('is_active', 'equalto', false)
+                |list
+                |length
+            }}
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =====================================================
+     STUDENTS TABLE
+====================================================== -->
+
+<div class="table-card">
+
+
+    <div class="table-card-header">
+
+        <h3>
+            <i class="bi bi-person-vcard-fill"></i>
+            Student Records
+        </h3>
+
+        <span class="record-count">
+            {{ students|length }} record(s)
+        </span>
+
+    </div>
+
+
+    {% if students %}
+
+        <div class="table-wrapper">
+
+            <table class="students-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            #
+                        </th>
+
+                        <th>
+                            Student
+                        </th>
+
+                        <th>
+                            Student Code
+                        </th>
+
+                        <th>
+                            School
+                        </th>
+
+                        <th>
+                            Class
+                        </th>
+
+                        <th>
+                            Phone
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                        <th>
+                            Registered
+                        </th>
+
+                        <th>
+                            Actions
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for student in students %}
+
+                        <tr>
+
+
+                            <!-- NUMBER -->
+
+                            <td>
+                                {{ loop.index }}
+                            </td>
+
+
+                            <!-- STUDENT -->
+
+                            <td>
+
+                                <div class="student-name">
+
+                                    {{ student.first_name }}
+
+                                    {% if student.other_name %}
+
+                                        {{ student.other_name }}
+
+                                    {% endif %}
+
+                                    {{ student.surname }}
+
+                                </div>
+
+                                <div class="student-id">
+
+                                    Student ID:
+                                    {{ student.id }}
+
+                                </div>
+
+                            </td>
+
+
+                            <!-- STUDENT CODE -->
+
+                            <td>
+
+                                <span class="student-code">
+
+                                    {{ student.student_code }}
+
+                                </span>
+
+                            </td>
+
+
+                            <!-- SCHOOL -->
+
+                            <td>
+
+                                <span class="school-name">
+
+                                    {{ student.school or '—' }}
+
+                                </span>
+
+                            </td>
+
+
+                            <!-- CLASS -->
+
+                            <td>
+
+                                <span class="class-name">
+
+                                    {{ student.class_name or '—' }}
+
+                                </span>
+
+                            </td>
+
+
+                            <!-- PHONE -->
+
+                            <td>
+
+                                {{ student.phone or '—' }}
+
+                            </td>
+
+
+                            <!-- STATUS -->
+
+                            <td>
+
+                                {% if student.is_active %}
+
+                                    <span
+                                        class="status-badge status-active"
+                                    >
+
+                                        <span class="status-dot"></span>
+
+                                        Active
+
+                                    </span>
+
+                                {% else %}
+
+                                    <span
+                                        class="status-badge status-inactive"
+                                    >
+
+                                        <span class="status-dot"></span>
+
+                                        Inactive
+
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- DATE -->
+
+                            <td>
+
+                                {{ student.created_at.strftime('%d %b %Y')
+                                   if student.created_at
+                                   else '—'
+                                }}
+
+                            </td>
+
+
+                            <!-- ACTIONS -->
+
+                            <td>
+
+                                <div class="actions">
+
+
+                                    <!-- VIEW -->
+
+                                    <a
+                                        href="{{ url_for(
+                                            'extra_class.super_admin_view_student',
+                                            student_id=student.id
+                                        ) }}"
+                                        class="action-btn view-btn"
+                                    >
+
+                                        <i class="bi bi-eye-fill"></i>
+
+                                        View
+
+                                    </a>
+
+
+                                    <!-- EDIT -->
+
+                                    <a
+                                        href="{{ url_for(
+                                            'extra_class.super_admin_edit_student',
+                                            student_id=student.id
+                                        ) }}"
+                                        class="action-btn edit-btn"
+                                    >
+
+                                        <i class="bi bi-pencil-fill"></i>
+
+                                        Edit
+
+                                    </a>
+
+
+                                    <!-- ACTIVATE / DEACTIVATE -->
+
+                                    <form
+                                        method="POST"
+                                        action="{{ url_for(
+                                            'extra_class.super_admin_toggle_student_status',
+                                            student_id=student.id
+                                        ) }}"
+                                    >
+
+                                        <input
+                                            type="hidden"
+                                            name="csrf_token"
+                                            value="{{ csrf_token() }}"
+                                        >
+
+
+                                        {% if student.is_active %}
+
+                                            <button
+                                                type="submit"
+                                                class="action-btn deactivate-btn"
+                                                onclick="return confirm(
+                                                    'Are you sure you want to deactivate this student?'
+                                                );"
+                                            >
+
+                                                <i
+                                                    class="bi bi-person-x-fill"
+                                                ></i>
+
+                                                Deactivate
+
+                                            </button>
+
+                                        {% else %}
+
+                                            <button
+                                                type="submit"
+                                                class="action-btn activate-btn"
+                                                onclick="return confirm(
+                                                    'Are you sure you want to activate this student?'
+                                                );"
+                                            >
+
+                                                <i
+                                                    class="bi bi-person-check-fill"
+                                                ></i>
+
+                                                Activate
+
+                                            </button>
+
+                                        {% endif %}
+
+                                    </form>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+    {% else %}
+
+
+        <!-- EMPTY STATE -->
+
+        <div class="empty-state">
+
+            <div class="empty-state-icon">
+
+                <i class="bi bi-person-vcard-fill"></i>
+
+            </div>
+
+            <h3>
+                No Students Found
+            </h3>
+
+            <p>
+                No students have been registered for Extra Classes yet.
+            </p>
+
+            <a
+                href="{{ url_for('extra_class.add_student') }}"
+                class="btn-super-red"
+            >
+
+                <i class="bi bi-person-plus-fill"></i>
+
+                Add First Student
+
+            </a>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+
+{% endblock %}

@@ -13,3 +13,15 @@ from .live_quiz_answers import LiveQuizAnswer
 from .live_quiz_questions import LiveQuizQuestion
 from .live_quiz_results import LiveQuizResult
 from .student_answer import StudentAnswer
+from .extra_class_parent import ExtraClassParent
+from .extra_class_student import ExtraClassStudent
+from .extra_class_student_parent import ExtraClassStudentParent
+from .extra_class_teacher import ExtraClassTeacher
+from .extra_class_subject import ExtraClassSubject
+from .extra_class_enrollment import ExtraClassEnrollment
+from .extra_class_monthly_fee import ExtraClassMonthlyFee
+from .extra_class_payment import ExtraClassPayment
+from .extra_class_payment_item import ExtraClassPaymentItem
+from .extra_class_teacher_settlement import ExtraClassTeacherSettlement
+from .extra_class_term import ExtraClassTerm
+from app.models.extra_class_teacher_account import ExtraClassTeacherAccount

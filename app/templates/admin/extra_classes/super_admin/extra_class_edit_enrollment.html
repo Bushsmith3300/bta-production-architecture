@@ -1,0 +1,621 @@
+{% extends "admin/extra_classes/super_admin/extra_class_super_admin_base.html" %}
+
+{% block title %}Edit Enrollment{% endblock %}
+
+{% block content %}
+
+<style>
+    .page-header {
+        margin-bottom: 25px;
+    }
+
+    .page-header h1 {
+        margin: 0;
+        color: #5c0008;
+        font-size: 28px;
+    }
+
+    .page-header p {
+        margin-top: 6px;
+        color: #777;
+    }
+
+    .form-card {
+        background: #fff;
+        border-radius: 16px;
+        padding: 30px;
+        max-width: 850px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    }
+
+    .section-title {
+        color: #5c0008;
+        font-size: 18px;
+        font-weight: 700;
+        margin: 0 0 18px;
+    }
+
+    .section {
+        margin-bottom: 28px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #333;
+    }
+
+    .required {
+        color: #d0001b;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 13px 14px;
+        border: 1px solid #ddd;
+        border-radius: 9px;
+        font-size: 15px;
+        box-sizing: border-box;
+        background: #fff;
+        transition: 0.2s;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #970015;
+        box-shadow: 0 0 0 3px rgba(151, 0, 21, 0.10);
+    }
+
+    .help-text {
+        margin-top: 6px;
+        font-size: 13px;
+        color: #777;
+    }
+
+    .subject-preview {
+        display: none;
+        margin-top: 12px;
+        padding: 16px;
+        border-radius: 10px;
+        background: #fff6f7;
+        border-left: 4px solid #970015;
+    }
+
+    .subject-preview.show {
+        display: block;
+    }
+
+    .preview-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+        padding: 6px 0;
+    }
+
+    .preview-label {
+        color: #777;
+    }
+
+    .preview-value {
+        font-weight: 600;
+        color: #5c0008;
+        text-align: right;
+    }
+
+    .current-info {
+        background: #f8f8f8;
+        border-radius: 10px;
+        padding: 16px 18px;
+        margin-bottom: 25px;
+        border-left: 4px solid #970015;
+    }
+
+    .current-info strong {
+        color: #5c0008;
+    }
+
+    .status-help {
+        margin-top: 8px;
+        font-size: 13px;
+        color: #777;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 30px;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 12px 20px;
+        border-radius: 9px;
+        border: none;
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #6d0009, #970015);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 5px 15px rgba(151, 0, 21, 0.25);
+    }
+
+    .btn-secondary {
+        background: #eee;
+        color: #333;
+    }
+
+    .btn-secondary:hover {
+        background: #ddd;
+    }
+
+    @media (max-width: 600px) {
+        .form-card {
+            padding: 20px;
+        }
+
+        .preview-row {
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .preview-value {
+            text-align: left;
+        }
+    }
+</style>
+
+
+<div class="page-header">
+    <h1>Edit Enrollment</h1>
+    <p>Update the student's Extra Class enrollment details.</p>
+</div>
+
+
+<div class="form-card">
+
+    <!-- CURRENT ENROLLMENT -->
+    <div class="current-info">
+        <strong>Current Enrollment:</strong>
+
+        {{ enrollment.student.first_name }}
+
+        {% if enrollment.student.other_name %}
+            {{ enrollment.student.other_name }}
+        {% endif %}
+
+        {{ enrollment.student.surname }}
+
+        —
+        {{ enrollment.extra_class_subject.subject.name }}
+    </div>
+
+
+    <form method="POST"
+          action="{{ url_for(
+              'extra_class.edit_enrollment',
+              enrollment_id=enrollment.id
+          ) }}">
+
+        <input type="hidden"
+               name="csrf_token"
+               value="{{ csrf_token() }}">
+
+
+        <!-- STUDENT -->
+        <div class="section">
+
+            <h2 class="section-title">
+                Student Information
+            </h2>
+
+            <div class="form-group">
+
+                <label for="student_id">
+                    Student <span class="required">*</span>
+                </label>
+
+                <select id="student_id"
+                        name="student_id"
+                        class="form-control"
+                        required>
+
+                    <option value="">
+                        -- Select Student --
+                    </option>
+
+                    {% for student in students %}
+
+                        <option
+                            value="{{ student.id }}"
+                            {% if student.id == enrollment.student_id %}
+                                selected
+                            {% endif %}
+                        >
+
+                            {{ student.first_name }}
+
+                            {% if student.other_name %}
+                                {{ student.other_name }}
+                            {% endif %}
+
+                            {{ student.surname }}
+
+                            — {{ student.student_code }}
+
+                        </option>
+
+                    {% endfor %}
+
+                </select>
+
+                <div class="help-text">
+                    Only active Extra Class students are available.
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- TERM -->
+		
+		<div class="section">
+
+			<h2 class="section-title">
+				Extra Class Term
+			</h2>
+
+			<div class="form-group">
+
+				<label for="term_id">
+					Term <span class="required">*</span>
+				</label>
+
+				<select
+					id="term_id"
+					name="term_id"
+					class="form-control"
+					required
+				>
+
+					<option value="">
+						-- Select Term --
+					</option>
+
+					{% for term in terms %}
+
+						<option
+							value="{{ term.id }}"
+							data-start="{{ term.start_date.strftime('%Y-%m-%d') }}"
+							data-end="{{ term.end_date.strftime('%Y-%m-%d') }}"
+							{% if term.id == enrollment.term_id %}
+								selected
+							{% endif %}
+						>
+							{{ term.name }}
+							—
+							{{ term.start_date.strftime('%d %b %Y') }}
+							to
+							{{ term.end_date.strftime('%d %b %Y') }}
+
+							{% if not term.is_active %}
+								(Inactive)
+							{% endif %}
+						</option>
+
+					{% endfor %}
+
+				</select>
+
+				<div class="help-text">
+					The enrollment must fall within the selected term.
+				</div>
+
+			</div>
+
+		</div> 
+
+
+        <!-- SUBJECT -->
+		
+        <div class="section">
+
+            <h2 class="section-title">
+                Extra Class Subject
+            </h2>
+
+            <div class="form-group">
+
+                <label for="extra_class_subject_id">
+                    Subject <span class="required">*</span>
+                </label>
+
+                <select id="extra_class_subject_id"
+                        name="extra_class_subject_id"
+                        class="form-control"
+                        required>
+
+                    <option value="">
+                        -- Select Subject --
+                    </option>
+
+                    {% for extra_subject in extra_subjects %}
+
+                        <option
+                            value="{{ extra_subject.id }}"
+                            data-fee="{{ '%.2f'|format(extra_subject.monthly_fee) }}"
+                            data-teacher="
+                                {% if extra_subject.teacher %}
+                                    {{ extra_subject.teacher.first_name }}
+                                    {{ extra_subject.teacher.surname }}
+                                {% else %}
+                                    Not Assigned
+                                {% endif %}
+                            "
+                            {% if extra_subject.id == enrollment.extra_class_subject_id %}
+                                selected
+                            {% endif %}
+                        >
+
+                            {{ extra_subject.subject.name }}
+
+                        </option>
+
+                    {% endfor %}
+
+                </select>
+
+                <div class="help-text">
+                    Only active Extra Class subjects are available.
+                </div>
+
+
+                <!-- SUBJECT PREVIEW -->
+                <div id="subjectPreview"
+                     class="subject-preview">
+
+                    <div class="preview-row">
+
+                        <span class="preview-label">
+                            Monthly Fee
+                        </span>
+
+                        <span class="preview-value">
+                            GH₵
+                            <span id="previewFee">
+                                0.00
+                            </span>
+                        </span>
+
+                    </div>
+
+
+                    <div class="preview-row">
+
+                        <span class="preview-label">
+                            Assigned Teacher
+                        </span>
+
+                        <span class="preview-value"
+                              id="previewTeacher">
+                            Not Assigned
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- DATES -->
+		
+		<div class="section">
+
+			<h2 class="section-title">
+				Enrollment Dates
+			</h2>
+
+			<div class="form-group">
+
+				<label for="start_date">
+					Start Date <span class="required">*</span>
+				</label>
+
+				<input
+					type="date"
+					id="start_date"
+					name="start_date"
+					class="form-control"
+					value="{{ enrollment.start_date.strftime('%Y-%m-%d') if enrollment.start_date else '' }}"
+					required
+				>
+
+				<div class="help-text" id="startDateHelp">
+					Select a date within the selected term.
+				</div>
+
+			</div>
+
+
+			<div class="form-group">
+
+				<label for="end_date">
+					End Date
+				</label>
+
+				<input
+					type="date"
+					id="end_date"
+					name="end_date"
+					class="form-control"
+					value="{{ enrollment.end_date.strftime('%Y-%m-%d') if enrollment.end_date else '' }}"
+				>
+
+				<div class="help-text">
+					Leave blank if the enrollment has no end date.
+					If provided, it must fall within the selected term.
+				</div>
+
+			</div>
+
+		</div>
+		
+		
+		
+
+        <!-- STATUS -->
+        <div class="section">
+
+            <h2 class="section-title">
+                Enrollment Status
+            </h2>
+
+            <div class="form-group">
+
+                <label for="status">
+                    Status <span class="required">*</span>
+                </label>
+
+                <select id="status"
+                        name="status"
+                        class="form-control"
+                        required>
+
+                    <option value="ACTIVE"
+                        {% if enrollment.status == "ACTIVE" %}
+                            selected
+                        {% endif %}>
+                        Active
+                    </option>
+
+                    <option value="INACTIVE"
+                        {% if enrollment.status == "INACTIVE" %}
+                            selected
+                        {% endif %}>
+                        Inactive
+                    </option>
+
+                    <option value="COMPLETED"
+                        {% if enrollment.status == "COMPLETED" %}
+                            selected
+                        {% endif %}>
+                        Completed
+                    </option>
+
+                    <option value="CANCELLED"
+                        {% if enrollment.status == "CANCELLED" %}
+                            selected
+                        {% endif %}>
+                        Cancelled
+                    </option>
+
+                </select>
+
+                <div class="status-help">
+                    <strong>Active:</strong> Student is currently taking the subject.<br>
+                    <strong>Inactive:</strong> Enrollment is temporarily inactive.<br>
+                    <strong>Completed:</strong> Student has completed the enrollment.<br>
+                    <strong>Cancelled:</strong> Enrollment has been cancelled.
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ACTIONS -->
+        <div class="form-actions">
+
+            <a href="{{ url_for(
+                'extra_class.view_enrollment',
+                enrollment_id=enrollment.id
+            ) }}"
+               class="btn btn-secondary">
+                ← Cancel
+            </a>
+
+            <button type="submit"
+                    class="btn btn-primary">
+                Save Changes
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+<script>
+    const termSelect =
+    document.getElementById("term_id");
+
+	const startDateInput =
+		document.getElementById("start_date");
+
+	const endDateInput =
+		document.getElementById("end_date");
+
+
+	function updateTermDates() {
+
+		const selectedOption =
+			termSelect.options[
+				termSelect.selectedIndex
+			];
+
+		if (
+			!selectedOption ||
+			!selectedOption.value
+		) {
+			startDateInput.removeAttribute("min");
+			startDateInput.removeAttribute("max");
+
+			endDateInput.removeAttribute("min");
+			endDateInput.removeAttribute("max");
+
+			return;
+		}
+
+		const termStart =
+			selectedOption.dataset.start;
+
+		const termEnd =
+			selectedOption.dataset.end;
+
+		startDateInput.min = termStart;
+		startDateInput.max = termEnd;
+
+		endDateInput.min = termStart;
+		endDateInput.max = termEnd;
+	}
+
+
+	termSelect.addEventListener(
+		"change",
+		updateTermDates
+	);
+
+
+	updateTermDates();
+</script>
+
+{% endblock %}

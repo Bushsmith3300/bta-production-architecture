@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Teacher Registration | Extra Classes</title>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #eff6ff;
+            --text: #172033;
+            --muted: #64748b;
+            --border: #dbe3ef;
+            --danger: #dc2626;
+            --success: #15803d;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Inter", Arial, sans-serif;
+            background:
+                linear-gradient(
+                    135deg,
+                    #eef5ff 0%,
+                    #f8fbff 50%,
+                    #eef4ff 100%
+                );
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 35px 20px;
+            color: var(--text);
+        }
+
+        .page-wrapper {
+            width: 100%;
+            max-width: 1050px;
+            min-height: 650px;
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 42% 58%;
+            box-shadow:
+                0 25px 70px rgba(37, 99, 235, 0.14);
+        }
+
+        /* =========================================
+           LEFT BRANDING PANEL
+        ========================================== */
+
+        .brand-panel {
+            position: relative;
+            padding: 50px 42px;
+            background:
+                linear-gradient(
+                    145deg,
+                    #1d4ed8,
+                    #2563eb 55%,
+                    #3b82f6
+                );
+            color: white;
+            overflow: hidden;
+        }
+
+        .brand-panel::before {
+            content: "";
+            position: absolute;
+            width: 260px;
+            height: 260px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.08);
+            top: -100px;
+            right: -100px;
+        }
+
+        .brand-panel::after {
+            content: "";
+            position: absolute;
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.06);
+            bottom: -100px;
+            left: -100px;
+        }
+
+        .brand-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .logo {
+            width: 58px;
+            height: 58px;
+            border-radius: 16px;
+            background: rgba(255,255,255,0.16);
+            border: 1px solid rgba(255,255,255,0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 25px;
+            font-weight: 800;
+            margin-bottom: 28px;
+            backdrop-filter: blur(10px);
+        }
+
+        .brand-title {
+            font-size: 32px;
+            line-height: 1.15;
+            font-weight: 800;
+            margin: 0 0 16px;
+        }
+
+        .brand-description {
+            font-size: 15px;
+            line-height: 1.7;
+            color: rgba(255,255,255,0.84);
+            margin-bottom: 42px;
+        }
+
+        .feature {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+
+        .feature-icon {
+            width: 38px;
+            height: 38px;
+            flex-shrink: 0;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.13);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 17px;
+        }
+
+        .feature-text strong {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .feature-text span {
+            display: block;
+            color: rgba(255,255,255,0.72);
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .brand-footer {
+            position: absolute;
+            bottom: 28px;
+            left: 42px;
+            color: rgba(255,255,255,0.65);
+            font-size: 11px;
+        }
+
+        /* =========================================
+           FORM PANEL
+        ========================================== */
+
+        .form-panel {
+            padding: 48px 55px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .form-header {
+            margin-bottom: 28px;
+        }
+
+        .form-header h1 {
+            margin: 0 0 7px;
+            font-size: 27px;
+            font-weight: 800;
+            color: #172033;
+        }
+
+        .form-header p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        /* =========================================
+           FLASH MESSAGES
+        ========================================== */
+
+        .flash-messages {
+            margin-bottom: 20px;
+        }
+
+        .flash {
+            padding: 11px 13px;
+            border-radius: 10px;
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+
+        .flash-success {
+            background: #ecfdf3;
+            border: 1px solid #bbf7d0;
+            color: var(--success);
+        }
+
+        .flash-danger {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: var(--danger);
+        }
+
+        .flash-warning {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            color: #92400e;
+        }
+
+        .flash-info {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            color: #1d4ed8;
+        }
+
+        /* =========================================
+           FORM GRID
+        ========================================== */
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 17px 15px;
+        }
+
+        .form-group {
+            margin-bottom: 0;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 7px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #334155;
+        }
+
+        .required {
+            color: var(--danger);
+        }
+
+        .optional {
+            color: #94a3b8;
+            font-weight: 500;
+            font-size: 10px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-size: 14px;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        input,
+        select {
+            width: 100%;
+            height: 45px;
+            padding: 0 13px 0 38px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: #fbfdff;
+            color: #172033;
+            font-family: inherit;
+            font-size: 13px;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        input::placeholder {
+            color: #a5afbd;
+        }
+
+        input:hover,
+        select:hover {
+            border-color: #b8c6d9;
+        }
+
+        input:focus,
+        select:focus {
+            background: white;
+            border-color: var(--primary);
+            box-shadow:
+                0 0 0 3px rgba(37, 99, 235, 0.10);
+        }
+
+        /* =========================================
+           SUBJECT SELECT
+        ========================================== */
+
+        select {
+            appearance: auto;
+            cursor: pointer;
+        }
+
+        select:invalid {
+            color: #a5afbd;
+        }
+
+        select option {
+            color: #172033;
+            background: white;
+        }
+
+        .field-help {
+            margin-top: 6px;
+            font-size: 10px;
+            color: #94a3b8;
+            line-height: 1.5;
+        }
+
+        /* =========================================
+           PASSWORD
+        ========================================== */
+
+        .password-wrapper input {
+            padding-right: 44px;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: none;
+            background: none;
+            cursor: pointer;
+            color: #94a3b8;
+            font-size: 13px;
+            padding: 3px;
+            z-index: 3;
+        }
+
+        .password-toggle:hover {
+            color: var(--primary);
+        }
+
+        .username-help {
+            margin-top: 6px;
+            font-size: 10px;
+            color: #94a3b8;
+            line-height: 1.5;
+        }
+
+        /* =========================================
+           PASSWORD STRENGTH
+        ========================================== */
+
+        .password-strength {
+            margin-top: 7px;
+            display: none;
+        }
+
+        .strength-bars {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 4px;
+        }
+
+        .strength-bar {
+            height: 3px;
+            flex: 1;
+            background: #e2e8f0;
+            border-radius: 10px;
+        }
+
+        .strength-text {
+            font-size: 10px;
+            color: #94a3b8;
+        }
+
+        /* =========================================
+           SUBMIT BUTTON
+        ========================================== */
+
+        .submit-btn {
+            width: 100%;
+            height: 47px;
+            margin-top: 23px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(
+                135deg,
+                #2563eb,
+                #1d4ed8
+            );
+            color: white;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow:
+                0 8px 18px rgba(37, 99, 235, 0.22);
+            transition: all 0.2s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-1px);
+            box-shadow:
+                0 11px 22px rgba(37, 99, 235, 0.28);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        /* =========================================
+           LOGIN
+        ========================================== */
+
+        .login-link {
+            text-align: center;
+            margin-top: 19px;
+            color: #94a3b8;
+            font-size: 12px;
+        }
+
+        .login-link a {
+            color: var(--primary);
+            font-weight: 700;
+            text-decoration: none;
+            margin-left: 4px;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        /* =========================================
+           MOBILE
+        ========================================== */
+
+        @media (max-width: 800px) {
+
+            body {
+                padding: 20px 12px;
+            }
+
+            .page-wrapper {
+                max-width: 540px;
+                grid-template-columns: 1fr;
+            }
+
+            .brand-panel {
+                padding: 32px 28px;
+            }
+
+            .brand-description {
+                margin-bottom: 25px;
+            }
+
+            .feature {
+                margin-bottom: 14px;
+            }
+
+            .brand-footer {
+                position: static;
+                margin-top: 25px;
+            }
+
+            .form-panel {
+                padding: 35px 28px;
+            }
+        }
+
+        @media (max-width: 500px) {
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .full-width {
+                grid-column: auto;
+            }
+
+            .brand-title {
+                font-size: 27px;
+            }
+
+            .form-header h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="page-wrapper">
+
+    <!-- =========================================
+         BRANDING PANEL
+    ========================================== -->
+
+    <section class="brand-panel">
+
+        <div class="brand-content">
+
+            <div class="logo">
+                BTA
+            </div>
+
+            <h2 class="brand-title">
+                Teach.<br>
+                Inspire.<br>
+                Make an Impact.
+            </h2>
+
+            <p class="brand-description">
+                Join the BTA Extra Classes platform and manage
+                your classes, students and learning activities
+                in one place.
+            </p>
+
+            <div class="feature">
+
+                <div class="feature-icon">
+                    ✓
+                </div>
+
+                <div class="feature-text">
+
+                    <strong>Manage Your Classes</strong>
+
+                    <span>
+                        Keep your extra-class activities
+                        organized in one place.
+                    </span>
+
+                </div>
+
+            </div>
+
+            <div class="feature">
+
+                <div class="feature-icon">
+                    ✓
+                </div>
+
+                <div class="feature-text">
+
+                    <strong>Track Your Students</strong>
+
+                    <span>
+                        Easily manage enrolled students
+                        and their class information.
+                    </span>
+
+                </div>
+
+            </div>
+
+            <div class="feature">
+
+                <div class="feature-icon">
+                    ✓
+                </div>
+
+                <div class="feature-text">
+
+                    <strong>Manage Your Fees</strong>
+
+                    <span>
+                        Set and manage your extra-class
+                        monthly fees.
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="brand-footer">
+            BTA Extra Classes &nbsp;•&nbsp; Teacher Portal
+        </div>
+
+    </section>
+
+
+    <!-- =========================================
+         REGISTRATION FORM
+    ========================================== -->
+
+    <section class="form-panel">
+
+        <div class="form-header">
+
+            <h1>Create your account</h1>
+
+            <p>
+                Register as an Extra Classes teacher to get started.
+            </p>
+
+        </div>
+
+
+        <!-- =========================================
+             FLASH MESSAGES
+        ========================================== -->
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+
+            {% if messages %}
+
+                <div class="flash-messages">
+
+                    {% for category, message in messages %}
+
+                        <div class="flash flash-{{ category }}">
+                            {{ message }}
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            {% endif %}
+
+        {% endwith %}
+
+
+        <!-- =========================================
+             REGISTRATION FORM
+        ========================================== -->
+
+        <form
+            method="POST"
+            action="{{ url_for('extra_class_auth.teacher_register') }}"
+        >
+
+            <!-- CSRF -->
+
+            <input
+                type="hidden"
+                name="csrf_token"
+                value="{{ csrf_token() }}"
+            >
+
+
+            <div class="form-grid">
+
+                <!-- =====================================
+                     FIRST NAME
+                ====================================== -->
+
+                <div class="form-group">
+
+                    <label for="first_name">
+
+                        First Name
+
+                        <span class="required">*</span>
+
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <span class="input-icon">
+                            👤
+                        </span>
+
+                        <input
+                            type="text"
+                            id="first_name"
+                            name="first_name"
+                            placeholder="Enter first name"
+                            required
+                            autocomplete="given-name"
+                            value="{{ request.form.get('first_name', '') }}"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- =====================================
+                     SURNAME
+                ====================================== -->
+
+                <div class="form-group">
+
+                    <label for="surname">
+
+                        Surname
+
+                        <span class="required">*</span>
+
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <span class="input-icon">
+                            👤
+                        </span>
+
+                        <input
+                            type="text"
+                            id="surname"
+                            name="surname"
+                            placeholder="Enter surname"
+                            required
+                            autocomplete="family-name"
+                            value="{{ request.form.get('surname', '') }}"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- =====================================
+                     PHONE
+                ====================================== -->
+
+                <div class="form-group">
+
+                    <label for="phone">
+
+                        Phone Number
+
+                        <span class="required">*</span>
+
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <span class="input-icon">
+                            📱
+                        </span>
+
+                        <input
+                            type="tel"
+                            id="phone"
+                            name="phone"
+                            placeholder="e.g. 024 XXX XXXX"
+                            required
+                            autocomplete="tel"
+                            value="{{ request.form.get('phone', '') }}"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- =====================================
+                     EMAIL
+                ====================================== -->
+
+                <div class="form-group">
+
+                    <label for="email">
+
+                        Email
+
+                        <span class="optional">
+                            (Optional)
+                        </span>
+
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <span class="input-icon">
+                            ✉
+                        </span>
+
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            placeholder="teacher@example.com"
+                            autocomplete="email"
+                            value="{{ request.form.get('email', '') }}"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- =====================================
+                     SUBJECT
+                ====================================== -->
+
+                <div class="form-group full-width">
+
+                    <label for="subject_id">
+
+                        Subject
+
+                        <span class="required">*</span>
+
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <span class="input-icon">
+                            📚
+                        </span>
+
+                        <select
+                            id="subject_id"
+                            name="subject_id"
+                            required
+                        >
+
+                            <option value="" disabled
+                                {% if not request.form.get('subject_id') %}
+                                    selected
+                                {% endif %}
+                            >
+                                Select the subject you teach
+                            </option>
+
+                            {% for subject in subjects %}
+
+                                <option
+                                    value="{{ subject.id }}"
+                                    {% if request.form.get('subject_id')|int == subject.id %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    {{ subject.name }}
+                                </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+                    <div class="field-help">
+                        Select the one subject you teach for Extra Classes.
+                    </div>
+
+                </div>
+
+
+                <!-- =====================================
+                     USERNAME
+                ====================================== -->
+
+                <div class="form-group full-width">
+
+                    <label for="username">
+
+                        Username
+
+                        <span class="required">*</span>
+
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <span class="input-icon">
+                            @
+                        </span>
+
+                        <input
+                            type="text"
+                            id="username"
+                            name="username"
+                            placeholder="Choose a username"
+                            required
+                            minlength="3"
+                            autocomplete="username"
+                            value="{{ request.form.get('username', '') }}"
+                        >
+
+                    </div>
+
+                    <div class="username-help">
+                        At least 3 characters. No spaces, hyphens or @ symbols.
+                    </div>
+
+                </div>
+
+
+                <!-- =====================================
+                     PASSWORD
+                ====================================== -->
+
+                <div class="form-group">
+
+                    <label for="password">
+
+                        Password
+
+                        <span class="required">*</span>
+
+                    </label>
+
+                    <div class="input-wrapper password-wrapper">
+
+                        <span class="input-icon">
+                            🔒
+                        </span>
+
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="Create a password"
+                            required
+                            minlength="8"
+                            autocomplete="new-password"
+                        >
+
+                        <button
+                            type="button"
+                            class="password-toggle"
+                            onclick="togglePassword('password', this)"
+                        >
+                            Show
+                        </button>
+
+                    </div>
+
+
+                    <!-- PASSWORD STRENGTH -->
+
+                    <div
+                        class="password-strength"
+                        id="passwordStrength"
+                    >
+
+                        <div class="strength-bars">
+
+                            <div class="strength-bar"></div>
+                            <div class="strength-bar"></div>
+                            <div class="strength-bar"></div>
+                            <div class="strength-bar"></div>
+
+                        </div>
+
+                        <div
+                            class="strength-text"
+                            id="strengthText"
+                        ></div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =====================================
+                     CONFIRM PASSWORD
+                ====================================== -->
+
+                <div class="form-group">
+
+                    <label for="confirm_password">
+
+                        Confirm Password
+
+                        <span class="required">*</span>
+
+                    </label>
+
+                    <div class="input-wrapper password-wrapper">
+
+                        <span class="input-icon">
+                            🔒
+                        </span>
+
+                        <input
+                            type="password"
+                            id="confirm_password"
+                            name="confirm_password"
+                            placeholder="Confirm your password"
+                            required
+                            minlength="8"
+                            autocomplete="new-password"
+                        >
+
+                        <button
+                            type="button"
+                            class="password-toggle"
+                            onclick="togglePassword(
+                                'confirm_password',
+                                this
+                            )"
+                        >
+                            Show
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =========================================
+                 SUBMIT
+            ========================================== -->
+
+            <button
+                type="submit"
+                class="submit-btn"
+            >
+                Create Teacher Account
+            </button>
+
+        </form>
+
+
+        <!-- =========================================
+             LOGIN LINK
+        ========================================== -->
+
+        <div class="login-link">
+
+            Already have an account?
+
+            <a
+                href="{{ url_for('extra_class_auth.teacher_login') }}"
+            >
+                Sign in
+            </a>
+
+        </div>
+
+    </section>
+
+</div>
+
+
+<script>
+
+    /* =========================================
+       PASSWORD VISIBILITY
+    ========================================== */
+
+    function togglePassword(fieldId, button) {
+
+        const field =
+            document.getElementById(fieldId);
+
+        if (field.type === "password") {
+
+            field.type = "text";
+
+            button.textContent = "Hide";
+
+        } else {
+
+            field.type = "password";
+
+            button.textContent = "Show";
+        }
+    }
+
+
+    /* =========================================
+       PASSWORD STRENGTH
+    ========================================== */
+
+    const passwordInput =
+        document.getElementById("password");
+
+    const passwordStrength =
+        document.getElementById("passwordStrength");
+
+    const strengthText =
+        document.getElementById("strengthText");
+
+    const strengthBars =
+        document.querySelectorAll(".strength-bar");
+
+
+    passwordInput.addEventListener(
+        "input",
+        function () {
+
+            const password = this.value;
+
+            if (!password) {
+
+                passwordStrength.style.display =
+                    "none";
+
+                return;
+            }
+
+            passwordStrength.style.display =
+                "block";
+
+            let strength = 0;
+
+
+            if (password.length >= 8) {
+                strength++;
+            }
+
+
+            if (/[A-Z]/.test(password)) {
+                strength++;
+            }
+
+
+            if (/[0-9]/.test(password)) {
+                strength++;
+            }
+
+
+            if (/[^A-Za-z0-9]/.test(password)) {
+                strength++;
+            }
+
+
+            strengthBars.forEach(
+                (bar, index) => {
+
+                    if (index < strength) {
+
+                        bar.style.background =
+                            "#2563eb";
+
+                    } else {
+
+                        bar.style.background =
+                            "#e2e8f0";
+                    }
+
+                }
+            );
+
+
+            if (strength <= 1) {
+
+                strengthText.textContent =
+                    "Weak password";
+
+            } else if (strength === 2) {
+
+                strengthText.textContent =
+                    "Fair password";
+
+            } else if (strength === 3) {
+
+                strengthText.textContent =
+                    "Good password";
+
+            } else {
+
+                strengthText.textContent =
+                    "Strong password";
+            }
+
+        }
+    );
+
+</script>
+
+</body>
+</html>

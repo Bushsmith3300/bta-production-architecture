@@ -1,0 +1,569 @@
+{% extends "extra_class_teacher_base.html" %}
+
+{% block title %}Class Fees{% endblock %}
+
+{% block extra_css %}
+
+.fees-header {
+    margin-bottom: 24px;
+}
+
+.fees-header-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+}
+
+.fees-header h1 {
+    margin: 0 0 7px;
+    font-size: 30px;
+    font-weight: 800;
+    color: var(--text);
+}
+
+.fees-header p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.fees-actions {
+    display: flex;
+    gap: 9px;
+    flex-wrap: wrap;
+}
+
+.fees-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 14px;
+    border-radius: 9px;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.fees-action.back {
+    color: var(--maroon);
+    background: var(--white);
+    border: 1px solid var(--border);
+}
+
+.fees-action.manage {
+    color: white;
+    background: var(--maroon);
+    border: 1px solid var(--maroon);
+}
+
+.class-fee-banner {
+    padding: 20px 22px;
+    margin-bottom: 22px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, var(--maroon), var(--maroon-dark));
+    color: white;
+}
+
+.class-fee-banner small {
+    display: block;
+    margin-bottom: 5px;
+    color: rgba(255,255,255,.72);
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+}
+
+.class-fee-banner h2 {
+    margin: 0 0 5px;
+    font-size: 23px;
+    font-weight: 800;
+}
+
+.class-fee-banner p {
+    margin: 0;
+    color: rgba(255,255,255,.8);
+    font-size: 13px;
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 22px;
+}
+
+.summary-card {
+    padding: 18px;
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    background: var(--white);
+    box-shadow: 0 6px 18px rgba(15,23,42,.05);
+}
+
+.summary-label {
+    margin-bottom: 7px;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+}
+
+.summary-value {
+    color: var(--text);
+    font-size: 23px;
+    font-weight: 900;
+}
+
+.fees-panel {
+    overflow: hidden;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 17px;
+    box-shadow: 0 6px 20px rgba(15,23,42,.05);
+}
+
+.panel-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 19px 21px;
+    border-bottom: 1px solid var(--border);
+}
+
+.panel-heading h2 {
+    margin: 0 0 4px;
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--text);
+}
+
+.panel-heading p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.fees-table {
+    width: 100%;
+    min-width: 900px;
+    border-collapse: collapse;
+}
+
+.fees-table th {
+    padding: 13px 16px;
+    background: #fafafa;
+    border-bottom: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 900;
+    text-align: left;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    white-space: nowrap;
+}
+
+.fees-table td {
+    padding: 15px 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    font-size: 12px;
+    vertical-align: middle;
+}
+
+.fees-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.fees-table tbody tr:hover {
+    background: #fffafa;
+}
+
+.student-name {
+    font-weight: 800;
+}
+
+.student-code {
+    margin-top: 3px;
+    color: var(--muted);
+    font-size: 10px;
+}
+
+.amount {
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.outstanding {
+    color: #b91c1c;
+    font-weight: 900;
+}
+
+.paid {
+    color: #166534;
+    font-weight: 900;
+}
+
+.fee-status {
+    display: inline-flex;
+    padding: 5px 9px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 900;
+}
+
+.fee-status.paid {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.fee-status.partial {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.fee-status.unpaid {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.fee-status.no-fees {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+.view-fees-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 11px;
+    border-radius: 8px;
+    background: var(--primary-light);
+    border: 1px solid #fecaca;
+    color: var(--maroon);
+    text-decoration: none;
+    font-size: 11px;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.empty-state {
+    padding: 55px 20px;
+    text-align: center;
+}
+
+.empty-state h3 {
+    margin: 0 0 6px;
+    font-size: 17px;
+    color: var(--text);
+}
+
+.empty-state p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+@media (max-width: 700px) {
+    .fees-header-top {
+        flex-direction: column;
+    }
+
+    .fees-actions {
+        width: 100%;
+    }
+
+    .fees-action {
+        flex: 1;
+    }
+
+    .summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .fees-header h1 {
+        font-size: 25px;
+    }
+}
+
+{% endblock %}
+
+{% block content %}
+
+<div class="fees-header">
+
+    <div class="fees-header-top">
+
+        <div>
+            <h1>Class Fees</h1>
+            <p>
+                Financial summary for students in your
+                {{ extra_subject.subject.name }} class.
+            </p>
+        </div>
+
+        <div class="fees-actions">
+
+            <a
+                href="{{ url_for(
+                    'extra_class_teacher.manage_class',
+                    class_id=extra_subject.id
+                ) }}"
+                class="fees-action back"
+            >
+                ← Back to Manage Class
+            </a>
+
+            <a
+                href="{{ url_for(
+                    'extra_class_teacher.class_students',
+                    class_id=extra_subject.id
+                ) }}"
+                class="fees-action manage"
+            >
+                Students
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<div class="class-fee-banner">
+
+    <small>Extra Class</small>
+
+    <h2>{{ extra_subject.subject.name }}</h2>
+
+    <p>
+        Current agreed monthly fee:
+        <strong>
+            GH¢ {{ "%.2f"|format(extra_subject.monthly_fee or 0) }}
+        </strong>
+    </p>
+
+</div>
+
+
+<div class="summary-grid">
+
+    <div class="summary-card">
+
+        <div class="summary-label">
+            Total Fees
+        </div>
+
+        <div class="summary-value">
+            GH¢ {{ "%.2f"|format(grand_total_fees) }}
+        </div>
+
+    </div>
+
+
+    <div class="summary-card">
+
+        <div class="summary-label">
+            Amount Paid
+        </div>
+
+        <div class="summary-value">
+            GH¢ {{ "%.2f"|format(grand_total_paid) }}
+        </div>
+
+    </div>
+
+
+    <div class="summary-card">
+
+        <div class="summary-label">
+            Outstanding
+        </div>
+
+        <div class="summary-value">
+            GH¢ {{ "%.2f"|format(grand_total_outstanding) }}
+        </div>
+
+    </div>
+
+</div>
+
+
+<div class="fees-panel">
+
+    <div class="panel-heading">
+
+        <div>
+
+            <h2>Student Fee Summary</h2>
+
+            <p>
+                Amounts are calculated from monthly fee records
+                and successful payments.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    {% if fee_students %}
+
+        <div class="table-wrapper">
+
+            <table class="fees-table">
+
+                <thead>
+
+                    <tr>
+                        <th>Student</th>
+                        <th>Form / Class</th>
+                        <th>Monthly Fee</th>
+                        <th>Total Fees</th>
+                        <th>Paid</th>
+                        <th>Outstanding</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for item in fee_students %}
+
+                        <tr>
+
+                            <td>
+
+                                <div class="student-name">
+                                    {{ item.student.first_name }}
+                                    {% if item.student.other_name %}
+                                        {{ item.student.other_name }}
+                                    {% endif %}
+                                    {{ item.student.surname }}
+                                </div>
+
+                                <div class="student-code">
+                                    {{ item.student.student_code }}
+                                </div>
+
+                            </td>
+
+
+                            <td>
+
+                                {{ item.enrollment.form }}
+
+                                {% if item.enrollment.class_name %}
+                                    · {{ item.enrollment.class_name }}
+                                {% endif %}
+
+                            </td>
+
+
+                            <td class="amount">
+
+                                GH¢
+                                {{ "%.2f"|format(item.monthly_fee) }}
+
+                            </td>
+
+
+                            <td class="amount">
+
+                                GH¢
+                                {{ "%.2f"|format(item.total_fees) }}
+
+                            </td>
+
+
+                            <td class="amount paid">
+
+                                GH¢
+                                {{ "%.2f"|format(item.total_paid) }}
+
+                            </td>
+
+
+                            <td class="amount outstanding">
+
+                                GH¢
+                                {{ "%.2f"|format(item.outstanding) }}
+
+                            </td>
+
+
+                            <td>
+
+                                <span
+                                    class="fee-status
+                                    {% if item.status == 'PAID' %}
+                                        paid
+                                    {% elif item.status == 'PARTIAL' %}
+                                        partial
+                                    {% elif item.status == 'UNPAID' %}
+                                        unpaid
+                                    {% else %}
+                                        no-fees
+                                    {% endif %}"
+                                >
+                                    {{ item.status }}
+                                </span>
+
+                            </td>
+
+
+                            <td>
+
+                                <a
+                                    href="{{ url_for(
+                                        'extra_class_teacher.view_class_student',
+                                        class_id=extra_subject.id,
+                                        student_id=item.student.id
+                                    ) }}"
+                                    class="view-fees-btn"
+                                >
+                                    View Student Fees
+                                </a>
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    {% else %}
+
+        <div class="empty-state">
+
+            <h3>No Active Students</h3>
+
+            <p>
+                There are currently no active students
+                enrolled in this class.
+            </p>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

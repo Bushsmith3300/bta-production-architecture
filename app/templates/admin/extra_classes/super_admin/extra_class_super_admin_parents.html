@@ -1,0 +1,859 @@
+{% extends "admin/extra_classes/super_admin/extra_class_super_admin_base.html" %}
+
+{% block title %}Parents | Extra Classes Super Admin{% endblock %}
+
+{% block page_title %}
+    Parents Management
+{% endblock %}
+
+{% block page_subtitle %}
+    Manage parents and guardians in the Extra Classes system.
+{% endblock %}
+
+{% block header_heading %}
+    Parents
+{% endblock %}
+
+{% block header_description %}
+    Manage parent records, account status and parent information.
+{% endblock %}
+
+{% block page_actions %}
+
+    <a
+        href="{{ url_for('extra_class.add_parent') }}"
+        class="btn-super-red"
+    >
+        <i class="bi bi-person-plus-fill"></i>
+        Add Parent
+    </a>
+
+{% endblock %}
+
+
+{% block extra_css %}
+
+<style>
+
+    /* =====================================================
+       PARENT STATISTICS
+    ====================================================== */
+
+    .stats-grid {
+        display: grid;
+
+        grid-template-columns:
+            repeat(3, 1fr);
+
+        gap: 18px;
+
+        margin-bottom: 25px;
+    }
+
+
+    .stat-card {
+        background: #ffffff;
+
+        border-radius: 12px;
+
+        padding: 20px;
+
+        box-shadow:
+            0 4px 15px
+            rgba(0, 0, 0, 0.07);
+
+        border-left:
+            5px solid #b00018;
+    }
+
+
+    .stat-card h3 {
+        margin: 0 0 7px;
+
+        font-size: 12px;
+
+        color: #777777;
+
+        text-transform: uppercase;
+
+        letter-spacing: 0.6px;
+
+        font-weight: 700;
+    }
+
+
+    .stat-number {
+        font-size: 28px;
+
+        font-weight: 800;
+
+        color: #5c0008;
+    }
+
+
+    /* =====================================================
+       TABLE CARD
+    ====================================================== */
+
+    .table-card {
+        background: #ffffff;
+
+        border-radius: 12px;
+
+        box-shadow:
+            0 4px 15px
+            rgba(0, 0, 0, 0.07);
+
+        overflow: hidden;
+    }
+
+
+    .table-card-header {
+        padding: 18px 20px;
+
+        border-bottom:
+            1px solid #eeeeee;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: space-between;
+
+        gap: 15px;
+    }
+
+
+    .table-card-header h3 {
+        margin: 0;
+
+        color: #5c0008;
+
+        font-size: 18px;
+
+        font-weight: 700;
+    }
+
+
+    .record-count {
+        color: #777777;
+
+        font-size: 11px;
+    }
+
+
+    /* =====================================================
+       TABLE
+    ====================================================== */
+
+    .table-wrapper {
+        width: 100%;
+
+        overflow-x: auto;
+    }
+
+
+    .parents-table {
+        width: 100%;
+
+        border-collapse: collapse;
+
+        min-width: 900px;
+    }
+
+
+    .parents-table th {
+        background: #faf1f2;
+
+        color: #5c0008;
+
+        font-size: 11px;
+
+        font-weight: 700;
+
+        text-align: left;
+
+        padding: 14px 15px;
+
+        white-space: nowrap;
+
+        border-bottom:
+            1px solid #eeeeee;
+    }
+
+
+    .parents-table td {
+        padding: 14px 15px;
+
+        border-bottom:
+            1px solid #eeeeee;
+
+        color: #444444;
+
+        font-size: 12px;
+
+        vertical-align: middle;
+    }
+
+
+    .parents-table tbody tr:hover {
+        background: #fff8f9;
+    }
+
+
+    /* =====================================================
+       PARENT NAME
+    ====================================================== */
+
+    .parent-name {
+        color: #5c0008;
+
+        font-size: 13px;
+
+        font-weight: 700;
+    }
+
+
+    .parent-id {
+        color: #999999;
+
+        font-size: 10px;
+
+        margin-top: 2px;
+    }
+
+
+    /* =====================================================
+       PHONE / EMAIL
+    ====================================================== */
+
+    .parent-phone {
+        font-weight: 600;
+
+        white-space: nowrap;
+    }
+
+
+    .parent-email {
+        color: #666666;
+    }
+
+
+    /* =====================================================
+       STATUS BADGES
+    ====================================================== */
+
+    .status-badge {
+        display: inline-flex;
+
+        align-items: center;
+
+        gap: 5px;
+
+        padding: 5px 10px;
+
+        border-radius: 20px;
+
+        font-size: 10px;
+
+        font-weight: 700;
+    }
+
+
+    .status-active {
+        background: #e8f7ed;
+
+        color: #16743a;
+    }
+
+
+    .status-inactive {
+        background: #fbe9eb;
+
+        color: #a00015;
+    }
+
+
+    .status-dot {
+        width: 6px;
+
+        height: 6px;
+
+        border-radius: 50%;
+
+        background: currentColor;
+    }
+
+
+    /* =====================================================
+       ACTIONS
+    ====================================================== */
+
+    .actions {
+        display: flex;
+
+        align-items: center;
+
+        gap: 6px;
+
+        flex-wrap: wrap;
+    }
+
+
+    .action-btn {
+        border: none;
+
+        text-decoration: none;
+
+        display: inline-flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        gap: 5px;
+
+        padding: 7px 10px;
+
+        border-radius: 6px;
+
+        font-size: 10px;
+
+        font-weight: 700;
+
+        cursor: pointer;
+
+        transition:
+            all 0.2s ease;
+    }
+
+
+    .view-btn {
+        background: #f1f1f1;
+
+        color: #444444;
+    }
+
+
+    .view-btn:hover {
+        background: #e5e5e5;
+
+        color: #222222;
+    }
+
+
+    .edit-btn {
+        background: #fff0f2;
+
+        color: #a00015;
+    }
+
+
+    .edit-btn:hover {
+        background: #fbe0e4;
+
+        color: #850012;
+    }
+
+
+    .activate-btn {
+        background: #e8f7ed;
+
+        color: #16743a;
+    }
+
+
+    .activate-btn:hover {
+        background: #d8f0df;
+
+        color: #105c2d;
+    }
+
+
+    .deactivate-btn {
+        background: #fff0f2;
+
+        color: #a00015;
+    }
+
+
+    .deactivate-btn:hover {
+        background: #fbe0e4;
+
+        color: #850012;
+    }
+
+
+    .actions form {
+        margin: 0;
+
+        padding: 0;
+    }
+
+
+    /* =====================================================
+       EMPTY STATE
+    ====================================================== */
+
+    .empty-state {
+        text-align: center;
+
+        padding: 60px 20px;
+
+        color: #777777;
+    }
+
+
+    .empty-state-icon {
+        width: 65px;
+
+        height: 65px;
+
+        margin: 0 auto 15px;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        border-radius: 50%;
+
+        background: #faf1f2;
+
+        color: #b00018;
+
+        font-size: 27px;
+    }
+
+
+    .empty-state h3 {
+        margin: 0 0 7px;
+
+        color: #5c0008;
+
+        font-size: 18px;
+    }
+
+
+    .empty-state p {
+        margin: 0 0 18px;
+
+        font-size: 12px;
+    }
+
+
+    /* =====================================================
+       RESPONSIVE
+    ====================================================== */
+
+    @media (max-width: 900px) {
+
+        .stats-grid {
+            grid-template-columns:
+                1fr;
+        }
+
+    }
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+
+<!-- =====================================================
+     STATISTICS
+====================================================== -->
+
+<div class="stats-grid">
+
+
+    <!-- TOTAL -->
+
+    <div class="stat-card">
+
+        <h3>
+            Total Parents
+        </h3>
+
+        <div class="stat-number">
+
+            {{ parents|length }}
+
+        </div>
+
+    </div>
+
+
+    <!-- ACTIVE -->
+
+    <div class="stat-card">
+
+        <h3>
+            Active Parents
+        </h3>
+
+        <div class="stat-number">
+
+            {{ parents
+                |selectattr('is_active', 'equalto', true)
+                |list
+                |length
+            }}
+
+        </div>
+
+    </div>
+
+
+    <!-- INACTIVE -->
+
+    <div class="stat-card">
+
+        <h3>
+            Inactive Parents
+        </h3>
+
+        <div class="stat-number">
+
+            {{ parents
+                |selectattr('is_active', 'equalto', false)
+                |list
+                |length
+            }}
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =====================================================
+     PARENTS TABLE
+====================================================== -->
+
+<div class="table-card">
+
+
+    <div class="table-card-header">
+
+        <h3>
+            <i class="bi bi-people-fill"></i>
+            Parent Records
+        </h3>
+
+        <span class="record-count">
+            {{ parents|length }} record(s)
+        </span>
+
+    </div>
+
+
+    {% if parents %}
+
+        <div class="table-wrapper">
+
+            <table class="parents-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            #
+                        </th>
+
+                        <th>
+                            Parent
+                        </th>
+
+                        <th>
+                            Phone
+                        </th>
+
+                        <th>
+                            Email
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                        <th>
+                            Registered
+                        </th>
+
+                        <th>
+                            Actions
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for parent in parents %}
+
+                        <tr>
+
+
+                            <!-- NUMBER -->
+
+                            <td>
+                                {{ loop.index }}
+                            </td>
+
+
+                            <!-- PARENT -->
+
+                            <td>
+
+                                <div class="parent-name">
+
+                                    {{ parent.first_name }}
+
+                                    {{ parent.surname }}
+
+                                </div>
+
+                                <div class="parent-id">
+
+                                    Parent ID:
+                                    {{ parent.id }}
+
+                                </div>
+
+                            </td>
+
+
+                            <!-- PHONE -->
+
+                            <td>
+
+                                <span class="parent-phone">
+
+                                    {{ parent.phone }}
+
+                                </span>
+
+                            </td>
+
+
+                            <!-- EMAIL -->
+
+                            <td>
+
+                                <span class="parent-email">
+
+                                    {{ parent.email or '—' }}
+
+                                </span>
+
+                            </td>
+
+
+                            <!-- STATUS -->
+
+                            <td>
+
+                                {% if parent.is_active %}
+
+                                    <span
+                                        class="status-badge status-active"
+                                    >
+
+                                        <span class="status-dot"></span>
+
+                                        Active
+
+                                    </span>
+
+                                {% else %}
+
+                                    <span
+                                        class="status-badge status-inactive"
+                                    >
+
+                                        <span class="status-dot"></span>
+
+                                        Inactive
+
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- DATE -->
+
+                            <td>
+
+                                {{ parent.created_at.strftime('%d %b %Y')
+                                   if parent.created_at
+                                   else '—'
+                                }}
+
+                            </td>
+
+
+                            <!-- ACTIONS -->
+
+                            <td>
+
+                                <div class="actions">
+
+
+                                    <!-- VIEW -->
+
+                                    <a
+                                        href="{{ url_for(
+                                            'extra_class.view_parent',
+                                            parent_id=parent.id
+                                        ) }}"
+                                        class="action-btn view-btn"
+                                    >
+
+                                        <i class="bi bi-eye-fill"></i>
+
+                                        View
+
+                                    </a>
+
+
+                                    <!-- EDIT -->
+
+                                    <a
+                                        href="{{ url_for(
+                                            'extra_class.edit_parent',
+                                            parent_id=parent.id
+                                        ) }}"
+                                        class="action-btn edit-btn"
+                                    >
+
+                                        <i class="bi bi-pencil-fill"></i>
+
+                                        Edit
+
+                                    </a>
+
+
+                                    <!-- ACTIVATE / DEACTIVATE -->
+
+                                    <form
+                                        method="POST"
+                                        action="{{ url_for(
+                                            'extra_class.super_admin_toggle_parent_status',
+                                            parent_id=parent.id
+                                        ) }}"
+                                    >
+
+                                        <input
+                                            type="hidden"
+                                            name="csrf_token"
+                                            value="{{ csrf_token() }}"
+                                        >
+
+
+                                        {% if parent.is_active %}
+
+                                            <button
+                                                type="submit"
+                                                class="action-btn deactivate-btn"
+                                                onclick="return confirm(
+                                                    'Are you sure you want to deactivate this parent?'
+                                                );"
+                                            >
+
+                                                <i
+                                                    class="bi bi-person-x-fill"
+                                                ></i>
+
+                                                Deactivate
+
+                                            </button>
+
+                                        {% else %}
+
+                                            <button
+                                                type="submit"
+                                                class="action-btn activate-btn"
+                                                onclick="return confirm(
+                                                    'Are you sure you want to activate this parent?'
+                                                );"
+                                            >
+
+                                                <i
+                                                    class="bi bi-person-check-fill"
+                                                ></i>
+
+                                                Activate
+
+                                            </button>
+
+                                        {% endif %}
+
+                                    </form>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+    {% else %}
+
+
+        <!-- EMPTY STATE -->
+
+        <div class="empty-state">
+
+            <div class="empty-state-icon">
+
+                <i class="bi bi-people-fill"></i>
+
+            </div>
+
+            <h3>
+                No Parents Found
+            </h3>
+
+            <p>
+                No parents have been registered for Extra Classes yet.
+            </p>
+
+            <a
+                href="{{ url_for('extra_class.add_parent') }}"
+                class="btn-super-red"
+            >
+
+                <i class="bi bi-person-plus-fill"></i>
+
+                Add First Parent
+
+            </a>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+
+{% endblock %}

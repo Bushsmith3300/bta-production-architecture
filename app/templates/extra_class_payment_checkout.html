@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Payment Checkout | Extra Classes</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:"Segoe UI",Arial,sans-serif;background:#f4f6f9;color:#1f2937}
+.topbar{background:linear-gradient(135deg,#0f0c29,#302b63);color:white;padding:28px 25px}
+.topbar-inner{max-width:950px;margin:auto}
+.brand{color:#00ffea;font-weight:800;letter-spacing:1px;margin-bottom:12px}
+h1{margin:0 0 6px;font-size:28px}
+.subtitle{margin:0;color:#d1d5db}
+.container{width:100%;max-width:950px;margin:25px auto;padding:0 20px 50px}
+.card,.summary{background:white;border-radius:15px;box-shadow:0 3px 15px rgba(0,0,0,.06)}
+.card{padding:20px;margin-bottom:20px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.label{font-size:12px;color:#6b7280;font-weight:700;text-transform:uppercase;margin-bottom:4px}
+.value{font-weight:650}
+.reference{font-family:monospace;color:#1565c0}
+.table{width:100%;border-collapse:collapse;margin-top:8px}
+.table th,.table td{text-align:left;padding:13px 8px;border-bottom:1px solid #eef0f2}
+.table th{font-size:12px;color:#6b7280;text-transform:uppercase}
+.amount{text-align:right!important;font-weight:750}
+.summary{padding:24px;border-left:5px solid #1565c0;margin-top:25px}
+.summary-line{display:flex;justify-content:space-between;gap:20px;margin:10px 0;color:#4b5563}
+.grand{border-top:1px solid #e5e7eb;padding-top:15px;margin-top:15px;font-size:20px;font-weight:800;color:#1565c0}
+.status{display:inline-block;padding:5px 10px;border-radius:999px;background:#fef3c7;color:#92400e;font-size:12px;font-weight:800}
+.notice{margin-top:20px;padding:14px 16px;border-radius:10px;background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe;line-height:1.5}
+.actions{display:flex;gap:12px;margin-top:25px}
+.btn{display:inline-block;padding:13px 18px;border-radius:9px;text-decoration:none;font-weight:700;border:0;cursor:pointer}
+.primary{background:#1565c0;color:white}
+.secondary{background:white;color:#374151;border:1px solid #d1d5db}
+@media(max-width:700px){
+.grid{grid-template-columns:1fr}
+.table{font-size:13px}
+.table th,.table td{padding:10px 5px}
+.actions{flex-direction:column}
+.btn{text-align:center;width:100%}
+}
+</style>
+</head>
+<body>
+<div class="topbar">
+    <div class="topbar-inner">
+        <div class="brand">BTA • EXTRA CLASSES</div>
+        <h1>Payment Checkout</h1>
+        <p class="subtitle">Your payment transaction has been created and is awaiting payment.</p>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="card">
+        <div class="grid">
+            <div>
+                <div class="label">Student</div>
+                <div class="value">
+                    {{ student.first_name }}
+                    {% if student.other_name %}{{ student.other_name }} {% endif %}
+                    {{ student.surname }}
+                </div>
+            </div>
+
+            <div>
+                <div class="label">Student Code</div>
+                <div class="value">{{ student.student_code }}</div>
+            </div>
+
+            <div>
+                <div class="label">Parent / Guardian</div>
+                <div class="value">{{ parent.first_name }} {{ parent.surname }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="grid">
+            <div>
+                <div class="label">Payment Reference</div>
+                <div class="value reference">{{ payment.payment_reference }}</div>
+            </div>
+
+            <div>
+                <div class="label">Payment Method</div>
+                <div class="value">{{ payment.payment_method.replace("_", " ") }}</div>
+            </div>
+
+            <div>
+                <div class="label">Status</div>
+                <div class="value"><span class="status">{{ payment.status }}</span></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Payment Items</h2>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Subject</th>
+                    <th>Billing Month</th>
+                    <th>Teacher</th>
+                    <th class="amount">Amount</th>
+                </tr>
+            </thead>
+
+            <tbody>
+            {% for row in payment_items %}
+                <tr>
+                    <td>{{ row.subject_name }}</td>
+                    <td>{{ row.fee.billing_month.strftime("%B %Y") }}</td>
+                    <td>{{ row.teacher_name }}</td>
+                    <td class="amount">GH₵{{ "%.2f"|format(row.outstanding|float) }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="summary">
+        <div class="summary-line">
+            <span>Transaction Amount</span>
+            <strong>GH₵{{ "%.2f"|format(selected_total|float) }}</strong>
+        </div>
+
+        <div class="summary-line grand">
+            <span>Total to Pay</span>
+            <span>GH₵{{ "%.2f"|format(selected_total|float) }}</span>
+        </div>
+    </div>
+
+    <div class="notice">
+        <strong>Payment status:</strong>
+        This transaction has been recorded as <strong>PENDING</strong>.
+        No money has been charged yet. The payment gateway and payment
+        verification will be connected in the next stage.
+    </div>
+
+    <div class="actions">
+        <a href="{{ url_for('extra_class_payment.payment_home') }}" class="btn secondary">
+            Start Over
+        </a>
+
+
+
+    </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,199 @@
+{% extends "admin/extra_classes/super_admin/extra_class_super_admin_base.html" %}
+
+{% block title %}
+Edit Parent
+{% endblock %}
+
+{% block page_title %}
+Edit Parent
+{% endblock %}
+
+{% block page_subtitle %}
+Update parent or guardian information
+{% endblock %}
+
+{% block header_heading %}
+Edit Parent
+{% endblock %}
+
+{% block header_description %}
+Update the information for {{ parent.first_name }} {{ parent.surname }}.
+{% endblock %}
+
+{% block page_actions %}
+
+<a href="{{ url_for(
+    'extra_class.super_admin_view_parent',
+    parent_id=parent.id
+) }}"
+   class="btn btn-light">
+
+    <i class="bi bi-arrow-left"></i>
+    Back to Parent
+
+</a>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="card shadow-sm border-0">
+
+    <div class="card-body p-4">
+
+        <form method="POST"
+              action="{{ url_for(
+                  'extra_class.super_admin_edit_parent',
+                  parent_id=parent.id
+              ) }}">
+
+            {% if csrf_token is defined %}
+                <input type="hidden"
+                       name="csrf_token"
+                       value="{{ csrf_token() }}">
+            {% endif %}
+
+            <div class="row g-4">
+
+                <!-- First Name -->
+                <div class="col-md-6">
+
+                    <label for="first_name"
+                           class="form-label fw-semibold">
+
+                        First Name
+
+                    </label>
+
+                    <input type="text"
+                           class="form-control"
+                           id="first_name"
+                           name="first_name"
+                           value="{{ request.form.get(
+                               'first_name',
+                               parent.first_name
+                           ) }}"
+                           required>
+
+                </div>
+
+
+                <!-- Surname -->
+                <div class="col-md-6">
+
+                    <label for="surname"
+                           class="form-label fw-semibold">
+
+                        Surname
+
+                    </label>
+
+                    <input type="text"
+                           class="form-control"
+                           id="surname"
+                           name="surname"
+                           value="{{ request.form.get(
+                               'surname',
+                               parent.surname
+                           ) }}"
+                           required>
+
+                </div>
+
+
+                <!-- Phone -->
+                <div class="col-md-6">
+
+                    <label for="phone"
+                           class="form-label fw-semibold">
+
+                        Phone Number
+
+                    </label>
+
+                    <input type="tel"
+                           class="form-control"
+                           id="phone"
+                           name="phone"
+                           value="{{ request.form.get(
+                               'phone',
+                               parent.phone
+                           ) }}"
+                           placeholder="e.g. 024XXXXXXX"
+                           required>
+
+                </div>
+
+
+                <!-- Email -->
+                <div class="col-md-6">
+
+                    <label for="email"
+                           class="form-label fw-semibold">
+
+                        Email Address
+
+                    </label>
+
+                    <input type="email"
+                           class="form-control"
+                           id="email"
+                           name="email"
+                           value="{{ request.form.get(
+                               'email',
+                               parent.email or ''
+                           ) }}"
+                           placeholder="Enter email address">
+
+                </div>
+
+            </div>
+
+
+            <hr class="my-4">
+
+
+            <div class="d-flex justify-content-between align-items-center">
+
+                <div class="text-muted small">
+
+                    <i class="bi bi-info-circle me-1"></i>
+
+                    Parent ID:
+                    <strong>{{ parent.id }}</strong>
+
+                </div>
+
+
+                <div class="d-flex gap-2">
+
+                    <a href="{{ url_for(
+                        'extra_class.super_admin_view_parent',
+                        parent_id=parent.id
+                    ) }}"
+                       class="btn btn-outline-secondary">
+
+                        Cancel
+
+                    </a>
+
+                    <button type="submit"
+                            class="btn btn-primary">
+
+                        <i class="bi bi-check-circle"></i>
+
+                        Save Changes
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

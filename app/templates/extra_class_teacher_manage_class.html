@@ -1,0 +1,576 @@
+{% extends "extra_class_teacher_base.html" %}
+
+{% block title %}Manage Class{% endblock %}
+
+{% block extra_css %}
+
+/* =========================================================
+   PAGE HEADER
+   ========================================================= */
+
+.manage-header {
+    margin-bottom: 30px;
+}
+
+.manage-header-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.manage-header h1 {
+    margin: 0 0 8px;
+    font-size: 30px;
+    font-weight: 800;
+    color: var(--text);
+}
+
+.manage-header p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+.class-name {
+    margin-top: 8px;
+    color: var(--maroon);
+    font-size: 17px;
+    font-weight: 800;
+}
+
+
+/* =========================================================
+   BACK BUTTON
+   ========================================================= */
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 10px 15px;
+    border-radius: 10px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    color: var(--maroon);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+    transition: 0.2s ease;
+}
+
+.back-link:hover {
+    background: var(--primary-light);
+    border-color: #fecaca;
+}
+
+
+/* =========================================================
+   MAIN MANAGEMENT PANEL
+   ========================================================= */
+
+.manage-panel {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+    overflow: hidden;
+}
+
+
+/* =========================================================
+   ACTION INTRODUCTION
+   ========================================================= */
+
+.action-intro {
+    padding: 20px 24px 0;
+}
+
+.action-intro p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   ACTION GRID
+   ========================================================= */
+
+.action-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    padding: 20px 24px 24px;
+}
+
+
+/* =========================================================
+   ACTION CARD
+   ========================================================= */
+
+.action-card {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    min-height: 105px;
+    padding: 18px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--white);
+    color: var(--text);
+    text-decoration: none;
+    box-sizing: border-box;
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease,
+        background 0.2s ease;
+}
+
+.action-card:hover {
+    transform: translateY(-2px);
+    border-color: #fecaca;
+    background: #fffafa;
+    box-shadow: 0 8px 20px rgba(127, 29, 29, 0.08);
+}
+
+
+/* =========================================================
+   ACTIVE ACTION
+   ========================================================= */
+
+.action-card.primary {
+    border-color: #fecaca;
+    background: var(--primary-light);
+}
+
+.action-card.primary:hover {
+    background: #fff1f1;
+}
+
+
+/* =========================================================
+   ACTION ICON
+   ========================================================= */
+
+.action-icon {
+    width: 50px;
+    height: 50px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 13px;
+    background: var(--primary-light);
+    color: var(--maroon);
+    font-size: 24px;
+}
+
+.action-card.primary .action-icon {
+    background: var(--maroon);
+    color: var(--white);
+}
+
+
+/* =========================================================
+   ACTION CONTENT
+   ========================================================= */
+
+.action-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.action-title {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--text);
+    font-size: 15px;
+    font-weight: 800;
+}
+
+.action-description {
+    display: block;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   ACTION ARROW
+   ========================================================= */
+
+.action-arrow {
+    flex-shrink: 0;
+    color: var(--maroon);
+    font-size: 19px;
+    font-weight: 800;
+}
+
+
+/* =========================================================
+   COMING NEXT STATE
+   ========================================================= */
+
+.action-card.disabled {
+    cursor: default;
+}
+
+.action-card.disabled:hover {
+    transform: none;
+    border-color: var(--border);
+    background: var(--white);
+    box-shadow: none;
+}
+
+.action-status {
+    display: inline-block;
+    margin-top: 6px;
+    padding: 3px 7px;
+    border-radius: 10px;
+    background: #f1f5f9;
+    color: var(--muted);
+    font-size: 9px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+
+/* =========================================================
+   TEACHER CONTROL NOTICE
+   ========================================================= */
+
+.info-notice {
+    margin-top: 24px;
+    padding: 16px 18px;
+    border-radius: 13px;
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    color: #78350f;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.info-notice strong {
+    font-weight: 800;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 800px) {
+
+    .action-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 700px) {
+
+    .manage-header-top {
+        flex-direction: column;
+    }
+
+    .manage-header h1 {
+        font-size: 26px;
+    }
+
+    .back-link {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .action-grid {
+        padding: 18px;
+    }
+}
+
+@media (max-width: 450px) {
+
+    .manage-header h1 {
+        font-size: 23px;
+    }
+
+    .action-intro {
+        padding: 18px 18px 0;
+    }
+
+    .action-grid {
+        gap: 12px;
+        padding: 15px 18px 18px;
+    }
+
+    .action-card {
+        min-height: 95px;
+        padding: 14px;
+    }
+
+    .action-icon {
+        width: 44px;
+        height: 44px;
+        font-size: 21px;
+    }
+
+    .action-title {
+        font-size: 14px;
+    }
+
+    .action-description {
+        font-size: 11px;
+    }
+}
+
+{% endblock %}
+
+
+{% block content %}
+
+<!-- =====================================================
+     PAGE HEADER
+     ===================================================== -->
+
+<div class="manage-header">
+
+    <div class="manage-header-top">
+
+        <div>
+
+            <h1>
+                Extra Class Manager
+            </h1>
+
+            <div class="class-name">
+                {{ extra_subject.subject.name }}
+            </div>
+
+        </div>
+
+
+        <a
+            href="{{ url_for(
+                'extra_class_teacher.teacher_my_class'
+            ) }}"
+            class="back-link"
+        >
+            ← Back to My Class
+        </a>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     MANAGEMENT OPTIONS
+     ===================================================== -->
+
+<div class="manage-panel">
+
+    <div class="action-intro">
+
+        <p>
+            Choose an option below to continue.
+        </p>
+
+    </div>
+
+
+    <div class="action-grid">
+
+
+        <!-- =================================================
+             STUDENTS
+             ================================================= -->
+
+        <a
+            href="{{ url_for(
+                'extra_class_teacher.class_students',
+                class_id=extra_subject.id
+            ) }}"
+            class="action-card primary"
+        >
+
+            <div class="action-icon">
+                👨‍🎓
+            </div>
+
+            <div class="action-content">
+
+                <span class="action-title">
+                    Students
+                </span>
+
+                <span class="action-description">
+                    View and manage students enrolled
+                    in this class.
+                </span>
+
+            </div>
+
+            <span class="action-arrow">
+                →
+            </span>
+
+        </a>
+
+
+        <!-- =================================================
+             SEMESTER
+             ================================================= -->
+
+        <div class="action-card disabled">
+
+            <div class="action-icon">
+                📅
+            </div>
+
+            <div class="action-content">
+
+                <span class="action-title">
+                    Semester
+                </span>
+
+                <span class="action-description">
+                    Create and manage the semester
+                    for this class.
+                </span>
+
+                <span class="action-status">
+                    Coming next
+                </span>
+
+            </div>
+
+        </div>
+
+<!-- =================================================
+     FEES
+     ================================================= -->
+
+        <a
+            href="{{ url_for(
+                'extra_class_teacher.class_fees',
+                class_id=extra_subject.id
+            ) }}"
+            class="action-card"
+        >
+
+            <div class="action-icon">
+                💰
+            </div>
+
+            <div class="action-content">
+
+                <span class="action-title">
+                    Fees
+                </span>
+
+                <span class="action-description">
+                    Manage monthly fees and student
+                    fee records.
+                </span>
+
+                <span class="action-status">
+                    View Fees →
+                </span>
+
+            </div>
+
+        </a>
+
+
+<!-- =================================================
+             PAYMENTS
+             ================================================= -->
+
+        <a
+            href="{{ url_for(
+                'extra_class_teacher.class_payments',
+                class_id=extra_subject.id
+            ) }}"
+            class="action-card"
+        >
+
+            <div class="action-icon">
+                💳
+            </div>
+
+            <div class="action-content">
+
+                <span class="action-title">
+                    Payments
+                </span>
+
+                <span class="action-description">
+                    View payments received for
+                    this class.
+                </span>
+
+                <span class="action-status">
+                    View Payments →
+                </span>
+
+            </div>
+
+        </a>
+
+
+        <!-- =================================================
+             REPORTS
+             ================================================= -->
+
+        <div class="action-card disabled">
+
+            <div class="action-icon">
+                📊
+            </div>
+
+            <div class="action-content">
+
+                <span class="action-title">
+                    Reports
+                </span>
+
+                <span class="action-description">
+                    View class, fee and payment
+                    reports.
+                </span>
+
+                <span class="action-status">
+                    Coming next
+                </span>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     TEACHER CONTROL NOTICE
+     ===================================================== -->
+
+<div class="info-notice">
+
+    <strong>Teacher control:</strong>
+
+    You can manage the students enrolled in your
+    {{ extra_subject.subject.name }} class. Additional
+    management tools will become available as each
+    section is completed.
+
+</div>
+
+{% endblock %}

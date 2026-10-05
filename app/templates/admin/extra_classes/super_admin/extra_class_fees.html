@@ -1,0 +1,267 @@
+{% extends "admin/extra_classes/super_admin/extra_class_super_admin_base.html" %}
+
+{% block title %}Monthly Fees{% endblock %}
+
+{% block content %}
+
+<style>
+    .page-header {
+        margin-bottom: 25px;
+    }
+
+    .page-header h1 {
+        margin: 0;
+        color: #5c0008;
+        font-size: 28px;
+    }
+
+    .page-header p {
+        margin-top: 6px;
+        color: #777;
+    }
+
+    .fees-card {
+        background: #fff;
+        border-radius: 16px;
+        padding: 25px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+        overflow-x: auto;
+    }
+
+    .fees-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 950px;
+    }
+
+    .fees-table th {
+        background: #5c0008;
+        color: #fff;
+        padding: 13px;
+        text-align: left;
+        font-size: 13px;
+    }
+
+    .fees-table td {
+        padding: 13px;
+        border-bottom: 1px solid #eee;
+        color: #333;
+        font-size: 14px;
+    }
+
+    .fees-table tr:hover {
+        background: #fafafa;
+    }
+
+    .status {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .status-unpaid {
+        background: #fff4d6;
+        color: #946200;
+    }
+
+    .status-partial {
+        background: #e8f0ff;
+        color: #2455a4;
+    }
+
+    .status-paid {
+        background: #e7f7ed;
+        color: #16803c;
+    }
+
+    .status-overdue {
+        background: #fde8e8;
+        color: #b42318;
+    }
+
+    .status-cancelled {
+        background: #eee;
+        color: #666;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 50px 20px;
+        color: #777;
+    }
+
+    .amount {
+        font-weight: 700;
+    }
+
+    .proration {
+        font-size: 12px;
+        color: #777;
+    }
+</style>
+
+<div class="page-header">
+    <h1>Monthly Fees</h1>
+    <p>
+        View generated monthly fees for Extra Class enrollments.
+    </p>
+</div>
+
+<div class="fees-card">
+
+    {% if monthly_fees %}
+
+        <table class="fees-table">
+
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Subject</th>
+                    <th>Semester</th>
+                    <th>Billing Month</th>
+                    <th>Standard Fee</th>
+                    <th>Amount Due</th>
+                    <th>Due Date</th>
+                    <th>Proration</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for fee in monthly_fees %}
+
+                    <tr>
+
+                        <td>
+                            {{ fee.student.first_name }}
+
+                            {% if fee.student.other_name %}
+                                {{ fee.student.other_name }}
+                            {% endif %}
+
+                            {{ fee.student.surname }}
+
+                            <br>
+
+                            <small>
+                                {{ fee.student.student_code }}
+                            </small>
+                        </td>
+
+                        <td>
+                            {{ fee.extra_class_subject.subject.name }}
+                        </td>
+
+                        <td>
+                            {% if fee.term %}
+                                {{ fee.term.name }}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {{ fee.billing_month.strftime("%B %Y") }}
+                        </td>
+
+                        <td>
+                            GH₵ {{ "%.2f"|format(fee.standard_amount) }}
+                        </td>
+
+                        <td class="amount">
+                            GH₵ {{ "%.2f"|format(fee.amount_due) }}
+                        </td>
+
+                        <td>
+                            {% if fee.due_date %}
+                                {{ fee.due_date.strftime("%d %B %Y") }}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </td>
+
+                        <td>
+
+                            {% if fee.proration_percentage < 100 %}
+
+                                <strong>
+                                    {{ "%.0f"|format(fee.proration_percentage) }}%
+                                </strong>
+
+                                <div class="proration">
+                                    {{ fee.proration_type }}
+                                </div>
+
+                            {% else %}
+
+                                Full
+
+                            {% endif %}
+
+                        </td>
+
+                        <td>
+
+                            {% if fee.status == "UNPAID" %}
+
+                                <span class="status status-unpaid">
+                                    UNPAID
+                                </span>
+
+                            {% elif fee.status == "PARTIAL" %}
+
+                                <span class="status status-partial">
+                                    PARTIAL
+                                </span>
+
+                            {% elif fee.status == "PAID" %}
+
+                                <span class="status status-paid">
+                                    PAID
+                                </span>
+
+                            {% elif fee.status == "OVERDUE" %}
+
+                                <span class="status status-overdue">
+                                    OVERDUE
+                                </span>
+
+                            {% elif fee.status == "CANCELLED" %}
+
+                                <span class="status status-cancelled">
+                                    CANCELLED
+                                </span>
+
+                            {% else %}
+
+                                {{ fee.status }}
+
+                            {% endif %}
+
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    {% else %}
+
+        <div class="empty-state">
+            <h3>No Monthly Fees Found</h3>
+            <p>
+                No monthly fee records have been generated yet.
+            </p>
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

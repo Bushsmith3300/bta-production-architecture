@@ -1,0 +1,425 @@
+{% extends "admin/extra_classes/super_admin/extra_class_super_admin_base.html" %}
+
+{% block title %}Fee Calculation Test{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid py-4">
+
+    <!-- PAGE HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">
+                <i class="fas fa-calculator"></i>
+                Monthly Fee Calculation
+            </h2>
+            <p class="text-muted mb-0">
+                Preview the fees that would be generated for this enrollment.
+            </p>
+        </div>
+
+        <a href="{{ url_for('extra_class.view_enrollment', enrollment_id=enrollment.id) }}"
+           class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i>
+            Back to Enrollment
+        </a>
+    </div>
+
+
+    <!-- INFORMATION CARD -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header"
+             style="background: #6f1d1b; color: white;">
+            <h5 class="mb-0">
+                <i class="fas fa-user-graduate"></i>
+                Enrollment Information
+            </h5>
+        </div>
+
+        <div class="card-body">
+
+            <div class="row g-3">
+
+                <!-- STUDENT -->
+                <div class="col-md-6">
+				<strong>Student:</strong><br>
+
+				{{ enrollment.student.first_name }}
+
+				{% if enrollment.student.other_name %}
+					{{ enrollment.student.other_name }}
+				{% endif %}
+
+				{{ enrollment.student.surname }}
+
+			    </div>
+				
+				
+                <!-- STUDENT CODE -->
+                <div class="col-md-6">
+                    <strong>Student Code:</strong><br>
+                    {{ enrollment.student.student_code }}
+                </div>
+
+                <!-- SUBJECT -->
+                <div class="col-md-6">
+                    <strong>Subject:</strong><br>
+                    {{ enrollment.extra_class_subject.subject.name }}
+                </div>
+
+                <!-- SEMESTER -->
+                <div class="col-md-6">
+                    <strong>Semester:</strong><br>
+                    {{ enrollment.term.name }}
+                </div>
+
+                <!-- SEMESTER START -->
+                <div class="col-md-6">
+                    <strong>Semester Start:</strong><br>
+                    {{ enrollment.term.start_date.strftime('%d %B %Y') }}
+                </div>
+
+                <!-- SEMESTER END -->
+                <div class="col-md-6">
+                    <strong>Semester End:</strong><br>
+                    {{ enrollment.term.end_date.strftime('%d %B %Y') }}
+                </div>
+
+                <!-- ENROLLMENT START -->
+                <div class="col-md-6">
+                    <strong>Enrollment Start:</strong><br>
+                    {{ enrollment.start_date.strftime('%d %B %Y') }}
+                </div>
+
+                <!-- ENROLLMENT END -->
+                <div class="col-md-6">
+                    <strong>Enrollment End:</strong><br>
+                    {% if enrollment.end_date %}
+                        {{ enrollment.end_date.strftime('%d %B %Y') }}
+                    {% else %}
+                        <span class="text-muted">Same as semester end</span>
+                    {% endif %}
+                </div>
+
+                <!-- MONTHLY FEE -->
+                <div class="col-md-6">
+                    <strong>Standard Monthly Fee:</strong><br>
+                    GH₵ {{ "%.2f"|format(enrollment.extra_class_subject.monthly_fee|float) }}
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- CALCULATED FEES -->
+    <div class="card shadow-sm">
+
+        <div class="card-header"
+             style="background: #6f1d1b; color: white;">
+            <div class="d-flex justify-content-between align-items-center">
+
+                <h5 class="mb-0">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                    Calculated Monthly Fees
+                </h5>
+
+                <span class="badge bg-light text-dark">
+                    Preview Only
+                </span>
+
+            </div>
+        </div>
+
+
+        <div class="card-body">
+
+            {% if fee_rows %}
+
+                <div class="table-responsive">
+
+                    <table class="table table-bordered table-hover align-middle">
+
+                        <thead class="table-light">
+
+                            <tr>
+                                <th>Billing Month</th>
+                                <th>Billing Period</th>
+                                <th class="text-center">Billable Days</th>
+                                <th>Standard Fee</th>
+                                <th>Proration</th>
+                                <th>Amount Due</th>
+                                <th>Due Date</th>
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                            {% for fee in fee_rows %}
+
+                                <tr>
+
+                                    <!-- BILLING MONTH -->
+                                    <td>
+                                        <strong>
+                                            {{ fee.billing_month.strftime('%B %Y') }}
+                                        </strong>
+                                    </td>
+
+
+                                    <!-- ACTUAL BILLING PERIOD -->
+                                    <td>
+
+                                        {{ fee.cycle_start.strftime('%d %b %Y') }}
+                                        –
+                                        {{ fee.actual_cycle_end.strftime('%d %b %Y') }}
+
+                                        {% if fee.is_shortened_cycle %}
+
+                                            <br>
+
+                                            <span class="badge bg-warning text-dark mt-1">
+                                                <i class="fas fa-calendar-check"></i>
+                                                Final Semester Period
+                                            </span>
+
+                                        {% endif %}
+
+                                    </td>
+
+
+                                    <!-- BILLABLE DAYS -->
+                                    <td class="text-center">
+
+                                        {{ fee.billable_days }}
+
+                                        {% if fee.is_shortened_cycle %}
+                                            days
+                                        {% endif %}
+
+                                    </td>
+
+
+                                    <!-- STANDARD FEE -->
+                                    <td>
+                                        GH₵ {{ "%.2f"|format(fee.standard_amount|float) }}
+                                    </td>
+
+
+                                    <!-- PRORATION -->
+                                    <td>
+
+                                        {% if fee.proration_percentage|float < 100 %}
+
+                                            <span class="badge bg-warning text-dark">
+                                                {{ "%.0f"|format(fee.proration_percentage|float) }}%
+                                            </span>
+
+                                            {% if fee.proration_reason %}
+                                                <div class="small text-muted mt-1">
+                                                    {{ fee.proration_reason }}
+                                                </div>
+                                            {% endif %}
+
+                                        {% else %}
+
+                                            <span class="badge bg-success">
+                                                100%
+                                            </span>
+
+                                        {% endif %}
+
+                                    </td>
+
+
+                                    <!-- AMOUNT DUE -->
+                                    <td>
+
+                                        <strong>
+                                            GH₵ {{ "%.2f"|format(fee.amount_due|float) }}
+                                        </strong>
+
+                                    </td>
+
+
+                                    <!-- DUE DATE -->
+                                    <td>
+
+                                        {% if fee.due_date %}
+                                            {{ fee.due_date.strftime('%d %b %Y') }}
+                                        {% else %}
+                                            —
+                                        {% endif %}
+
+                                    </td>
+
+                                </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+                <!-- TOTAL -->
+                <div class="row justify-content-end mt-4">
+
+                    <div class="col-md-5">
+
+                        <div class="card border-0"
+                             style="background: #f8f9fa;">
+
+                            <div class="card-body">
+
+                                <div class="d-flex justify-content-between">
+
+                                    <span class="fw-bold">
+                                        Total Calculated Amount:
+                                    </span>
+
+                                    <span class="fw-bold fs-5"
+                                          style="color: #6f1d1b;">
+
+                                        GH₵
+                                        {{
+                                            "%.2f"|format(
+                                                fee_rows
+                                                |map(attribute='amount_due')
+                                                |map('float')
+                                                |sum
+                                            )
+                                        }}
+
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- FINAL SEMESTER EXPLANATION -->
+                <div class="alert alert-info mt-4">
+
+                    <h6 class="fw-bold">
+                        <i class="fas fa-info-circle"></i>
+                        How the Final Semester Period Works
+                    </h6>
+
+                    <p class="mb-2">
+                        When a semester ends before the student's normal
+                        monthly billing cycle is completed, the billing period
+                        ends on the actual semester end date.
+                    </p>
+
+                    <p class="mb-2">
+                        For example, if a student's billing date is
+                        <strong>18 December</strong> and the semester ends on
+                        <strong>31 December</strong>, the displayed billing
+                        period is:
+                    </p>
+
+                    <div class="text-center my-3">
+
+                        <span class="badge fs-6 px-3 py-2"
+                              style="background: #6f1d1b;">
+
+                            18 December – 31 December
+
+                        </span>
+
+                    </div>
+
+                    <p class="mb-0">
+                        The remaining days are used to determine the applicable
+                        semester proration according to the school's
+                        proration rules.
+                    </p>
+
+                </div>
+
+
+                <!-- PRORATION RULES -->
+                <div class="alert alert-warning mt-3">
+
+                    <h6 class="fw-bold">
+                        <i class="fas fa-percentage"></i>
+                        Semester Proration Rules
+                    </h6>
+
+                    <ul class="mb-0">
+
+                        <li>
+                            <strong>1–7 days remaining:</strong>
+                            25% of monthly fee
+                        </li>
+
+                        <li>
+                            <strong>8–14 days remaining:</strong>
+                            50% of monthly fee
+                        </li>
+
+                        <li>
+                            <strong>15–21 days remaining:</strong>
+                            75% of monthly fee
+                        </li>
+
+                        <li>
+                            <strong>22+ days remaining:</strong>
+                            100% of monthly fee
+                        </li>
+
+                    </ul>
+
+                </div>
+
+
+                <!-- PREVIEW WARNING -->
+                <div class="alert alert-secondary mt-3 mb-0">
+
+                    <i class="fas fa-eye"></i>
+
+                    <strong>Preview only:</strong>
+
+                    This page calculates the expected monthly fees but does
+                    not create or modify any records in the database.
+
+                </div>
+
+
+            {% else %}
+
+                <!-- NO FEES -->
+                <div class="text-center py-5">
+
+                    <i class="fas fa-file-invoice fa-3x text-muted mb-3"></i>
+
+                    <h5>No billable periods found</h5>
+
+                    <p class="text-muted mb-0">
+                        There are no monthly fees to calculate for this
+                        enrollment based on its semester and enrollment dates.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

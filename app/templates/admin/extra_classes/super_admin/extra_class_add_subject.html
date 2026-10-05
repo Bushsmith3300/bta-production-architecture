@@ -1,0 +1,429 @@
+{% extends "admin/extra_classes/super_admin/extra_class_super_admin_base.html" %}
+
+{% block title %}
+    Add Extra Class Subject
+{% endblock %}
+
+{% block page_title %}
+    Add Extra Class Subject
+{% endblock %}
+
+{% block page_subtitle %}
+    Register a subject for the Extra Classes programme
+{% endblock %}
+
+{% block header_heading %}
+    Add Extra Class Subject
+{% endblock %}
+
+{% block header_description %}
+    Select an existing BTA subject, assign a teacher and set the monthly class fee.
+{% endblock %}
+
+{% block page_actions %}
+    <a href="{{ url_for('extra_class.subjects') }}" class="btn btn-light">
+        <i class="bi bi-arrow-left"></i>
+        Back to Subjects
+    </a>
+{% endblock %}
+
+{% block extra_css %}
+
+<style>
+
+    .form-wrapper {
+        max-width: 850px;
+        margin: 0 auto;
+    }
+
+    .form-card {
+        background: #fff;
+        border-radius: 18px;
+        box-shadow: 0 8px 30px rgba(92, 0, 8, 0.08);
+        border: 1px solid #f0e1e3;
+        overflow: hidden;
+    }
+
+    .form-card-header {
+        padding: 24px 28px;
+        background: linear-gradient(
+            135deg,
+            #fff5f6 0%,
+            #ffffff 100%
+        );
+        border-bottom: 1px solid #f0e1e3;
+    }
+
+    .form-card-header h3 {
+        margin: 0 0 6px;
+        color: #5c0008;
+        font-size: 20px;
+        font-weight: 800;
+    }
+
+    .form-card-header p {
+        margin: 0;
+        color: #777;
+        font-size: 13px;
+    }
+
+    .form-body {
+        padding: 30px;
+    }
+
+    .form-group {
+        margin-bottom: 24px;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 8px;
+        color: #3d1014;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .required {
+        color: #c00018;
+    }
+
+    .form-control,
+    .form-select {
+        width: 100%;
+        min-height: 48px;
+        padding: 12px 14px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        background: #fff;
+        color: #333;
+        font-size: 14px;
+        transition: all 0.2s ease;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        outline: none;
+        border-color: #a00015;
+        box-shadow: 0 0 0 3px rgba(160, 0, 21, 0.08);
+    }
+
+    .form-help {
+        display: block;
+        margin-top: 7px;
+        color: #888;
+        font-size: 11px;
+    }
+
+    .fee-input-wrapper {
+        position: relative;
+    }
+
+    .fee-prefix {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #5c0008;
+        font-weight: 800;
+        font-size: 14px;
+        pointer-events: none;
+    }
+
+    .fee-input {
+        padding-left: 50px;
+    }
+
+    .info-box {
+        margin-top: 10px;
+        padding: 15px 18px;
+        border-radius: 10px;
+        background: #fff7e8;
+        border: 1px solid #f2dfb3;
+        color: #795900;
+        font-size: 12px;
+        line-height: 1.6;
+    }
+
+    .info-box i {
+        margin-right: 6px;
+    }
+
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        margin-top: 30px;
+        padding-top: 22px;
+        border-top: 1px solid #eee;
+    }
+
+    .btn-cancel {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        min-height: 44px;
+        padding: 10px 18px;
+        border-radius: 9px;
+        border: 1px solid #ddd;
+        background: #fff;
+        color: #555;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .btn-cancel:hover {
+        background: #f7f7f7;
+        color: #333;
+    }
+
+    .btn-submit {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        min-height: 44px;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 9px;
+        background: linear-gradient(
+            135deg,
+            #b00018,
+            #78000d
+        );
+        color: #fff;
+        font-size: 13px;
+        font-weight: 800;
+        cursor: pointer;
+        box-shadow: 0 5px 15px rgba(120, 0, 13, 0.20);
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 7px 18px rgba(120, 0, 13, 0.28);
+    }
+
+    @media (max-width: 600px) {
+
+        .form-body {
+            padding: 20px;
+        }
+
+        .form-card-header {
+            padding: 20px;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+
+        .btn-cancel,
+        .btn-submit {
+            width: 100%;
+            justify-content: center;
+        }
+
+    }
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="form-wrapper">
+
+    <div class="form-card">
+
+        <div class="form-card-header">
+
+            <h3>
+                <i class="bi bi-book-half"></i>
+                Extra Class Subject Details
+            </h3>
+
+            <p>
+                Connect an existing BTA subject to the Extra Classes payment system.
+            </p>
+
+        </div>
+
+
+        <div class="form-body">
+
+            <form method="POST">
+
+                {% if csrf_token %}
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                {% endif %}
+
+
+                <!-- SUBJECT -->
+
+                <div class="form-group">
+
+                    <label class="form-label">
+                        BTA Subject
+                        <span class="required">*</span>
+                    </label>
+
+                    <select
+                        name="subject_id"
+                        class="form-select"
+                        required
+                    >
+
+                        <option value="">
+                            -- Select BTA Subject --
+                        </option>
+
+                        {% for subject in bta_subjects %}
+
+                            <option
+                                value="{{ subject.id }}"
+                                {% if request.form.get('subject_id') == subject.id|string %}selected{% endif %}
+                            >
+
+                                {% if subject.icon %}
+                                    {{ subject.icon }}
+                                {% endif %}
+
+                                {{ subject.name }}
+
+                                {% if subject.code %}
+                                    ({{ subject.code }})
+                                {% endif %}
+
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                    <span class="form-help">
+                        Only active subjects from the existing BTA subject catalogue are shown.
+                    </span>
+
+                </div>
+
+
+                <!-- TEACHER -->
+
+                <div class="form-group">
+
+                    <label class="form-label">
+                        Extra Class Teacher
+                    </label>
+
+                    <select
+                        name="teacher_id"
+                        class="form-select"
+                    >
+
+                        <option value="">
+                            -- Assign Teacher Later --
+                        </option>
+
+                        {% for teacher in teachers %}
+
+                            <option
+                                value="{{ teacher.id }}"
+                                {% if request.form.get('teacher_id') == teacher.id|string %}selected{% endif %}
+                            >
+
+                                {{ teacher.first_name }}
+                                {{ teacher.surname }}
+
+                                {% if teacher.teacher_code %}
+                                    — {{ teacher.teacher_code }}
+                                {% endif %}
+
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                    <span class="form-help">
+                        You may assign a teacher now or assign one later.
+                    </span>
+
+                </div>
+
+
+                <!-- MONTHLY FEE -->
+
+                <div class="form-group">
+
+                    <label class="form-label">
+                        Monthly Class Fee
+                        <span class="required">*</span>
+                    </label>
+
+                    <div class="fee-input-wrapper">
+
+                        <span class="fee-prefix">
+                            GH₵
+                        </span>
+
+                        <input
+                            type="number"
+                            name="monthly_fee"
+                            class="form-control fee-input"
+                            value="{{ request.form.get('monthly_fee', '') }}"
+                            min="0"
+                            step="0.01"
+                            placeholder="e.g. 150.00"
+                            required
+                        >
+
+                    </div>
+
+                    <span class="form-help">
+                        This amount will be charged monthly to students enrolled in this subject.
+                    </span>
+
+                    <div class="info-box">
+
+                        <i class="bi bi-info-circle-fill"></i>
+
+                        The monthly fee applies to every student enrolled in this
+                        Extra Class subject. Individual students will not have
+                        different fees for the same subject.
+
+                    </div>
+
+                </div>
+
+
+                <!-- ACTIONS -->
+
+                <div class="form-actions">
+
+                    <a
+                        href="{{ url_for('extra_class.subjects') }}"
+                        class="btn-cancel"
+                    >
+                        <i class="bi bi-x-circle"></i>
+                        Cancel
+                    </a>
+
+                    <button
+                        type="submit"
+                        class="btn-submit"
+                    >
+                        <i class="bi bi-check-circle"></i>
+                        Add Subject
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,1641 @@
+{% extends "extra_class_teacher_base.html" %}
+
+
+{% block title %}
+    Teacher Dashboard | BTA Extra Classes
+{% endblock %}
+
+
+{% block page_heading %}
+    Teacher Dashboard
+{% endblock %}
+
+
+{% block extra_css %}
+
+/* ============================================================
+   TEACHER DASHBOARD
+============================================================ */
+
+:root {
+    --teacher-maroon: #7f1d1d;
+    --teacher-maroon-dark: #5f1515;
+    --teacher-maroon-light: #fef2f2;
+
+    --teacher-gold: #d4a72c;
+
+    --dashboard-text: #172033;
+    --dashboard-muted: #64748b;
+    --dashboard-border: #e5e7eb;
+    --dashboard-bg: #f6f7fb;
+}
+
+
+/* ============================================================
+   DASHBOARD WRAPPER
+============================================================ */
+
+.dashboard-container {
+    max-width: 1450px;
+    margin: 0 auto;
+}
+
+
+/* ============================================================
+   WELCOME HERO
+============================================================ */
+
+.welcome-card {
+    position: relative;
+    overflow: hidden;
+
+    background:
+        linear-gradient(
+            135deg,
+            #5f1515 0%,
+            #7f1d1d 55%,
+            #991b1b 100%
+        );
+
+    color: white;
+
+    border-radius: 20px;
+
+    padding: 30px 32px;
+
+    margin-bottom: 25px;
+
+    box-shadow:
+        0 12px 30px
+        rgba(127, 29, 29, 0.18);
+}
+
+
+.welcome-card::before {
+    content: "";
+
+    position: absolute;
+
+    width: 230px;
+    height: 230px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(255, 255, 255, 0.055);
+
+    right: -70px;
+    top: -105px;
+}
+
+
+.welcome-card::after {
+    content: "";
+
+    position: absolute;
+
+    width: 130px;
+    height: 130px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(212, 167, 44, 0.10);
+
+    right: 120px;
+    bottom: -80px;
+}
+
+
+.welcome-content {
+    position: relative;
+    z-index: 2;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 25px;
+}
+
+
+.welcome-text {
+    min-width: 0;
+}
+
+
+.welcome-eyebrow {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    margin-bottom: 9px;
+
+    font-size: 10px;
+
+    font-weight: 800;
+
+    letter-spacing: 1.2px;
+
+    text-transform: uppercase;
+
+    color: #fecaca;
+}
+
+
+.welcome-card h1 {
+    margin: 0 0 8px;
+
+    font-size: 29px;
+
+    line-height: 1.2;
+
+    font-weight: 800;
+
+    color: white;
+}
+
+
+.welcome-card p {
+    margin: 0;
+
+    max-width: 650px;
+
+    color: #fee2e2;
+
+    font-size: 13px;
+
+    line-height: 1.6;
+}
+
+
+/* ============================================================
+   TEACHER IDENTITY
+============================================================ */
+
+.teacher-identity {
+    position: relative;
+
+    z-index: 2;
+
+    flex-shrink: 0;
+
+    min-width: 190px;
+
+    padding: 16px 18px;
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.15);
+
+    border-radius: 14px;
+
+    background:
+        rgba(255, 255, 255, 0.08);
+
+    backdrop-filter: blur(8px);
+}
+
+
+.identity-label {
+    color: #fecaca;
+
+    font-size: 9px;
+
+    font-weight: 700;
+
+    text-transform: uppercase;
+
+    letter-spacing: 1px;
+
+    margin-bottom: 5px;
+}
+
+
+.identity-code {
+    color: white;
+
+    font-size: 17px;
+
+    font-weight: 800;
+
+    letter-spacing: 0.5px;
+
+    margin-bottom: 9px;
+}
+
+
+.status-badge {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    padding: 5px 9px;
+
+    border-radius: 20px;
+
+    background: rgba(34, 197, 94, 0.15);
+
+    color: #bbf7d0;
+
+    font-size: 10px;
+
+    font-weight: 700;
+}
+
+
+.status-dot {
+    width: 7px;
+    height: 7px;
+
+    border-radius: 50%;
+
+    background: #4ade80;
+}
+
+
+/* ============================================================
+   SECTION HEADER
+============================================================ */
+
+.dashboard-section {
+    margin-bottom: 28px;
+}
+
+
+.section-header {
+    display: flex;
+
+    align-items: flex-end;
+
+    justify-content: space-between;
+
+    gap: 15px;
+
+    margin-bottom: 14px;
+}
+
+
+.section-heading {
+    min-width: 0;
+}
+
+
+.section-title {
+    margin: 0;
+
+    color: var(--dashboard-text);
+
+    font-size: 18px;
+
+    font-weight: 800;
+}
+
+
+.section-subtitle {
+    margin-top: 4px;
+
+    color: var(--dashboard-muted);
+
+    font-size: 11px;
+}
+
+
+.section-period {
+    color: var(--teacher-maroon);
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    white-space: nowrap;
+}
+
+
+/* ============================================================
+   STATISTICS
+============================================================ */
+
+.stats-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    gap: 16px;
+}
+
+
+.stat-card {
+    position: relative;
+
+    overflow: hidden;
+
+    background: white;
+
+    border:
+        1px solid
+        var(--dashboard-border);
+
+    border-radius: 15px;
+
+    padding: 20px;
+
+    box-shadow:
+        0 3px 12px
+        rgba(15, 23, 42, 0.04);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.stat-card:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 9px 22px
+        rgba(15, 23, 42, 0.08);
+}
+
+
+.stat-top {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 10px;
+
+    margin-bottom: 16px;
+}
+
+
+.stat-icon {
+    width: 40px;
+    height: 40px;
+
+    border-radius: 11px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 18px;
+
+    background: var(--teacher-maroon-light);
+
+    color: var(--teacher-maroon);
+}
+
+
+.stat-label {
+    color: var(--dashboard-muted);
+
+    font-size: 10px;
+
+    font-weight: 700;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.4px;
+}
+
+
+.stat-number {
+    color: var(--dashboard-text);
+
+    font-size: 24px;
+
+    line-height: 1.2;
+
+    font-weight: 800;
+
+    word-break: break-word;
+}
+
+
+.stat-description {
+    margin-top: 5px;
+
+    color: #94a3b8;
+
+    font-size: 10px;
+}
+
+
+/* ============================================================
+   CLASS GRID
+============================================================ */
+
+.class-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 18px;
+}
+
+
+.class-card {
+    position: relative;
+
+    background: white;
+
+    border:
+        1px solid
+        var(--dashboard-border);
+
+    border-radius: 16px;
+
+    padding: 21px;
+
+    box-shadow:
+        0 3px 12px
+        rgba(15, 23, 42, 0.04);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.class-card:hover {
+    transform: translateY(-3px);
+
+    box-shadow:
+        0 10px 24px
+        rgba(15, 23, 42, 0.08);
+}
+
+
+.class-card-top {
+    display: flex;
+
+    align-items: flex-start;
+
+    justify-content: space-between;
+
+    gap: 12px;
+
+    margin-bottom: 17px;
+}
+
+
+.class-icon {
+    width: 48px;
+    height: 48px;
+
+    border-radius: 13px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background:
+        var(--teacher-maroon-light);
+
+    color:
+        var(--teacher-maroon);
+
+    font-size: 21px;
+}
+
+
+.active-class {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 5px;
+
+    padding: 5px 8px;
+
+    border-radius: 20px;
+
+    background: #f0fdf4;
+
+    color: #15803d;
+
+    font-size: 9px;
+
+    font-weight: 700;
+}
+
+
+.class-card h3 {
+    margin: 0 0 5px;
+
+    color: var(--dashboard-text);
+
+    font-size: 16px;
+
+    font-weight: 800;
+}
+
+
+.class-label {
+    margin-bottom: 18px;
+
+    color: var(--dashboard-muted);
+
+    font-size: 10px;
+}
+
+
+.class-details {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, 1fr);
+
+    gap: 10px;
+
+    padding-top: 15px;
+
+    border-top:
+        1px solid
+        #f1f5f9;
+}
+
+
+.class-detail {
+    min-width: 0;
+}
+
+
+.detail-label {
+    color: #94a3b8;
+
+    font-size: 9px;
+
+    margin-bottom: 4px;
+}
+
+
+.detail-value {
+    color: var(--dashboard-text);
+
+    font-size: 13px;
+
+    font-weight: 800;
+}
+
+
+.detail-value.fee {
+    color: var(--teacher-maroon);
+}
+
+
+/* ============================================================
+   TWO COLUMN AREA
+============================================================ */
+
+.dashboard-columns {
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1.2fr)
+        minmax(0, 0.8fr);
+
+    gap: 20px;
+
+    margin-top: 25px;
+}
+
+
+.panel {
+    background: white;
+
+    border:
+        1px solid
+        var(--dashboard-border);
+
+    border-radius: 16px;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 3px 12px
+        rgba(15, 23, 42, 0.04);
+}
+
+
+.panel-header {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 15px;
+
+    padding: 18px 20px;
+
+    border-bottom:
+        1px solid
+        #f1f5f9;
+}
+
+
+.panel-title {
+    margin: 0;
+
+    color: var(--dashboard-text);
+
+    font-size: 14px;
+
+    font-weight: 800;
+}
+
+
+.panel-subtitle {
+    margin-top: 3px;
+
+    color: var(--dashboard-muted);
+
+    font-size: 10px;
+}
+
+
+.panel-body {
+    padding: 20px;
+}
+
+
+/* ============================================================
+   SEMESTER
+============================================================ */
+
+.semester-card {
+    display: flex;
+
+    align-items: center;
+
+    gap: 14px;
+
+    padding: 15px;
+
+    border-radius: 12px;
+
+    background: #fafafa;
+
+    border:
+        1px solid
+        #f1f5f9;
+
+    margin-bottom: 10px;
+}
+
+
+.semester-card:last-child {
+    margin-bottom: 0;
+}
+
+
+.semester-icon {
+    width: 42px;
+    height: 42px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 11px;
+
+    background:
+        var(--teacher-maroon-light);
+
+    color:
+        var(--teacher-maroon);
+
+    font-size: 18px;
+}
+
+
+.semester-content {
+    min-width: 0;
+}
+
+
+.semester-name {
+    color: var(--dashboard-text);
+
+    font-size: 12px;
+
+    font-weight: 800;
+
+    margin-bottom: 4px;
+}
+
+
+.semester-dates {
+    color: var(--dashboard-muted);
+
+    font-size: 10px;
+}
+
+
+.semester-status {
+    margin-left: auto;
+
+    flex-shrink: 0;
+
+    padding: 5px 8px;
+
+    border-radius: 20px;
+
+    background: #f0fdf4;
+
+    color: #15803d;
+
+    font-size: 9px;
+
+    font-weight: 700;
+}
+
+
+/* ============================================================
+   RECENT PAYMENTS
+============================================================ */
+
+.payment-list {
+    display: flex;
+
+    flex-direction: column;
+}
+
+
+.payment-item {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 13px 0;
+
+    border-bottom:
+        1px solid
+        #f1f5f9;
+}
+
+
+.payment-item:last-child {
+    border-bottom: none;
+
+    padding-bottom: 0;
+}
+
+
+.payment-icon {
+    width: 38px;
+    height: 38px;
+
+    flex-shrink: 0;
+
+    border-radius: 10px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background: #f0fdf4;
+
+    color: #15803d;
+
+    font-size: 16px;
+}
+
+
+.payment-info {
+    min-width: 0;
+
+    flex: 1;
+}
+
+
+.payment-reference {
+    color: var(--dashboard-text);
+
+    font-size: 11px;
+
+    font-weight: 800;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+}
+
+
+.payment-date {
+    color: #94a3b8;
+
+    font-size: 9px;
+
+    margin-top: 3px;
+}
+
+
+.payment-amount {
+    color: var(--teacher-maroon);
+
+    font-size: 12px;
+
+    font-weight: 800;
+
+    white-space: nowrap;
+}
+
+
+/* ============================================================
+   EMPTY STATE
+============================================================ */
+
+.empty-state {
+    padding: 32px 20px;
+
+    text-align: center;
+}
+
+
+.empty-icon {
+    width: 48px;
+    height: 48px;
+
+    margin: 0 auto 12px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background:
+        var(--teacher-maroon-light);
+
+    color:
+        var(--teacher-maroon);
+
+    font-size: 21px;
+}
+
+
+.empty-state strong {
+    display: block;
+
+    color: var(--dashboard-text);
+
+    font-size: 12px;
+
+    margin-bottom: 6px;
+}
+
+
+.empty-state span {
+    display: block;
+
+    max-width: 360px;
+
+    margin: 0 auto;
+
+    color: var(--dashboard-muted);
+
+    font-size: 10px;
+
+    line-height: 1.6;
+}
+
+
+/* ============================================================
+   RESPONSIVE — TABLET
+============================================================ */
+
+@media (max-width: 1100px) {
+
+    .stats-grid {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+
+    .class-grid {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+}
+
+
+/* ============================================================
+   RESPONSIVE — SMALL TABLET
+============================================================ */
+
+@media (max-width: 850px) {
+
+    .dashboard-columns {
+        grid-template-columns: 1fr;
+    }
+
+
+    .welcome-content {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+
+    .teacher-identity {
+        width: 100%;
+    }
+
+}
+
+
+/* ============================================================
+   RESPONSIVE — PHONE
+============================================================ */
+
+@media (max-width: 700px) {
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+
+    .class-grid {
+        grid-template-columns: 1fr;
+    }
+
+
+    .welcome-card {
+        padding: 24px;
+
+        border-radius: 16px;
+    }
+
+
+    .welcome-card h1 {
+        font-size: 23px;
+    }
+
+
+    .section-header {
+        align-items: flex-start;
+
+        flex-direction: column;
+
+        gap: 4px;
+    }
+
+
+    .section-title {
+        font-size: 16px;
+    }
+
+}
+
+
+/* ============================================================
+   RESPONSIVE — SMALL PHONE
+============================================================ */
+
+@media (max-width: 450px) {
+
+    .welcome-card {
+        padding: 20px;
+    }
+
+
+    .welcome-card h1 {
+        font-size: 21px;
+    }
+
+
+    .welcome-card p {
+        font-size: 11px;
+    }
+
+
+    .teacher-identity {
+        min-width: 0;
+    }
+
+
+    .stat-card {
+        padding: 17px;
+    }
+
+
+    .class-card {
+        padding: 18px;
+    }
+
+
+    .class-details {
+        grid-template-columns: 1fr 1fr;
+    }
+
+
+    .panel-header {
+        padding: 16px;
+    }
+
+
+    .panel-body {
+        padding: 16px;
+    }
+
+}
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="dashboard-container">
+
+    <!-- =====================================================
+         WELCOME HERO
+    ====================================================== -->
+
+    <section class="welcome-card">
+
+        <div class="welcome-content">
+
+            <div class="welcome-text">
+
+                <div class="welcome-eyebrow">
+                    <span>●</span>
+                    BTA Extra Classes Teacher Portal
+                </div>
+
+                <h1>
+                    Welcome,
+                    {{ teacher.first_name }}!
+                </h1>
+
+                <p>
+                    Manage your classes, students, fees and
+                    payments from one place.
+                </p>
+
+            </div>
+
+
+            <div class="teacher-identity">
+
+                <div class="identity-label">
+                    Teacher Code
+                </div>
+
+                <div class="identity-code">
+                    {{ teacher.teacher_code }}
+                </div>
+
+                <div class="status-badge">
+
+                    <span class="status-dot"></span>
+
+                    Active Account
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         OVERVIEW STATISTICS
+    ====================================================== -->
+
+    <section class="dashboard-section">
+
+        <div class="section-header">
+
+            <div class="section-heading">
+
+                <h2 class="section-title">
+                    Overview
+                </h2>
+
+                <div class="section-subtitle">
+                    A quick view of your Extra Classes activities.
+                </div>
+
+            </div>
+
+            <div class="section-period">
+                {{ current_month_display }}
+            </div>
+
+        </div>
+
+
+        <div class="stats-grid">
+
+
+            <!-- STUDENTS -->
+
+            <div class="stat-card">
+
+                <div class="stat-top">
+
+                    <div class="stat-label">
+                        Active Students
+                    </div>
+
+                    <div class="stat-icon">
+                        👨‍🎓
+                    </div>
+
+                </div>
+
+                <div class="stat-number">
+                    {{ total_students }}
+                </div>
+
+                <div class="stat-description">
+                    Students currently enrolled
+                </div>
+
+            </div>
+
+
+            <!-- ENROLLMENTS -->
+
+            <div class="stat-card">
+
+                <div class="stat-top">
+
+                    <div class="stat-label">
+                        Active Enrollments
+                    </div>
+
+                    <div class="stat-icon">
+                        📚
+                    </div>
+
+                </div>
+
+                <div class="stat-number">
+                    {{ active_enrollments }}
+                </div>
+
+                <div class="stat-description">
+                    Current class enrollments
+                </div>
+
+            </div>
+
+
+            <!-- MONTHLY FEES -->
+
+            <div class="stat-card">
+
+                <div class="stat-top">
+
+                    <div class="stat-label">
+                        Monthly Fees
+                    </div>
+
+                    <div class="stat-icon">
+                        💰
+                    </div>
+
+                </div>
+
+                <div class="stat-number">
+                    GH₵{{ "%.2f"|format(current_month_fees) }}
+                </div>
+
+                <div class="stat-description">
+                    Fees billed this month
+                </div>
+
+            </div>
+
+
+            <!-- OUTSTANDING -->
+
+            <div class="stat-card">
+
+                <div class="stat-top">
+
+                    <div class="stat-label">
+                        Outstanding
+                    </div>
+
+                    <div class="stat-icon">
+                        ⚠️
+                    </div>
+
+                </div>
+
+                <div class="stat-number">
+                    GH₵{{ "%.2f"|format(current_month_outstanding) }}
+                </div>
+
+                <div class="stat-description">
+                    Unpaid amount this month
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         MY CLASSES
+    ====================================================== -->
+
+    <section class="dashboard-section">
+
+        <div class="section-header">
+
+            <div class="section-heading">
+
+                <h2 class="section-title">
+                    My Classes
+                </h2>
+
+                <div class="section-subtitle">
+                    Subjects assigned to your teacher account.
+                </div>
+
+            </div>
+
+            <div class="section-period">
+                {{ assigned_subjects|length }}
+                {{ 'Class' if assigned_subjects|length == 1 else 'Classes' }}
+            </div>
+
+        </div>
+
+
+        {% if assigned_subjects %}
+
+        <div class="class-grid">
+
+            {% for extra_subject in assigned_subjects %}
+
+            <div class="class-card">
+
+                <div class="class-card-top">
+
+                    <div class="class-icon">
+                        📚
+                    </div>
+
+                    <div class="active-class">
+                        <span>●</span>
+                        Active
+                    </div>
+
+                </div>
+
+
+                <h3>
+                    {{ extra_subject.subject.name }}
+                </h3>
+
+
+                <div class="class-label">
+                    Extra Classes Subject
+                </div>
+
+
+                <div class="class-details">
+
+                    <div class="class-detail">
+
+                        <div class="detail-label">
+                            Monthly Fee
+                        </div>
+
+                        <div class="detail-value fee">
+                            GH₵{{ "%.2f"|format(
+                                extra_subject.monthly_fee
+                            ) }}
+                        </div>
+
+                    </div>
+
+
+                    <div class="class-detail">
+
+                        <div class="detail-label">
+                            Students
+                        </div>
+
+                        {% set class_summary = namespace(count=0) %}
+
+                        {% for summary in class_summaries %}
+
+                            {% if summary.subject.id == extra_subject.id %}
+
+                                {% set class_summary.count = summary.student_count %}
+
+                            {% endif %}
+
+                        {% endfor %}
+
+                        <div class="detail-value">
+                            {{ class_summary.count }}
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+
+        {% else %}
+
+        <div class="panel">
+
+            <div class="empty-state">
+
+                <div class="empty-icon">
+                    📚
+                </div>
+
+                <strong>
+                    No classes assigned yet
+                </strong>
+
+                <span>
+                    Your Extra Classes subjects will appear
+                    here once a subject has been assigned
+                    to your teacher account.
+                </span>
+
+            </div>
+
+        </div>
+
+        {% endif %}
+
+    </section>
+
+
+    <!-- =====================================================
+         SEMESTERS + RECENT PAYMENTS
+    ====================================================== -->
+
+    <div class="dashboard-columns">
+
+
+        <!-- =================================================
+             CURRENT SEMESTERS
+        ================================================== -->
+
+        <section class="panel">
+
+            <div class="panel-header">
+
+                <div>
+
+                    <h2 class="panel-title">
+                        Current Semesters
+                    </h2>
+
+                    <div class="panel-subtitle">
+                        Active semester periods for your classes.
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="panel-body">
+
+                {% if active_semesters %}
+
+                    {% for semester in active_semesters %}
+
+                    <div class="semester-card">
+
+                        <div class="semester-icon">
+                            📅
+                        </div>
+
+
+                        <div class="semester-content">
+
+                            <div class="semester-name">
+                                {{ semester.name }}
+                            </div>
+
+                            <div class="semester-dates">
+
+                                {{ semester.start_date.strftime('%d %b %Y') }}
+
+                                &nbsp;—&nbsp;
+
+                                {{ semester.end_date.strftime('%d %b %Y') }}
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="semester-status">
+                            Active
+                        </div>
+
+                    </div>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <div class="empty-state">
+
+                        <div class="empty-icon">
+                            📅
+                        </div>
+
+                        <strong>
+                            No active semester
+                        </strong>
+
+                        <span>
+                            There is currently no active semester
+                            covering today's date.
+                        </span>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             RECENT PAYMENTS
+        ================================================== -->
+
+        <section class="panel">
+
+            <div class="panel-header">
+
+                <div>
+
+                    <h2 class="panel-title">
+                        Recent Payments
+                    </h2>
+
+                    <div class="panel-subtitle">
+                        Latest successful payment activity.
+                    </div>
+
+                </div>
+
+                <div class="section-period">
+                    {{ successful_payment_count }}
+                </div>
+
+            </div>
+
+
+            <div class="panel-body">
+
+                {% if recent_payments %}
+
+                <div class="payment-list">
+
+                    {% for payment in recent_payments %}
+
+                    <div class="payment-item">
+
+                        <div class="payment-icon">
+                            ✓
+                        </div>
+
+
+                        <div class="payment-info">
+
+                            <div class="payment-reference">
+
+                                {% if payment.reference %}
+                                    {{ payment.reference }}
+                                {% elif payment.transaction_reference %}
+                                    {{ payment.transaction_reference }}
+                                {% else %}
+                                    Payment #{{ payment.id }}
+                                {% endif %}
+
+                            </div>
+
+
+                            <div class="payment-date">
+
+                                {% if payment.created_at %}
+
+                                    {{ payment.created_at.strftime(
+                                        '%d %b %Y'
+                                    ) }}
+
+                                {% else %}
+
+                                    Payment recorded
+
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="payment-amount">
+
+                            {% if payment.amount %}
+
+                                GH₵{{ "%.2f"|format(
+                                    payment.amount
+                                ) }}
+
+                            {% else %}
+
+                                Paid
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                    {% endfor %}
+
+                </div>
+
+
+                {% else %}
+
+                <div class="empty-state">
+
+                    <div class="empty-icon">
+                        💳
+                    </div>
+
+                    <strong>
+                        No payments yet
+                    </strong>
+
+                    <span>
+                        Successful payments for your classes
+                        will appear here.
+                    </span>
+
+                </div>
+
+                {% endif %}
+
+            </div>
+
+        </section>
+
+
+    </div>
+
+</div>
+
+{% endblock %}

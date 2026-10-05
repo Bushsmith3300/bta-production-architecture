@@ -11,6 +11,10 @@ from app.admin.dashboard_super_admin import super_admin_bp
 from app.admin.users_management import users_management_bp
 from app.admin.admin_management import admin_management_bp 
 from app.admin.questions_management import questions_bp
+from app.admin.extra_class_management import extra_class_bp
+from app.routes.extra_class_auth import extra_class_auth_bp
+from app.routes.extra_class_teacher import extra_class_teacher_bp
+from app.routes.extra_class_payment import extra_class_payment_bp
 
 
 def create_app():
@@ -32,6 +36,10 @@ def create_app():
     app.register_blueprint(users_management_bp)  
     app.register_blueprint(admin_management_bp) 
     app.register_blueprint(questions_bp)
+    app.register_blueprint(extra_class_bp)
+    app.register_blueprint(extra_class_auth_bp)
+    app.register_blueprint(extra_class_teacher_bp)
+    app.register_blueprint(extra_class_payment_bp)
 
 
     return app

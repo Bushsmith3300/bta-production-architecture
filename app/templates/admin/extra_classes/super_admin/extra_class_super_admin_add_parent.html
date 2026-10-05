@@ -1,0 +1,126 @@
+{% extends "admin/extra_classes/super_admin/extra_class_super_admin_base.html" %}
+
+{% block title %}Add Parent{% endblock %}
+
+{% block page_title %}Add Parent{% endblock %}
+
+{% block page_subtitle %}
+Register a new parent or guardian
+{% endblock %}
+
+{% block header_heading %}
+Add Parent
+{% endblock %}
+
+{% block header_description %}
+Enter the parent's details below to create a new parent record.
+{% endblock %}
+
+{% block page_actions %}
+<a href="{{ url_for('extra_class.super_admin_parents') }}"
+   class="btn btn-light">
+    <i class="bi bi-arrow-left"></i>
+    Back to Parents
+</a>
+{% endblock %}
+
+{% block content %}
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-4">
+
+        <form method="POST"
+              action="{{ url_for('extra_class.super_admin_add_parent') }}">
+
+            {{ form.csrf_token if form is defined else "" }}
+
+            {% if csrf_token is defined %}
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            {% endif %}
+
+            <div class="row g-4">
+
+                <!-- First Name -->
+                <div class="col-md-6">
+                    <label for="first_name" class="form-label fw-semibold">
+                        First Name
+                    </label>
+
+                    <input type="text"
+                           class="form-control"
+                           id="first_name"
+                           name="first_name"
+                           value="{{ request.form.get('first_name', '') }}"
+                           placeholder="Enter first name"
+                           required>
+                </div>
+
+                <!-- Surname -->
+                <div class="col-md-6">
+                    <label for="surname" class="form-label fw-semibold">
+                        Surname
+                    </label>
+
+                    <input type="text"
+                           class="form-control"
+                           id="surname"
+                           name="surname"
+                           value="{{ request.form.get('surname', '') }}"
+                           placeholder="Enter surname"
+                           required>
+                </div>
+
+                <!-- Phone -->
+                <div class="col-md-6">
+                    <label for="phone" class="form-label fw-semibold">
+                        Phone Number
+                    </label>
+
+                    <input type="tel"
+                           class="form-control"
+                           id="phone"
+                           name="phone"
+                           value="{{ request.form.get('phone', '') }}"
+                           placeholder="e.g. 024XXXXXXX"
+                           required>
+                </div>
+
+                <!-- Email -->
+                <div class="col-md-6">
+                    <label for="email" class="form-label fw-semibold">
+                        Email Address
+                    </label>
+
+                    <input type="email"
+                           class="form-control"
+                           id="email"
+                           name="email"
+                           value="{{ request.form.get('email', '') }}"
+                           placeholder="Enter email address">
+                </div>
+
+            </div>
+
+            <hr class="my-4">
+
+            <div class="d-flex justify-content-end gap-2">
+
+                <a href="{{ url_for('extra_class.super_admin_parents') }}"
+                   class="btn btn-outline-secondary">
+                    Cancel
+                </a>
+
+                <button type="submit"
+                        class="btn btn-primary">
+                    <i class="bi bi-person-plus"></i>
+                    Save Parent
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+{% endblock %}

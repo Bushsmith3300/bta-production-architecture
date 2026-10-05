@@ -1,0 +1,1469 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        {% block title %}
+            BTA Extra Classes Teacher Portal
+        {% endblock %}
+    </title>
+
+
+    <style>
+
+        /* =================================================
+           ROOT VARIABLES
+        ================================================= */
+
+        :root {
+
+            --primary: #7f1d1d;
+            --primary-dark: #5f1515;
+            --primary-light: #fef2f2;
+
+            --maroon: #7f1d1d;
+            --maroon-dark: #5f1515;
+            --maroon-deep: #450a0a;
+            --maroon-light: #fef2f2;
+
+            --gold: #d4a72c;
+            --gold-light: #fef3c7;
+
+            --text: #172033;
+            --muted: #64748b;
+            --border: #e5e7eb;
+
+            --sidebar: #4a0d0d;
+            --sidebar-dark: #350909;
+            --sidebar-hover: #691717;
+            --sidebar-active: #8f2525;
+            --sidebar-text: #f8dede;
+
+            --white: #ffffff;
+            --background: #f6f7fb;
+
+        }
+
+
+        /* =================================================
+           GLOBAL RESET
+        ================================================= */
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+
+        html,
+        body {
+            min-height: 100%;
+        }
+
+
+        body {
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            background: var(--background);
+
+            color: var(--text);
+
+        }
+
+
+        /* =================================================
+           SIDEBAR
+        ================================================= */
+
+        .sidebar {
+
+            position: fixed;
+
+            top: 0;
+            left: 0;
+            bottom: 0;
+
+            width: 260px;
+
+            background:
+                linear-gradient(
+                    180deg,
+                    var(--sidebar) 0%,
+                    var(--sidebar-dark) 100%
+                );
+
+            color: var(--sidebar-text);
+
+            display: flex;
+            flex-direction: column;
+
+            overflow: hidden;
+
+            z-index: 1000;
+
+            transition:
+                transform 0.3s ease;
+
+            box-shadow:
+                5px 0 20px
+                rgba(69, 10, 10, 0.18);
+
+        }
+
+
+        /* =================================================
+           LOGO
+        ================================================= */
+
+        .logo {
+
+            display: flex;
+            align-items: center;
+
+            gap: 12px;
+
+            padding: 22px 20px;
+
+            flex-shrink: 0;
+
+            border-bottom:
+                1px solid
+                rgba(255, 255, 255, 0.07);
+
+        }
+
+
+        .logo-box {
+
+            width: 43px;
+            height: 43px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 11px;
+
+            background: #ffffff;
+
+            color: var(--maroon);
+
+            font-weight: 900;
+            font-size: 15px;
+
+            box-shadow:
+                0 4px 12px
+                rgba(0, 0, 0, 0.15);
+
+        }
+
+
+        .logo-text {
+
+            color: white;
+
+            font-size: 14px;
+            font-weight: 800;
+
+            letter-spacing: 0.2px;
+
+        }
+
+
+        .portal-label {
+
+            color: #e8b7b7;
+
+            font-size: 9px;
+
+            margin-top: 3px;
+
+            letter-spacing: 1px;
+
+            font-weight: 600;
+
+        }
+
+
+        /* =================================================
+           NAVIGATION SECTION TITLE
+        ================================================= */
+
+        .nav-section {
+
+            padding: 18px 20px 8px;
+
+            color: #c98f8f;
+
+            font-size: 9px;
+
+            text-transform: uppercase;
+
+            letter-spacing: 1.2px;
+
+            font-weight: 700;
+
+            flex-shrink: 0;
+
+        }
+
+
+        /* =================================================
+           SCROLLABLE NAVIGATION
+        ================================================= */
+
+        .sidebar-navigation {
+
+            flex: 1;
+
+            min-height: 0;
+
+            overflow-y: auto;
+            overflow-x: hidden;
+
+            padding-bottom: 10px;
+
+        }
+
+
+        .sidebar-navigation::-webkit-scrollbar {
+            width: 5px;
+        }
+
+
+        .sidebar-navigation::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+
+        .sidebar-navigation::-webkit-scrollbar-thumb {
+
+            background:
+                rgba(255, 255, 255, 0.18);
+
+            border-radius: 10px;
+
+        }
+
+
+        .sidebar-navigation::-webkit-scrollbar-thumb:hover {
+
+            background:
+                rgba(255, 255, 255, 0.28);
+
+        }
+
+
+        /* =================================================
+           NAVIGATION LINKS
+        ================================================= */
+
+        .nav-link {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+
+            margin: 4px 12px;
+
+            padding: 12px 14px;
+
+            border-radius: 9px;
+
+            color: var(--sidebar-text);
+
+            text-decoration: none;
+
+            font-size: 12px;
+
+            font-weight: 600;
+
+            transition:
+                background 0.2s ease,
+                color 0.2s ease,
+                transform 0.2s ease;
+
+        }
+
+
+        .nav-link:hover {
+
+            background: var(--sidebar-hover);
+
+            color: white;
+
+            transform: translateX(2px);
+
+        }
+
+
+        .nav-link.active {
+
+            background: var(--sidebar-active);
+
+            color: white;
+
+            box-shadow:
+                inset 3px 0 0
+                #f5c2c2;
+
+        }
+
+
+        .nav-icon {
+
+            width: 20px;
+
+            text-align: center;
+
+            font-size: 15px;
+
+            flex-shrink: 0;
+
+        }
+
+
+        /* =================================================
+           SIDEBAR BOTTOM
+           SIGN OUT
+        ================================================= */
+
+        .sidebar-bottom {
+
+            flex-shrink: 0;
+
+            margin-top: auto;
+
+            padding: 15px 12px;
+
+            border-top:
+                1px solid
+                rgba(255, 255, 255, 0.08);
+
+            background:
+                rgba(0, 0, 0, 0.08);
+
+        }
+
+
+        .logout {
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            width: 100%;
+
+            min-height: 44px;
+
+            padding: 11px 14px;
+
+            border-radius: 9px;
+
+            background:
+                rgba(255, 255, 255, 0.07);
+
+            color: #f8dede;
+
+            border:
+                1px solid
+                rgba(255, 255, 255, 0.06);
+
+            text-decoration: none;
+
+            font-size: 12px;
+
+            font-weight: 700;
+
+            transition:
+                background 0.2s ease,
+                color 0.2s ease,
+                border-color 0.2s ease;
+
+        }
+
+
+        .logout:hover {
+
+            background:
+                rgba(239, 68, 68, 0.18);
+
+            color: #fecaca;
+
+            border-color:
+                rgba(248, 113, 113, 0.2);
+
+        }
+
+
+        /* =================================================
+           SIDEBAR CLOSE BUTTON
+        ================================================= */
+
+        .sidebar-close {
+
+            display: none;
+
+            position: absolute;
+
+            top: 16px;
+            right: 15px;
+
+            width: 34px;
+            height: 34px;
+
+            border: none;
+
+            border-radius: 8px;
+
+            background:
+                rgba(255, 255, 255, 0.08);
+
+            color: white;
+
+            font-size: 20px;
+
+            cursor: pointer;
+
+            align-items: center;
+            justify-content: center;
+
+            z-index: 5;
+
+        }
+
+
+        .sidebar-close:hover {
+
+            background:
+                rgba(255, 255, 255, 0.16);
+
+        }
+
+
+        /* =================================================
+           MAIN AREA
+        ================================================= */
+
+        .main {
+
+            min-height: 100vh;
+
+            margin-left: 260px;
+
+            display: flex;
+
+            flex-direction: column;
+
+        }
+
+
+        /* =================================================
+           TOP BAR
+        ================================================= */
+
+        .topbar {
+
+            min-height: 70px;
+
+            padding: 0 25px;
+
+            background: white;
+
+            border-bottom:
+                1px solid
+                var(--border);
+
+            display: flex;
+
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 15px;
+
+            box-shadow:
+                0 2px 8px
+                rgba(15, 23, 42, 0.025);
+
+        }
+
+
+        .topbar-left {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+
+            min-width: 0;
+
+        }
+
+
+        .topbar-title {
+
+            position: relative;
+
+            padding-left: 12px;
+
+            font-size: 17px;
+
+            font-weight: 800;
+
+            color: var(--text);
+
+            white-space: nowrap;
+
+            overflow: hidden;
+
+            text-overflow: ellipsis;
+
+        }
+
+
+        .topbar-title::before {
+
+            content: "";
+
+            position: absolute;
+
+            left: 0;
+
+            top: 3px;
+            bottom: 3px;
+
+            width: 3px;
+
+            border-radius: 4px;
+
+            background: var(--maroon);
+
+        }
+
+
+        /* =================================================
+           TEACHER INFORMATION
+        ================================================= */
+
+        .teacher-info {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 10px;
+
+            flex-shrink: 0;
+
+        }
+
+
+        .avatar {
+
+            width: 40px;
+            height: 40px;
+
+            border-radius: 50%;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            background: var(--maroon-light);
+
+            color: var(--maroon);
+
+            border:
+                1px solid
+                #fecaca;
+
+            font-weight: 800;
+
+            box-shadow:
+                0 3px 8px
+                rgba(127, 29, 29, 0.08);
+
+        }
+
+
+        .teacher-name {
+
+            font-size: 12px;
+
+            font-weight: 700;
+
+            color: var(--text);
+
+        }
+
+
+        .teacher-code {
+
+            font-size: 9px;
+
+            color: var(--muted);
+
+            margin-top: 2px;
+
+        }
+
+
+        /* =================================================
+           MOBILE MENU BUTTON
+        ================================================= */
+
+        .mobile-menu-btn {
+
+            display: none;
+
+            width: 42px;
+            height: 42px;
+
+            border: none;
+
+            border-radius: 9px;
+
+            background: var(--maroon);
+
+            color: white;
+
+            font-size: 22px;
+
+            cursor: pointer;
+
+            align-items: center;
+            justify-content: center;
+
+            flex-shrink: 0;
+
+            box-shadow:
+                0 4px 10px
+                rgba(127, 29, 29, 0.15);
+
+        }
+
+
+        .mobile-menu-btn:hover {
+
+            background: var(--maroon-dark);
+
+        }
+
+
+        /* =================================================
+           MOBILE OVERLAY
+        ================================================= */
+
+        .sidebar-overlay {
+
+            display: none;
+
+            position: fixed;
+
+            inset: 0;
+
+            background:
+                rgba(45, 5, 5, 0.55);
+
+            z-index: 999;
+
+            opacity: 0;
+
+            transition:
+                opacity 0.3s ease;
+
+        }
+
+
+        .sidebar-overlay.show {
+
+            display: block;
+
+            opacity: 1;
+
+        }
+
+
+        /* =================================================
+           CONTENT
+        ================================================= */
+
+        .content {
+
+            flex: 1;
+
+            padding: 30px;
+
+        }
+
+
+        /* =================================================
+           FOOTER
+        ================================================= */
+
+        .dashboard-footer {
+
+            min-height: 58px;
+
+            padding: 15px 25px;
+
+            background: var(--sidebar-dark);
+
+            color:
+                rgba(255, 255, 255, 0.78);
+
+            display: flex;
+
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 15px;
+
+            font-size: 10px;
+
+            border-top:
+                1px solid
+                rgba(255, 255, 255, 0.06);
+
+        }
+
+
+        .footer-brand {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 7px;
+
+        }
+
+
+        .footer-brand strong {
+
+            color: white;
+
+            font-size: 11px;
+
+        }
+
+
+        .footer-divider {
+
+            color:
+                rgba(255, 255, 255, 0.35);
+
+        }
+
+
+        .footer-developer {
+
+            color:
+                rgba(255, 255, 255, 0.82);
+
+            font-size: 10px;
+
+        }
+
+
+        .footer-developer strong {
+
+            color: #f5c2c2;
+
+        }
+
+
+        .footer-links {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 15px;
+
+        }
+
+
+        .footer-links a {
+
+            color:
+                rgba(255, 255, 255, 0.78);
+
+            text-decoration: none;
+
+        }
+
+
+        .footer-links a:hover {
+
+            color: white;
+
+        }
+
+
+        /* =================================================
+           PAGE-SPECIFIC CSS
+        ================================================= */
+
+        {% block extra_css %}
+        {% endblock %}
+
+
+        /* =================================================
+           TABLET
+        ================================================= */
+
+        @media (max-width: 900px) {
+
+            .content {
+                padding: 25px;
+            }
+
+        }
+
+
+        /* =================================================
+           PHONE + TABLET
+        ================================================= */
+
+        @media (max-width: 700px) {
+
+            .sidebar {
+
+                display: flex;
+
+                transform: translateX(-100%);
+
+                width: 280px;
+
+                box-shadow:
+                    8px 0 25px
+                    rgba(69, 10, 10, 0.30);
+
+            }
+
+
+            .sidebar.open {
+
+                transform: translateX(0);
+
+            }
+
+
+            .sidebar-close {
+
+                display: flex;
+
+            }
+
+
+            .main {
+
+                margin-left: 0;
+
+            }
+
+
+            .mobile-menu-btn {
+
+                display: flex;
+
+            }
+
+
+            .content {
+
+                padding: 20px;
+
+            }
+
+
+            .topbar {
+
+                min-height: 64px;
+
+                padding: 0 15px;
+
+            }
+
+
+            .topbar-title {
+
+                font-size: 15px;
+
+            }
+
+
+            .dashboard-footer {
+
+                flex-direction: column;
+
+                justify-content: center;
+
+                text-align: center;
+
+                gap: 12px;
+
+            }
+
+
+            .footer-brand,
+            .footer-links {
+
+                justify-content: center;
+
+                text-align: center;
+
+                flex-wrap: wrap;
+
+            }
+
+        }
+
+
+        /* =================================================
+           SMALL PHONE
+        ================================================= */
+
+        @media (max-width: 450px) {
+
+            .topbar {
+
+                padding: 0 12px;
+
+            }
+
+
+            .topbar-title {
+
+                font-size: 14px;
+
+            }
+
+
+            .topbar-left {
+
+                gap: 9px;
+
+            }
+
+
+            .mobile-menu-btn {
+
+                width: 40px;
+
+                height: 40px;
+
+                font-size: 21px;
+
+            }
+
+
+            .teacher-name,
+            .teacher-code {
+
+                display: none;
+
+            }
+
+
+            .footer-divider {
+
+                display: none;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- =================================================
+         SIDEBAR
+    ================================================= -->
+
+    <aside
+        class="sidebar"
+        id="teacherSidebar"
+    >
+
+
+        <!-- =================================================
+             LOGO
+        ================================================= -->
+
+        <div class="logo">
+
+            <div class="logo-box">
+                BTA
+            </div>
+
+
+            <div>
+
+                <div class="logo-text">
+                    Extra Classes
+                </div>
+
+
+                <div class="portal-label">
+                    TEACHER PORTAL
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             CLOSE BUTTON
+        ================================================= -->
+
+        <button
+            type="button"
+            class="sidebar-close"
+            onclick="closeTeacherSidebar()"
+            aria-label="Close navigation"
+        >
+            ×
+        </button>
+
+
+        <!-- =================================================
+             NAVIGATION TITLE
+        ================================================= -->
+
+        <div class="nav-section">
+            Main
+        </div>
+
+
+        <!-- =================================================
+             SCROLLABLE NAVIGATION
+        ================================================= -->
+
+        <div class="sidebar-navigation">
+
+            <!-- DASHBOARD -->
+            <a
+                href="{{ url_for('extra_class_teacher.teacher_dashboard') }}"
+                class="nav-link {% if request.endpoint == 'extra_class_teacher.teacher_dashboard' %}active{% endif %}"
+            >
+                <span class="nav-icon">⌂</span>
+                <span>Dashboard</span>
+            </a>
+
+            <!-- MY CLASS -->
+            <a
+                href="{{ url_for('extra_class_teacher.teacher_my_class') }}"
+                class="nav-link {% if request.endpoint in ['extra_class_teacher.teacher_my_class', 'extra_class_teacher.manage_class'] %}active{% endif %}"
+            >
+                <span class="nav-icon">📚</span>
+                <span>My Class</span>
+            </a>
+
+            <!-- MY STUDENTS -->
+            <a
+                href="{{ url_for('extra_class_teacher.teacher_my_students') }}"
+                class="nav-link {% if request.endpoint in ['extra_class_teacher.teacher_my_students', 'extra_class_teacher.class_students', 'extra_class_teacher.view_class_student'] %}active{% endif %}"
+            >
+                <span class="nav-icon">👨‍🎓</span>
+                <span>My Students</span>
+            </a>
+
+            <!-- SEMESTER -->
+            <a
+                href="{{ url_for('extra_class_teacher.teacher_semester') }}"
+                class="nav-link {% if request.endpoint == 'extra_class_teacher.teacher_semester' %}active{% endif %}"
+            >
+                <span class="nav-icon">📅</span>
+                <span>Semester</span>
+            </a>
+
+            <!-- FEES & PAYMENTS -->
+            <a
+                href="{{ url_for('extra_class_teacher.teacher_fees_payments') }}"
+                class="nav-link {% if request.endpoint in ['extra_class_teacher.teacher_fees_payments', 'extra_class_teacher.class_fees', 'extra_class_teacher.class_payments'] %}active{% endif %}"
+            >
+                <span class="nav-icon">💰</span>
+                <span>Fees &amp; Payments</span>
+            </a>
+
+            <!-- FINANCIAL REPORTS -->
+            <a
+                href="{{ url_for('extra_class_teacher.teacher_financial_reports') }}"
+                class="nav-link {% if request.endpoint == 'extra_class_teacher.teacher_financial_reports' %}active{% endif %}"
+            >
+                <span class="nav-icon">📊</span>
+                <span>Financial Reports</span>
+            </a>
+
+        </div>
+
+
+
+        <!-- =================================================
+             SIGN OUT
+        ================================================= -->
+
+        <div class="sidebar-bottom">
+
+            <a
+                href="{{ url_for('extra_class_auth.teacher_logout') }}"
+                class="logout"
+            >
+
+                Sign Out
+
+            </a>
+
+        </div>
+
+
+    </aside>
+
+
+    <!-- =================================================
+         MOBILE OVERLAY
+    ================================================= -->
+
+    <div
+        id="teacherSidebarOverlay"
+        class="sidebar-overlay"
+        onclick="closeTeacherSidebar()"
+    ></div>
+
+
+    <!-- =================================================
+         MAIN AREA
+    ================================================= -->
+
+    <main class="main">
+
+
+        <!-- =================================================
+             TOP BAR
+        ================================================= -->
+
+        <header class="topbar">
+
+
+            <div class="topbar-left">
+
+
+                <!-- =================================================
+                     MOBILE MENU BUTTON
+                ================================================= -->
+
+                <button
+                    type="button"
+                    class="mobile-menu-btn"
+                    onclick="toggleTeacherSidebar()"
+                    aria-label="Open navigation"
+                    aria-controls="teacherSidebar"
+                    aria-expanded="false"
+                    id="mobileMenuButton"
+                >
+
+                    ☰
+
+                </button>
+
+
+                <!-- =================================================
+                     PAGE TITLE
+                ================================================= -->
+
+                <div class="topbar-title">
+
+                    {% block page_heading %}
+
+                        Teacher Portal
+
+                    {% endblock %}
+
+                </div>
+
+
+            </div>
+
+
+            <!-- =================================================
+                 TEACHER INFORMATION
+            ================================================= -->
+
+            <div class="teacher-info">
+
+                {% if teacher %}
+
+                    <div class="avatar">
+
+                        {{ teacher.first_name[0] | upper }}
+
+                    </div>
+
+
+                    <div>
+
+                        <div class="teacher-name">
+
+                            {{ teacher.first_name }}
+                            {{ teacher.surname }}
+
+                        </div>
+
+
+                        <div class="teacher-code">
+
+                            {{ teacher.teacher_code }}
+
+                        </div>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+
+        </header>
+
+
+        <!-- =================================================
+             PAGE CONTENT
+        ================================================= -->
+
+        <section class="content">
+
+            {% block content %}
+            {% endblock %}
+
+        </section>
+
+
+        <!-- =================================================
+             FOOTER
+        ================================================= -->
+
+        <footer class="dashboard-footer">
+
+
+            <div class="footer-brand">
+
+                <strong>
+                    BTA
+                </strong>
+
+
+                <span class="footer-divider">
+                    |
+                </span>
+
+
+                <span>
+                    Extra Classes Payment System
+                </span>
+
+            </div>
+
+
+            <div class="footer-developer">
+
+                Developed by
+
+                <strong>
+                    Bush Software Inc.
+                </strong>
+
+            </div>
+
+
+            <div class="footer-links">
+
+                <span>
+                    Teacher Portal
+                </span>
+
+            </div>
+
+
+        </footer>
+
+
+    </main>
+
+
+    <!-- =================================================
+         JAVASCRIPT
+    ================================================= -->
+
+    <script>
+
+        function toggleTeacherSidebar() {
+
+            const sidebar =
+                document.getElementById(
+                    "teacherSidebar"
+                );
+
+            const overlay =
+                document.getElementById(
+                    "teacherSidebarOverlay"
+                );
+
+            const menuButton =
+                document.getElementById(
+                    "mobileMenuButton"
+                );
+
+
+            sidebar.classList.toggle("open");
+
+            overlay.classList.toggle("show");
+
+
+            const isOpen =
+                sidebar.classList.contains("open");
+
+
+            menuButton.setAttribute(
+                "aria-expanded",
+                isOpen ? "true" : "false"
+            );
+
+        }
+
+
+        function closeTeacherSidebar() {
+
+            const sidebar =
+                document.getElementById(
+                    "teacherSidebar"
+                );
+
+            const overlay =
+                document.getElementById(
+                    "teacherSidebarOverlay"
+                );
+
+            const menuButton =
+                document.getElementById(
+                    "mobileMenuButton"
+                );
+
+
+            sidebar.classList.remove("open");
+
+            overlay.classList.remove("show");
+
+
+            if (menuButton) {
+
+                menuButton.setAttribute(
+                    "aria-expanded",
+                    "false"
+                );
+
+            }
+
+        }
+
+
+        /*
+         * Close sidebar after selecting
+         * a navigation link on mobile.
+         */
+
+        document
+            .querySelectorAll(
+                ".sidebar .nav-link"
+            )
+            .forEach(function(link) {
+
+                link.addEventListener(
+                    "click",
+                    function() {
+
+                        if (
+                            window.innerWidth <= 700
+                        ) {
+
+                            closeTeacherSidebar();
+
+                        }
+
+                    }
+                );
+
+            });
+
+
+        /*
+         * Close sidebar when switching
+         * back to desktop size.
+         */
+
+        window.addEventListener(
+            "resize",
+            function() {
+
+                if (
+                    window.innerWidth > 700
+                ) {
+
+                    closeTeacherSidebar();
+
+                }
+
+            }
+        );
+
+
+        /*
+         * Close sidebar when ESC is pressed.
+         */
+
+        document.addEventListener(
+            "keydown",
+            function(event) {
+
+                if (
+                    event.key === "Escape"
+                ) {
+
+                    closeTeacherSidebar();
+
+                }
+
+            }
+        );
+
+    </script>
+
+
+</body>
+
+</html>

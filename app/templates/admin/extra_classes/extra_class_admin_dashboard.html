@@ -1,0 +1,1249 @@
+{% extends "admin/extra_classes/extra_class_admin_base.html" %}
+
+{% block title %}Extra Classes Dashboard | BTA{% endblock %}
+
+{% block page_title %}
+Extra Classes Dashboard
+{% endblock %}
+
+{% block page_subtitle %}
+Monitor students, parents, enrolments, fees and payments.
+{% endblock %}
+
+{% block page_actions %}
+<div class="month-badge">
+    <i class="bi bi-calendar3 me-1"></i>
+    {{ current_month if current_month is defined else "Current Month" }}
+</div>
+{% endblock %}
+
+
+{% block extra_css %}
+
+<style>
+
+    /* =========================================================
+       DASHBOARD
+       ========================================================= */
+
+    .dashboard-container {
+        width: 100%;
+    }
+
+
+    /* =========================================================
+       STAT CARDS
+       ========================================================= */
+
+    .stat-card {
+        border: none;
+        border-radius: 18px;
+        padding: 22px;
+        height: 100%;
+        background: #ffffff;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
+        transition: all 0.25s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.10);
+    }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 21px;
+        margin-bottom: 15px;
+    }
+
+    .stat-title {
+        font-size: 13px;
+        color: #6c757d;
+        margin-bottom: 5px;
+        font-weight: 500;
+    }
+
+    .stat-value {
+        font-size: 27px;
+        font-weight: 700;
+        color: #102a43;
+        margin-bottom: 0;
+    }
+
+
+    /* =========================================================
+       STAT COLORS
+       ========================================================= */
+
+    .students-icon {
+        background: #e8f0ff;
+        color: #155eef;
+    }
+
+    .parents-icon {
+        background: #eafaf1;
+        color: #198754;
+    }
+
+    .enrolments-icon {
+        background: #fff4e5;
+        color: #f08c00;
+    }
+
+    .fees-icon {
+        background: #f3e8ff;
+        color: #7b2cbf;
+    }
+
+    .payment-icon {
+        background: #e8fff8;
+        color: #00897b;
+    }
+
+    .outstanding-icon {
+        background: #fff0f0;
+        color: #dc3545;
+    }
+
+
+    /* =========================================================
+       SECTION CARD
+       ========================================================= */
+
+    .dashboard-card {
+        background: #ffffff;
+        border-radius: 18px;
+        border: none;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
+        overflow: hidden;
+        height: 100%;
+    }
+
+    .dashboard-card-header {
+        padding: 20px 22px;
+        border-bottom: 1px solid #edf0f5;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .dashboard-card-title {
+        margin: 0;
+        font-size: 17px;
+        font-weight: 700;
+        color: #102a43;
+    }
+
+    .dashboard-card-body {
+        padding: 22px;
+    }
+
+
+    /* =========================================================
+       QUICK ACTIONS
+       ========================================================= */
+
+    .quick-action {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        text-decoration: none;
+        color: #102a43;
+        padding: 14px;
+        border-radius: 13px;
+        background: #f8faff;
+        margin-bottom: 10px;
+        transition: all 0.2s ease;
+    }
+
+    .quick-action:hover {
+        background: #edf3ff;
+        color: #0d47a1;
+        transform: translateX(3px);
+    }
+
+    .quick-action-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 11px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #e8f0ff;
+        color: #155eef;
+        font-size: 18px;
+        flex-shrink: 0;
+    }
+
+    .quick-action-text strong {
+        display: block;
+        font-size: 14px;
+        margin-bottom: 2px;
+    }
+
+    .quick-action-text span {
+        display: block;
+        font-size: 12px;
+        color: #7a869a;
+    }
+
+
+    /* =========================================================
+       FEE SUMMARY
+       ========================================================= */
+
+    .fee-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 13px 0;
+        border-bottom: 1px solid #edf0f5;
+    }
+
+    .fee-row:last-child {
+        border-bottom: none;
+    }
+
+    .fee-label {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 13px;
+        color: #4f5d73;
+    }
+
+    .fee-count {
+        font-weight: 700;
+        color: #102a43;
+    }
+
+    .fee-dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    .dot-unpaid {
+        background: #dc3545;
+    }
+
+    .dot-partial {
+        background: #f0ad4e;
+    }
+
+    .dot-paid {
+        background: #198754;
+    }
+
+    .dot-overdue {
+        background: #7b2cbf;
+    }
+
+
+    /* =========================================================
+       PAYMENT TABLE
+       ========================================================= */
+
+    .payment-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .payment-table th {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: #7a869a;
+        font-weight: 600;
+        padding: 10px 8px;
+        border-bottom: 1px solid #edf0f5;
+    }
+
+    .payment-table td {
+        padding: 13px 8px;
+        border-bottom: 1px solid #f0f2f6;
+        font-size: 13px;
+        vertical-align: middle;
+    }
+
+    .payment-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .payment-reference {
+        font-weight: 600;
+        color: #155eef;
+    }
+
+    .payment-amount {
+        font-weight: 700;
+        color: #102a43;
+    }
+
+
+    /* =========================================================
+       STATUS BADGES
+       ========================================================= */
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 5px 9px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+    .status-success {
+        background: #e8f7ef;
+        color: #198754;
+    }
+
+    .status-pending {
+        background: #fff5df;
+        color: #b26a00;
+    }
+
+    .status-failed {
+        background: #ffe9e9;
+        color: #dc3545;
+    }
+
+    .status-cancelled {
+        background: #eef0f3;
+        color: #6c757d;
+    }
+
+
+    /* =========================================================
+       RECENT STUDENTS
+       ========================================================= */
+
+    .student-item {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        padding: 12px 0;
+        border-bottom: 1px solid #edf0f5;
+    }
+
+    .student-item:last-child {
+        border-bottom: none;
+    }
+
+    .student-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #e8f0ff;
+        color: #155eef;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 14px;
+        flex-shrink: 0;
+    }
+
+    .student-info {
+        min-width: 0;
+    }
+
+    .student-name {
+        font-size: 14px;
+        font-weight: 600;
+        color: #102a43;
+        margin-bottom: 2px;
+    }
+
+    .student-code {
+        font-size: 11px;
+        color: #7a869a;
+    }
+
+
+    /* =========================================================
+       EMPTY STATE
+       ========================================================= */
+
+    .empty-state {
+        text-align: center;
+        padding: 30px 15px;
+        color: #8a94a6;
+    }
+
+    .empty-state i {
+        font-size: 32px;
+        margin-bottom: 10px;
+        display: block;
+    }
+
+    .empty-state p {
+        margin: 0;
+        font-size: 13px;
+    }
+
+
+    /* =========================================================
+       RESPONSIVE
+       ========================================================= */
+
+    @media (max-width: 768px) {
+
+        .stat-card {
+            padding: 18px;
+        }
+
+        .stat-value {
+            font-size: 23px;
+        }
+
+        .dashboard-card-header {
+            padding: 16px;
+        }
+
+        .dashboard-card-body {
+            padding: 16px;
+        }
+
+        .payment-table {
+            min-width: 650px;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+    }
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="dashboard-container">
+
+    <!-- =====================================================
+         STATISTICS
+         ===================================================== -->
+
+    <div class="row g-4 mb-4">
+
+        <!-- Students -->
+        <div class="col-xl-3 col-md-6">
+
+            <div class="stat-card">
+
+                <div class="stat-icon students-icon">
+                    <i class="bi bi-mortarboard-fill"></i>
+                </div>
+
+                <div class="stat-title">
+                    Total Students in Extra Class
+                </div>
+
+                <div class="stat-value">
+                    {{ total_students }}
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Parents -->
+        <div class="col-xl-3 col-md-6">
+
+            <div class="stat-card">
+
+                <div class="stat-icon parents-icon">
+                    <i class="bi bi-people-fill"></i>
+                </div>
+
+                <div class="stat-title">
+                    Total Parents
+                </div>
+
+                <div class="stat-value">
+                    {{ total_parents }}
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Enrolments -->
+        <div class="col-xl-3 col-md-6">
+
+            <div class="stat-card">
+
+                <div class="stat-icon enrolments-icon">
+                    <i class="bi bi-journal-check"></i>
+                </div>
+
+                <div class="stat-title">
+                    Active Enrolments
+                </div>
+
+                <div class="stat-value">
+                    {{ active_enrollments }}
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+    <!-- =====================================================
+         FINANCIAL STATISTICS
+         ===================================================== -->
+
+    <div class="row g-4 mb-4">
+
+        <!-- Current Month Fees -->
+        <div class="col-xl-4 col-md-6">
+
+            <div class="stat-card">
+
+                <div class="stat-icon fees-icon">
+                    <i class="bi bi-receipt-cutoff"></i>
+                </div>
+
+                <div class="stat-title">
+                    Current Month Fees
+                </div>
+
+                <div class="stat-value">
+                    GH₵ {{ "%.2f"|format(current_month_fees or 0) }}
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Payments Received -->
+        <div class="col-xl-4 col-md-6">
+
+            <div class="stat-card">
+
+                <div class="stat-icon payment-icon">
+                    <i class="bi bi-cash-stack"></i>
+                </div>
+
+                <div class="stat-title">
+                    Payments Received
+                </div>
+
+                <div class="stat-value">
+                    GH₵ {{ "%.2f"|format(payments_received or 0) }}
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Outstanding -->
+        <div class="col-xl-4 col-md-6">
+
+            <div class="stat-card">
+
+                <div class="stat-icon outstanding-icon">
+                    <i class="bi bi-exclamation-circle-fill"></i>
+                </div>
+
+                <div class="stat-title">
+                    Outstanding Fees
+                </div>
+
+                <div class="stat-value">
+                    GH₵ {{ "%.2f"|format(total_outstanding or 0) }}
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         QUICK ACTIONS + FEE SUMMARY
+         ===================================================== -->
+
+    <div class="row g-4 mb-4">
+
+        <!-- Quick Actions -->
+        <div class="col-xl-5">
+
+            <div class="dashboard-card">
+
+                <div class="dashboard-card-header">
+
+                    <h5 class="dashboard-card-title">
+                        Quick Actions
+                    </h5>
+
+                </div>
+
+
+                <div class="dashboard-card-body">
+
+                    <a
+                        href="{{ url_for('extra_class.students') }}"
+                        class="quick-action"
+                    >
+
+                        <div class="quick-action-icon">
+                            <i class="bi bi-person-plus-fill"></i>
+                        </div>
+
+                        <div class="quick-action-text">
+
+                            <strong>
+                                Manage Students
+                            </strong>
+
+                            <span>
+                                Add, edit and manage extra class students.
+                            </span>
+
+                        </div>
+
+                    </a>
+
+
+                    <a
+                        href="{{ url_for('extra_class.parents') }}"
+                        class="quick-action"
+                    >
+
+                        <div class="quick-action-icon">
+                            <i class="bi bi-people-fill"></i>
+                        </div>
+
+                        <div class="quick-action-text">
+
+                            <strong>
+                                Manage Parents
+                            </strong>
+
+                            <span>
+                                Manage parents and student relationships.
+                            </span>
+
+                        </div>
+
+                    </a>
+
+
+                    <a
+                        href="{{ url_for('extra_class.enrollments') }}"
+                        class="quick-action"
+                    >
+
+                        <div class="quick-action-icon">
+                            <i class="bi bi-journal-check"></i>
+                        </div>
+
+                        <div class="quick-action-text">
+
+                            <strong>
+                                Manage Enrolments
+                            </strong>
+
+                            <span>
+                                Enrol students into extra classes.
+                            </span>
+
+                        </div>
+
+                    </a>
+
+
+                    <a
+                        href="{{ url_for('extra_class.fees') }}"
+                        class="quick-action"
+                    >
+
+                        <div class="quick-action-icon">
+                            <i class="bi bi-receipt"></i>
+                        </div>
+
+                        <div class="quick-action-text">
+
+                            <strong>
+                                Monthly Fees
+                            </strong>
+
+                            <span>
+                                View and manage monthly student fees.
+                            </span>
+
+                        </div>
+
+                    </a>
+
+
+                    <a
+                        href="{{ url_for('extra_class.payments') }}"
+                        class="quick-action"
+                    >
+
+                        <div class="quick-action-icon">
+                            <i class="bi bi-credit-card-fill"></i>
+                        </div>
+
+                        <div class="quick-action-text">
+
+                            <strong>
+                                Payments
+                            </strong>
+
+                            <span>
+                                View payments and transaction records.
+                            </span>
+
+                        </div>
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Fee Summary -->
+        <div class="col-xl-7">
+
+            <div class="dashboard-card">
+
+                <div class="dashboard-card-header">
+
+                    <h5 class="dashboard-card-title">
+                        Current Month Fee Summary
+                    </h5>
+
+                </div>
+
+
+                <div class="dashboard-card-body">
+
+                    <div class="fee-row">
+
+                        <div class="fee-label">
+                            <span class="fee-dot dot-unpaid"></span>
+                            Unpaid
+                        </div>
+
+                        <div class="fee-count">
+                            {{ unpaid_fee_count }}
+                        </div>
+
+                    </div>
+
+
+                    <div class="fee-row">
+
+                        <div class="fee-label">
+                            <span class="fee-dot dot-partial"></span>
+                            Partial
+                        </div>
+
+                        <div class="fee-count">
+                            {{ partial_fee_count }}
+                        </div>
+
+                    </div>
+
+
+                    <div class="fee-row">
+
+                        <div class="fee-label">
+                            <span class="fee-dot dot-paid"></span>
+                            Paid
+                        </div>
+
+                        <div class="fee-count">
+                            {{ paid_fee_count }}
+                        </div>
+
+                    </div>
+
+
+                    <div class="fee-row">
+
+                        <div class="fee-label">
+                            <span class="fee-dot dot-overdue"></span>
+                            Overdue
+                        </div>
+
+                        <div class="fee-count">
+                            {{ overdue_fee_count }}
+                        </div>
+
+                    </div>
+
+
+                    <div class="mt-4 p-3 rounded-3 bg-light">
+
+                        <div class="d-flex justify-content-between mb-2">
+
+                            <span class="text-muted small">
+                                Total Fees
+                            </span>
+
+                            <strong>
+                                GH₵ {{ "%.2f"|format(current_month_fees or 0) }}
+                            </strong>
+
+                        </div>
+
+
+                        <div class="d-flex justify-content-between">
+
+                            <span class="text-muted small">
+                                Outstanding
+                            </span>
+
+                            <strong class="text-danger">
+                                GH₵ {{ "%.2f"|format(total_outstanding or 0) }}
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         RECENT PAYMENTS
+         ===================================================== -->
+
+    <div class="row g-4 mb-4">
+
+        <div class="col-12">
+
+            <div class="dashboard-card">
+
+                <div class="dashboard-card-header">
+
+                    <h5 class="dashboard-card-title">
+                        Recent Payments
+                    </h5>
+
+                    <a
+                        href="{{ url_for('extra_class.payments') }}"
+                        class="btn btn-sm btn-outline-primary"
+                    >
+                        View All
+                    </a>
+
+                </div>
+
+
+                <div class="dashboard-card-body">
+
+                    {% if recent_payments %}
+
+                    <div class="table-responsive">
+
+                        <table class="payment-table">
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>
+                                        Reference
+                                    </th>
+
+                                    <th>
+                                        Student
+                                    </th>
+
+                                    <th>
+                                        Parent
+                                    </th>
+
+                                    <th>
+                                        Amount
+                                    </th>
+
+                                    <th>
+                                        Method
+                                    </th>
+
+                                    <th>
+                                        Status
+                                    </th>
+
+                                    <th>
+                                        Date
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody>
+
+                                {% for payment in recent_payments %}
+
+                                <tr>
+
+                                    <td>
+
+                                        <span class="payment-reference">
+                                            {{ payment.payment_reference }}
+                                        </span>
+
+                                    </td>
+
+
+                                    <td>
+
+                                        {% if payment.student %}
+
+                                            {{ payment.student.first_name }}
+                                            {{ payment.student.surname }}
+
+                                        {% else %}
+
+                                            —
+
+                                        {% endif %}
+
+                                    </td>
+
+
+                                    <td>
+
+                                        {% if payment.parent %}
+
+                                            {{ payment.parent.first_name }}
+                                            {{ payment.parent.surname }}
+
+                                        {% else %}
+
+                                            —
+
+                                        {% endif %}
+
+                                    </td>
+
+
+                                    <td>
+
+                                        <span class="payment-amount">
+
+                                            GH₵
+                                            {{ "%.2f"|format(payment.amount or 0) }}
+
+                                        </span>
+
+                                    </td>
+
+
+                                    <td>
+
+                                        {{ payment.payment_method
+                                           |replace('_', ' ')
+                                           |title
+                                           if payment.payment_method
+                                           else "—" }}
+
+                                    </td>
+
+
+                                    <td>
+
+                                        {% if payment.status == "SUCCESS" %}
+
+                                            <span class="status-badge status-success">
+                                                <i class="bi bi-check-circle me-1"></i>
+                                                Successful
+                                            </span>
+
+                                        {% elif payment.status == "PENDING" %}
+
+                                            <span class="status-badge status-pending">
+                                                <i class="bi bi-clock me-1"></i>
+                                                Pending
+                                            </span>
+
+                                        {% elif payment.status == "FAILED" %}
+
+                                            <span class="status-badge status-failed">
+                                                <i class="bi bi-x-circle me-1"></i>
+                                                Failed
+                                            </span>
+
+                                        {% elif payment.status == "CANCELLED" %}
+
+                                            <span class="status-badge status-cancelled">
+                                                <i class="bi bi-dash-circle me-1"></i>
+                                                Cancelled
+                                            </span>
+
+                                        {% else %}
+
+                                            <span class="status-badge status-pending">
+                                                {{ payment.status }}
+                                            </span>
+
+                                        {% endif %}
+
+                                    </td>
+
+
+                                    <td>
+
+                                        {% if payment.created_at %}
+
+                                            {{ payment.created_at.strftime("%d %b %Y") }}
+
+                                        {% else %}
+
+                                            —
+
+                                        {% endif %}
+
+                                    </td>
+
+                                </tr>
+
+                                {% endfor %}
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                    {% else %}
+
+                        <div class="empty-state">
+
+                            <i class="bi bi-credit-card"></i>
+
+                            <p>
+                                No payment records yet.
+                            </p>
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         RECENT STUDENTS
+         ===================================================== -->
+
+    <div class="row g-4">
+
+        <div class="col-xl-6">
+
+            <div class="dashboard-card">
+
+                <div class="dashboard-card-header">
+
+                    <h5 class="dashboard-card-title">
+                        Recent Students
+                    </h5>
+
+                    <a
+                        href="{{ url_for('extra_class.students') }}"
+                        class="btn btn-sm btn-outline-primary"
+                    >
+                        View All
+                    </a>
+
+                </div>
+
+
+                <div class="dashboard-card-body">
+
+                    {% if recent_students %}
+
+                        {% for student in recent_students %}
+
+                        <div class="student-item">
+
+                            <div class="student-avatar">
+
+                                {{ student.first_name[:1]|upper }}
+
+                            </div>
+
+
+                            <div class="student-info">
+
+                                <div class="student-name">
+
+                                    {{ student.first_name }}
+                                    {{ student.surname }}
+
+                                </div>
+
+                                <div class="student-code">
+
+                                    {{ student.student_code }}
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        {% endfor %}
+
+                    {% else %}
+
+                        <div class="empty-state">
+
+                            <i class="bi bi-mortarboard"></i>
+
+                            <p>
+                                No students have been added yet.
+                            </p>
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- System Overview -->
+        <div class="col-xl-6">
+
+            <div class="dashboard-card">
+
+                <div class="dashboard-card-header">
+
+                    <h5 class="dashboard-card-title">
+                        Payment Overview
+                    </h5>
+
+                </div>
+
+
+                <div class="dashboard-card-body">
+
+                    <div class="fee-row">
+
+                        <div class="fee-label">
+
+                            <i class="bi bi-check-circle-fill text-success"></i>
+
+                            Successful Payments
+
+                        </div>
+
+                        <div class="fee-count">
+
+                            {{ successful_payment_count }}
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="fee-row">
+
+                        <div class="fee-label">
+
+                            <i class="bi bi-clock-fill text-warning"></i>
+
+                            Pending Payments
+
+                        </div>
+
+                        <div class="fee-count">
+
+                            {{ pending_payments }}
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="fee-row">
+
+                        <div class="fee-label">
+
+                            <i class="bi bi-x-circle-fill text-danger"></i>
+
+                            Failed Payments
+
+                        </div>
+
+                        <div class="fee-count">
+
+                            {{ failed_payment_count }}
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="mt-4">
+
+                        <a
+                            href="{{ url_for('extra_class.payments') }}"
+                            class="btn btn-primary w-100"
+                        >
+
+                            <i class="bi bi-credit-card me-1"></i>
+
+                            Manage Payments
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

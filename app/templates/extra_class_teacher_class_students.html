@@ -1,0 +1,919 @@
+{% extends "extra_class_teacher_base.html" %}
+
+{% block title %}Class Students{% endblock %}
+
+{% block extra_css %}
+
+.students-header {
+    margin-bottom: 28px;
+}
+
+.students-header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.students-header-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.students-header h1 {
+    margin: 0 0 8px;
+    font-size: 30px;
+    font-weight: 800;
+    color: var(--text);
+}
+
+.students-header p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 15px;
+}
+
+.back-link,
+.add-student-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 10px 15px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+    transition: 0.2s ease;
+}
+
+.back-link {
+    background: var(--white);
+    border: 1px solid var(--border);
+    color: var(--maroon);
+}
+
+.back-link:hover {
+    background: var(--primary-light);
+}
+
+.add-student-btn {
+    background: var(--maroon);
+    color: white;
+    border: 1px solid var(--maroon);
+}
+
+.add-student-btn:hover {
+    background: var(--maroon-dark);
+    border-color: var(--maroon-dark);
+    transform: translateY(-1px);
+}
+
+.class-banner {
+    margin-bottom: 24px;
+    padding: 22px 24px;
+    border-radius: 18px;
+    background: linear-gradient(
+        135deg,
+        var(--maroon),
+        var(--maroon-dark)
+    );
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.class-banner::after {
+    content: "";
+    position: absolute;
+    width: 160px;
+    height: 160px;
+    right: -55px;
+    top: -70px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.class-banner-content {
+    position: relative;
+    z-index: 1;
+}
+
+.class-banner-label {
+    display: inline-block;
+    margin-bottom: 7px;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: rgba(255,255,255,0.72);
+}
+
+.class-banner h2 {
+    margin: 0 0 5px;
+    font-size: 25px;
+    font-weight: 800;
+}
+
+.class-banner p {
+    margin: 0;
+    color: rgba(255,255,255,0.78);
+    font-size: 13px;
+}
+
+.students-panel {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    box-shadow: 0 8px 24px rgba(15,23,42,0.06);
+    overflow: hidden;
+}
+
+.panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 20px 22px;
+    border-bottom: 1px solid var(--border);
+}
+
+.panel-header h2 {
+    margin: 0 0 5px;
+    color: var(--text);
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.panel-header p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.panel-header-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.student-count {
+    padding: 6px 11px;
+    border-radius: 20px;
+    background: var(--primary-light);
+    color: var(--maroon);
+    font-size: 12px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.students-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 720px;
+}
+
+.students-table th {
+    padding: 14px 18px;
+    background: #fafafa;
+    border-bottom: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.students-table td {
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    font-size: 13px;
+    vertical-align: middle;
+}
+
+.students-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.students-table tbody tr:hover {
+    background: #fffafa;
+}
+
+.student-info {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+}
+
+.student-avatar {
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--primary-light);
+    color: var(--maroon);
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.student-name {
+    font-weight: 800;
+    color: var(--text);
+}
+
+.student-code {
+    margin-top: 3px;
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.status-badge.active {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.status-badge.inactive {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+.status-dot-small {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.view-student-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: var(--primary-light);
+    color: var(--maroon);
+    border: 1px solid #fecaca;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.view-student-btn:hover {
+    background: #fee2e2;
+}
+
+.reactivate-student-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: #fff7ed;
+    color: #9a3412;
+    border: 1px solid #fed7aa;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.reactivate-student-btn:hover {
+    background: #ffedd5;
+}
+
+.empty-state {
+    padding: 55px 25px;
+    text-align: center;
+}
+
+.empty-icon {
+    width: 62px;
+    height: 62px;
+    margin: 0 auto 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--primary-light);
+    font-size: 27px;
+}
+
+.empty-state h3 {
+    margin: 0 0 7px;
+    color: var(--text);
+    font-size: 17px;
+    font-weight: 800;
+}
+
+.empty-state p {
+    max-width: 450px;
+    margin: 0 auto;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+@media (max-width: 700px) {
+
+    .students-header-top {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .students-header-actions {
+        width: 100%;
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .students-header-actions .add-student-btn,
+    .students-header-actions .back-link {
+        width: 100%;
+    }
+
+    .students-header h1 {
+        font-size: 26px;
+    }
+
+    .class-banner {
+        padding: 20px;
+    }
+
+    .class-banner h2 {
+        font-size: 22px;
+    }
+
+    .panel-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .panel-header-actions {
+        width: 100%;
+        align-items: flex-start;
+    }
+}
+
+@media (max-width: 450px) {
+
+    .students-header h1 {
+        font-size: 23px;
+    }
+
+    .class-banner {
+        padding: 18px;
+    }
+
+    .class-banner h2 {
+        font-size: 20px;
+    }
+}
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="students-header">
+
+    <div class="students-header-top">
+
+        <div>
+
+            <h1>Extra Class Students</h1>
+
+            <p>
+                Students currently enrolled in your
+                {{ extra_subject.subject.name }} class.
+            </p>
+
+        </div>
+
+        <div class="students-header-actions">
+
+            <a
+                href="{{ url_for(
+                    'extra_class_teacher.add_class_student',
+                    class_id=extra_subject.id
+                ) }}"
+                class="add-student-btn"
+            >
+                + Add Student
+            </a>
+
+            <a
+                href="{{ url_for(
+                    'extra_class_teacher.manage_class',
+                    class_id=extra_subject.id
+                ) }}"
+                class="back-link"
+            >
+                ← Back to Manage Class
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- CLASS BANNER -->
+
+<div class="class-banner">
+
+    <div class="class-banner-content">
+
+        <span class="class-banner-label">
+            Your Extra Class
+        </span>
+
+        <h2>
+            {{ extra_subject.subject.name }}
+        </h2>
+
+        <p>
+            Teacher Code:
+            {{ teacher.teacher_code }}
+        </p>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     ACTIVE STUDENTS
+     ========================================================= -->
+
+<div class="students-panel">
+
+    <div class="panel-header">
+
+        <div>
+
+            <h2>Enrolled Students</h2>
+
+            <p>
+                Active students currently assigned
+                to this class.
+            </p>
+
+        </div>
+
+        <span class="student-count">
+
+            {{ students|length }}
+
+            {% if students|length == 1 %}
+                Student
+            {% else %}
+                Students
+            {% endif %}
+
+        </span>
+
+    </div>
+
+
+    {% if students %}
+
+        <div class="table-wrapper">
+
+            <table class="students-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Student</th>
+                        <th>Enrollment Date</th>
+                        <th>Semester</th>
+                        <th>Status</th>
+                        <th>Action</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for item in students %}
+
+                        {% set student = item.student %}
+                        {% set enrollment = item.enrollment %}
+
+                        <tr>
+
+                            <td>
+
+                                <div class="student-info">
+
+                                    <div class="student-avatar">
+
+                                        {% if student.first_name %}
+
+                                            {{ student.first_name[0]|upper }}
+
+                                        {% else %}
+
+                                            S
+
+                                        {% endif %}
+
+                                    </div>
+
+
+                                    <div>
+
+                                        <div class="student-name">
+
+                                            {{ student.first_name }}
+
+                                            {% if student.other_name %}
+                                                {{ student.other_name }}
+                                            {% endif %}
+
+                                            {{ student.surname }}
+
+                                        </div>
+
+
+                                        {% if student.student_code %}
+
+                                            <div class="student-code">
+                                                {{ student.student_code }}
+                                            </div>
+
+                                        {% endif %}
+
+                                    </div>
+
+                                </div>
+
+                            </td>
+
+
+                            <td>
+
+                                {% if enrollment.created_at %}
+
+                                    {{ enrollment.created_at.strftime("%d %b %Y") }}
+
+                                {% else %}
+
+                                    —
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <td>
+
+                                {% if enrollment.term %}
+
+                                    {{ enrollment.term.name }}
+
+                                {% else %}
+
+                                    —
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <td>
+
+                                <span class="status-badge active">
+
+                                    <span class="status-dot-small"></span>
+
+                                    Active
+
+                                </span>
+
+                            </td>
+
+
+                            <td>
+
+                                <a
+                                    href="{{ url_for(
+                                        'extra_class_teacher.view_class_student',
+                                        class_id=extra_subject.id,
+                                        student_id=student.id
+                                    ) }}"
+                                    class="view-student-btn"
+                                >
+                                    👁 View
+                                </a>
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+    {% else %}
+
+        <div class="empty-state">
+
+            <div class="empty-icon">
+                👨‍🎓
+            </div>
+
+            <h3>
+                No Students Yet
+            </h3>
+
+            <p>
+                There are currently no active students
+                enrolled in this class. Click
+                <strong>+ Add Student</strong> above
+                to add your first student.
+            </p>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+
+<!-- =========================================================
+     INACTIVE STUDENTS
+     ========================================================= -->
+
+<div
+    class="students-panel"
+    style="margin-top: 24px;"
+>
+
+    <div class="panel-header">
+
+        <div>
+
+            <h2>
+                Inactive Students
+            </h2>
+
+            <p>
+                Students previously enrolled in this class
+                but currently inactive.
+            </p>
+
+        </div>
+
+
+        <span class="student-count">
+
+            {{ inactive_students|length }}
+
+            {% if inactive_students|length == 1 %}
+                Student
+            {% else %}
+                Students
+            {% endif %}
+
+        </span>
+
+    </div>
+
+
+    {% if inactive_students %}
+
+        <div class="table-wrapper">
+
+            <table class="students-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Student</th>
+                        <th>Enrollment Date</th>
+                        <th>Semester</th>
+                        <th>Status</th>
+                        <th>Action</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for item in inactive_students %}
+
+                        {% set student = item.student %}
+                        {% set enrollment = item.enrollment %}
+
+
+                        <tr>
+
+                            <td>
+
+                                <div class="student-info">
+
+                                    <div class="student-avatar">
+
+                                        {% if student.first_name %}
+
+                                            {{ student.first_name[0]|upper }}
+
+                                        {% else %}
+
+                                            S
+
+                                        {% endif %}
+
+                                    </div>
+
+
+                                    <div>
+
+                                        <div class="student-name">
+
+                                            {{ student.first_name }}
+
+                                            {% if student.other_name %}
+
+                                                {{ student.other_name }}
+
+                                            {% endif %}
+
+                                            {{ student.surname }}
+
+                                        </div>
+
+
+                                        {% if student.student_code %}
+
+                                            <div class="student-code">
+                                                {{ student.student_code }}
+                                            </div>
+
+                                        {% endif %}
+
+                                    </div>
+
+                                </div>
+
+                            </td>
+
+
+                            <td>
+
+                                {% if enrollment.start_date %}
+
+                                    {{ enrollment.start_date.strftime("%d %b %Y") }}
+
+                                {% elif enrollment.created_at %}
+
+                                    {{ enrollment.created_at.strftime("%d %b %Y") }}
+
+                                {% else %}
+
+                                    —
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <td>
+
+                                {% if enrollment.term %}
+
+                                    {{ enrollment.term.name }}
+
+                                {% else %}
+
+                                    —
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <td>
+
+                                <span class="status-badge inactive">
+
+                                    <span class="status-dot-small"></span>
+
+                                    Inactive
+
+                                </span>
+
+                            </td>
+
+
+                            <td>
+
+                                <div
+                                    style="
+                                        display: flex;
+                                        gap: 8px;
+                                        flex-wrap: wrap;
+                                    "
+                                >
+
+                                    <a
+                                        href="{{ url_for(
+                                            'extra_class_teacher.view_class_student',
+                                            class_id=extra_subject.id,
+                                            student_id=student.id
+                                        ) }}"
+                                        class="view-student-btn"
+                                    >
+                                        👁 View
+                                    </a>
+
+
+                                    <a
+                                        href="{{ url_for(
+                                            'extra_class_teacher.reactivate_class_student',
+                                            class_id=extra_subject.id,
+                                            student_id=student.id
+                                        ) }}"
+                                        class="reactivate-student-btn"
+                                    >
+                                        ↻ Reactivate
+                                    </a>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+    {% else %}
+
+        <div class="empty-state">
+
+            <div class="empty-icon">
+                📋
+            </div>
+
+            <h3>
+                No Inactive Students
+            </h3>
+
+            <p>
+                There are currently no inactive students
+                in this class.
+            </p>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

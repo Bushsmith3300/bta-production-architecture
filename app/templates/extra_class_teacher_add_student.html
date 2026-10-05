@@ -1,0 +1,2097 @@
+{% extends "extra_class_teacher_base.html" %}
+
+{% block title %}Add Student to My Class{% endblock %}
+
+
+{% block extra_css %}
+
+/* =========================================================
+   ADD STUDENT PAGE
+   Matches BTA Extra Classes Teacher Portal
+   ========================================================= */
+
+.add-student-page {
+    max-width: 1050px;
+    margin: 0 auto;
+    padding-bottom: 40px;
+}
+
+
+/* =========================================================
+   REGISTRATION PROGRESS
+   ========================================================= */
+
+.registration-progress {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 5px auto 30px;
+    max-width: 720px;
+}
+
+.progress-step {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.progress-circle {
+    width: 36px;
+    height: 36px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.progress-step.active .progress-circle {
+    background: var(--maroon);
+    color: var(--white);
+
+    box-shadow:
+        0 4px 12px rgba(127, 29, 29, 0.22);
+}
+
+.progress-step.upcoming .progress-circle {
+    background: var(--white);
+
+    border: 1px solid var(--border);
+
+    color: var(--muted);
+}
+
+.progress-label {
+    color: var(--muted);
+
+    font-size: 12px;
+    font-weight: 700;
+
+    white-space: nowrap;
+}
+
+.progress-step.active .progress-label {
+    color: var(--maroon);
+}
+
+.progress-line {
+    width: 75px;
+    height: 2px;
+
+    margin: 0 14px;
+
+    background: var(--border);
+}
+
+
+/* =========================================================
+   PAGE HEADER
+   ========================================================= */
+
+.page-header {
+    margin-bottom: 25px;
+}
+
+.page-header h1 {
+    margin: 0 0 7px;
+
+    color: var(--text);
+
+    font-size: 28px;
+    font-weight: 800;
+}
+
+.page-header p {
+    margin: 0;
+
+    color: var(--muted);
+
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   CLASS CONTEXT
+   ========================================================= */
+
+.class-context {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    margin-bottom: 22px;
+
+    flex-wrap: wrap;
+}
+
+.context-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+
+    padding: 8px 13px;
+
+    background: var(--white);
+
+    border: 1px solid var(--border);
+
+    border-radius: 9px;
+
+    color: var(--maroon);
+
+    font-size: 12px;
+    font-weight: 800;
+
+    box-shadow:
+        0 2px 7px rgba(15, 23, 42, 0.03);
+}
+
+.context-separator {
+    color: #a0a8b5;
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   MAIN FORM CARD
+   ========================================================= */
+
+.student-form-card {
+    background: var(--white);
+
+    border: 1px solid var(--border);
+
+    border-radius: 18px;
+
+    box-shadow:
+        0 8px 24px rgba(15, 23, 42, 0.06);
+
+    overflow: hidden;
+}
+
+
+/* =========================================================
+   CARD INTRODUCTION
+   ========================================================= */
+
+.card-intro {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+
+    padding: 23px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #fff7f7,
+            #ffffff
+        );
+
+    border-bottom: 1px solid var(--border);
+}
+
+.card-intro-icon {
+    width: 44px;
+    height: 44px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: var(--primary-light);
+
+    border: 1px solid #fecaca;
+
+    border-radius: 11px;
+
+    color: var(--maroon);
+
+    font-size: 20px;
+}
+
+.card-intro h2 {
+    margin: 0 0 5px;
+
+    color: var(--text);
+
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.card-intro p {
+    margin: 0;
+
+    color: var(--muted);
+
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   FORM BODY
+   ========================================================= */
+
+.form-body {
+    padding: 25px;
+}
+
+
+/* =========================================================
+   FORM SECTION
+   ========================================================= */
+
+.form-section {
+    margin-bottom: 28px;
+}
+
+.section-heading {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    margin-bottom: 17px;
+}
+
+.section-heading-icon {
+    width: 34px;
+    height: 34px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: var(--primary-light);
+
+    border: 1px solid #fecaca;
+
+    border-radius: 9px;
+
+    color: var(--maroon);
+
+    font-size: 15px;
+}
+
+.section-heading h2 {
+    margin: 0;
+
+    color: var(--text);
+
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.section-heading p {
+    margin: 3px 0 0;
+
+    color: var(--muted);
+
+    font-size: 11px;
+}
+
+
+/* =========================================================
+   FORM GRID
+   ========================================================= */
+
+.form-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 18px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-label {
+    margin-bottom: 7px;
+
+    color: var(--text);
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.form-label .optional {
+    color: #94a3b8;
+
+    font-size: 10px;
+    font-weight: 500;
+}
+
+.form-control {
+    width: 100%;
+
+    box-sizing: border-box;
+
+    min-height: 46px;
+
+    padding: 11px 13px;
+
+    background: var(--white);
+
+    border: 1px solid #d7dce3;
+
+    border-radius: 9px;
+
+    outline: none;
+
+    color: var(--text);
+
+    font-family: inherit;
+    font-size: 13px;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+}
+
+.form-control::placeholder {
+    color: #a3acb9;
+}
+
+.form-control:hover {
+    border-color: #b8c0cb;
+}
+
+.form-control:focus {
+    background: var(--white);
+
+    border-color: var(--maroon);
+
+    box-shadow:
+        0 0 0 3px rgba(127, 29, 29, 0.08);
+}
+
+
+/* =========================================================
+   SYSTEM NOTE
+   ========================================================= */
+
+.system-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+
+    margin-top: 5px;
+    margin-bottom: 25px;
+
+    padding: 14px 16px;
+
+    background: #f8fafc;
+
+    border: 1px solid var(--border);
+
+    border-left: 4px solid var(--maroon);
+
+    border-radius: 9px;
+}
+
+.system-note-icon {
+    flex-shrink: 0;
+
+    color: var(--maroon);
+
+    font-size: 16px;
+}
+
+.system-note p {
+    margin: 0;
+
+    color: var(--muted);
+
+    font-size: 11px;
+    line-height: 1.65;
+}
+
+.system-note strong {
+    color: var(--text);
+}
+
+
+/* =========================================================
+   SUBMIT AREA
+   ========================================================= */
+
+.submit-area {
+    display: flex;
+    justify-content: flex-end;
+
+    margin-top: 25px;
+    padding-top: 20px;
+
+    border-top: 1px solid var(--border);
+}
+
+.btn-add-student {
+    min-height: 45px;
+
+    padding: 11px 21px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--maroon),
+            var(--maroon-dark)
+        );
+
+    border: none;
+
+    border-radius: 9px;
+
+    color: var(--white);
+
+    font-family: inherit;
+
+    font-size: 12px;
+    font-weight: 800;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 5px 15px rgba(127, 29, 29, 0.16);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        opacity 0.2s ease;
+}
+
+.btn-add-student:hover {
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 7px 18px rgba(127, 29, 29, 0.23);
+}
+
+.btn-add-student:active {
+    transform: translateY(0);
+}
+
+
+/* =========================================================
+   RESULT AREA
+   ========================================================= */
+
+.result-area {
+    margin-top: 22px;
+}
+
+
+/* =========================================================
+   RESULT CARD
+   ========================================================= */
+
+.result-card {
+    background: var(--white);
+
+    border: 1px solid var(--border);
+
+    border-radius: 16px;
+
+    padding: 22px;
+
+    box-shadow:
+        0 7px 20px rgba(15, 23, 42, 0.05);
+}
+
+.result-card.existing {
+    border-top: 3px solid #15803d;
+}
+
+.result-card.new {
+    border-top: 3px solid var(--maroon);
+}
+
+.result-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+
+    margin-bottom: 17px;
+}
+
+.result-icon {
+    width: 40px;
+    height: 40px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 10px;
+
+    font-size: 18px;
+}
+
+.result-card.existing .result-icon {
+    background: #ecfdf3;
+
+    color: #15803d;
+}
+
+.result-card.new .result-icon {
+    background: var(--primary-light);
+
+    color: var(--maroon);
+}
+
+.result-header h3 {
+    margin: 0 0 5px;
+
+    color: var(--text);
+
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.result-header p {
+    margin: 0;
+
+    color: var(--muted);
+
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   MATCHED STUDENT
+   ========================================================= */
+
+.matched-student {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 18px;
+
+    padding: 15px;
+
+    background: #f8fafc;
+
+    border: 1px solid var(--border);
+
+    border-radius: 10px;
+}
+
+.matched-student-info {
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+}
+
+.matched-avatar {
+    width: 42px;
+    height: 42px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: var(--primary-light);
+
+    border-radius: 10px;
+
+    color: var(--maroon);
+
+    font-size: 17px;
+}
+
+.matched-name {
+    margin: 0 0 3px;
+
+    color: var(--text);
+
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.matched-school {
+    margin: 0;
+
+    color: var(--muted);
+
+    font-size: 10px;
+}
+
+.result-student-code {
+    display: inline-flex;
+
+    padding: 7px 10px;
+
+    background: #fff7ed;
+
+    border: 1px solid #fed7aa;
+
+    border-radius: 7px;
+
+    color: #9a3412;
+
+    font-size: 11px;
+    font-weight: 900;
+
+    letter-spacing: 0.4px;
+}
+
+
+/* =========================================================
+   RESULT ACTIONS
+   ========================================================= */
+
+.result-actions {
+    display: flex;
+    justify-content: flex-end;
+
+    margin-top: 16px;
+}
+
+.btn-continue {
+    min-height: 42px;
+
+    padding: 9px 18px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+
+    background: var(--maroon);
+
+    border: 1px solid var(--maroon);
+
+    border-radius: 9px;
+
+    color: var(--white);
+
+    font-family: inherit;
+
+    font-size: 12px;
+    font-weight: 800;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+.btn-continue:hover {
+    background: var(--maroon-dark);
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   NO MATCH MESSAGE
+   ========================================================= */
+
+.no-match-message {
+    margin-bottom: 17px;
+
+    padding: 14px 15px;
+
+    background: #f8fafc;
+
+    border: 1px solid var(--border);
+
+    border-radius: 9px;
+
+    color: var(--muted);
+
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.no-match-message strong {
+    color: var(--text);
+}
+
+.new-student-action {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.btn-create-new {
+    min-height: 42px;
+
+    padding: 9px 18px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+
+    background: var(--maroon);
+
+    border: 1px solid var(--maroon);
+
+    border-radius: 9px;
+
+    color: var(--white);
+
+    font-family: inherit;
+
+    font-size: 12px;
+    font-weight: 800;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+.btn-create-new:hover {
+    background: var(--maroon-dark);
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   BOTTOM NAVIGATION
+   ========================================================= */
+
+.bottom-navigation {
+    display: flex;
+    justify-content: center;
+
+    margin-top: 24px;
+    padding-top: 20px;
+
+    border-top: 1px solid var(--border);
+}
+
+.back-to-class {
+    min-height: 42px;
+
+    padding: 9px 18px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 7px;
+
+    background: var(--white);
+
+    border: 1px solid var(--border);
+
+    border-radius: 9px;
+
+    color: var(--maroon);
+
+    text-decoration: none;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.back-to-class:hover {
+    background: var(--primary-light);
+
+    border-color: #fecaca;
+
+    color: var(--maroon-dark);
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+    .registration-progress {
+        justify-content: flex-start;
+
+        overflow-x: auto;
+
+        padding: 0 5px 8px;
+    }
+
+    .progress-line {
+        width: 40px;
+
+        margin: 0 8px;
+    }
+
+    .progress-label {
+        font-size: 11px;
+    }
+
+    .form-body {
+        padding: 20px;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .submit-area {
+        justify-content: stretch;
+    }
+
+    .btn-add-student {
+        width: 100%;
+    }
+
+    .matched-student {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+    .result-student-code {
+        align-self: flex-start;
+    }
+
+    .result-actions,
+    .new-student-action {
+        justify-content: stretch;
+    }
+
+    .btn-continue,
+    .btn-create-new {
+        width: 100%;
+    }
+}
+
+
+@media (max-width: 450px) {
+
+    .add-student-page {
+        padding-bottom: 25px;
+    }
+
+    .page-header h1 {
+        font-size: 23px;
+    }
+
+    .card-intro {
+        gap: 10px;
+    }
+
+    .card-intro-icon {
+        width: 40px;
+        height: 40px;
+    }
+
+    .context-separator {
+        display: none;
+    }
+
+    .class-context {
+        flex-direction: column;
+
+        align-items: stretch;
+    }
+
+    .context-badge {
+        justify-content: center;
+    }
+
+    .back-to-class {
+        width: 100%;
+    }
+}
+
+
+/* =========================================================
+   PARENT / GUARDIAN INFORMATION
+   ========================================================= */
+
+.parent-primary-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    min-height: 46px;
+    padding: 10px 13px;
+
+    background: #f8fafc;
+
+    border: 1px solid #d7dce3;
+    border-radius: 9px;
+
+    cursor: pointer;
+}
+
+.parent-primary-option:hover {
+    border-color: #b8c0cb;
+}
+
+.parent-primary-option input[type="checkbox"] {
+    width: 17px;
+    height: 17px;
+
+    accent-color: var(--maroon);
+
+    cursor: pointer;
+}
+
+.parent-primary-option span {
+    color: var(--text);
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.parent-help-text {
+    margin-top: 5px;
+
+    color: var(--muted);
+
+    font-size: 10px;
+    line-height: 1.5;
+}
+
+.existing-parents {
+    margin-top: 18px;
+    padding: 16px;
+
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+}
+
+.existing-parents-heading {
+    margin: 0 0 12px;
+
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.parent-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.parent-list-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    padding: 11px 12px;
+
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}
+
+.parent-list-name {
+    margin: 0 0 3px;
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.parent-list-meta {
+    margin: 0;
+    color: var(--muted);
+    font-size: 10px;
+}
+
+.parent-primary-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 8px;
+
+    background: #ecfdf3;
+    border: 1px solid #bbf7d0;
+    border-radius: 6px;
+
+    color: #15803d;
+    font-size: 9px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+@media (max-width: 700px) {
+    .parent-list-item {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="add-student-page">
+
+
+    <!-- =====================================================
+         REGISTRATION PROGRESS
+         ===================================================== -->
+
+    <div class="registration-progress">
+
+        <div class="progress-step active">
+
+            <div class="progress-circle">
+                1
+            </div>
+
+            <div class="progress-label">
+                Add Student
+            </div>
+
+        </div>
+
+
+        <div class="progress-line"></div>
+
+
+        <div class="progress-step upcoming">
+
+            <div class="progress-circle">
+                2
+            </div>
+
+            <div class="progress-label">
+                Complete Registration
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         PAGE HEADER
+         ===================================================== -->
+
+    <div class="page-header">
+
+        <h1>
+            Add Student to My Class
+        </h1>
+
+        <p>
+            Enter the student's and parent/guardian's information below.
+            We'll check whether the student already has a
+            BTA record before continuing.
+        </p>
+
+    </div>
+
+
+    <!-- =====================================================
+         CLASS CONTEXT
+         ===================================================== -->
+
+    <div class="class-context">
+
+        <div class="context-badge">
+
+            📘
+
+            {% if extra_subject and extra_subject.subject %}
+
+                {{ extra_subject.subject.name }}
+
+            {% else %}
+
+                My Class
+
+            {% endif %}
+
+        </div>
+
+
+        <span class="context-separator">
+            •
+        </span>
+
+
+        <div class="context-badge">
+
+            👨‍🏫
+
+            {{ session.get(
+                "extra_class_teacher_name",
+                "Current Teacher"
+            ) }}
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         MAIN STUDENT FORM
+         ===================================================== -->
+
+    {% if not student_found and not no_match %}
+
+    <div class="student-form-card">
+
+
+        <!-- =================================================
+             INTRODUCTION
+             ================================================= -->
+
+        <div class="card-intro">
+
+            <div class="card-intro-icon">
+                👨‍🎓
+            </div>
+
+            <div>
+
+                <h2>
+                    Student Information
+                </h2>
+
+                <p>
+                    Provide the student's basic information.
+                    If the student is already registered, their
+                    existing BTA record will be used. You will not
+                    need to create another student record.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="form-body">
+
+
+            <!-- =================================================
+                 FORM
+                 ================================================= -->
+
+            <form
+                method="POST"
+                id="addStudentForm"
+            >
+
+                <!-- CSRF -->
+
+                <input
+                    type="hidden"
+                    name="csrf_token"
+                    value="{{ csrf_token() }}"
+                >
+
+
+                <!-- =================================================
+                     PERSONAL INFORMATION
+                     ================================================= -->
+
+                <div class="form-section">
+
+                    <div class="section-heading">
+
+                        <div class="section-heading-icon">
+                            👤
+                        </div>
+
+                        <div>
+
+                            <h2>
+                                Personal Information
+                            </h2>
+
+                            <p>
+                                Enter the student's name as it should appear in the records.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-grid">
+
+
+                        <!-- FIRST NAME -->
+
+                        <div class="form-group">
+
+                            <label
+                                for="first_name"
+                                class="form-label"
+                            >
+                                First Name
+                            </label>
+
+                            <input
+                                type="text"
+                                id="first_name"
+                                name="first_name"
+                                class="form-control"
+                                value="{{ request.form.get('first_name', '') }}"
+                                placeholder="e.g. John"
+                                maxlength="100"
+                                autocomplete="given-name"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- SURNAME -->
+
+                        <div class="form-group">
+
+                            <label
+                                for="surname"
+                                class="form-label"
+                            >
+                                Surname
+                            </label>
+
+                            <input
+                                type="text"
+                                id="surname"
+                                name="surname"
+                                class="form-control"
+                                value="{{ request.form.get('surname', '') }}"
+                                placeholder="e.g. Mensah"
+                                maxlength="100"
+                                autocomplete="family-name"
+                                required
+                            >
+
+                        </div>
+
+
+                        <!-- OTHER NAME -->
+
+                        <div class="form-group">
+
+                            <label
+                                for="other_name"
+                                class="form-label"
+                            >
+                                Other Name
+
+                                <span class="optional">
+                                    (Optional)
+                                </span>
+
+                            </label>
+
+                            <input
+                                type="text"
+                                id="other_name"
+                                name="other_name"
+                                class="form-control"
+                                value="{{ request.form.get('other_name', '') }}"
+                                placeholder="e.g. Kofi"
+                                maxlength="100"
+                                autocomplete="additional-name"
+                            >
+
+                        </div>
+
+
+                        <!-- SCHOOL -->
+
+                        <div class="form-group">
+
+                            <label
+                                for="school"
+                                class="form-label"
+                            >
+                                School
+
+                                <span class="optional">
+                                    (Optional)
+                                </span>
+
+                            </label>
+
+                            <input
+                                type="text"
+                                id="school"
+                                name="school"
+                                class="form-control"
+                                value="{{ request.form.get('school', '') }}"
+                                placeholder="e.g. Yaa Asantewaa Girls SHS"
+                                maxlength="200"
+                                autocomplete="organization"
+                            >
+
+                        </div>
+
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     CONTACT INFORMATION
+                     ================================================= -->
+
+                <div class="form-section">
+
+                    <div class="section-heading">
+
+                        <div class="section-heading-icon">
+                            📱
+                        </div>
+
+                        <div>
+
+                            <h2>
+                                Contact Information
+                            </h2>
+
+                            <p>
+                                Contact details can help with future communication.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-grid">
+
+
+                        <!-- PHONE -->
+
+                        <div class="form-group">
+
+                            <label
+                                for="phone"
+                                class="form-label"
+                            >
+                                Phone
+
+                                <span class="optional">
+                                    (Optional)
+                                </span>
+
+                            </label>
+
+                            <input
+                                type="tel"
+                                id="phone"
+                                name="phone"
+                                class="form-control"
+                                value="{{ request.form.get('phone', '') }}"
+                                placeholder="e.g. 024 123 4567"
+                                maxlength="30"
+                                autocomplete="tel"
+                            >
+
+                        </div>
+
+
+                        <!-- EMAIL -->
+
+                        <div class="form-group">
+
+                            <label
+                                for="email"
+                                class="form-label"
+                            >
+                                Email
+
+                                <span class="optional">
+                                    (Optional)
+                                </span>
+
+                            </label>
+
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                class="form-control"
+                                value="{{ request.form.get('email', '') }}"
+                                placeholder="e.g. student@example.com"
+                                maxlength="200"
+                                autocomplete="email"
+                            >
+
+                        </div>
+
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     PARENT / GUARDIAN INFORMATION
+                     ================================================= -->
+
+                <div class="form-section">
+
+                    <div class="section-heading">
+
+                        <div class="section-heading-icon">
+                            👨‍👩‍👧
+                        </div>
+
+                        <div>
+
+                            <h2>
+                                Parent / Guardian Information
+                            </h2>
+
+                            <p>
+                                Enter the details of a parent or guardian responsible for this student.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <div class="form-grid">
+
+                        <div class="form-group">
+                            <label for="parent_first_name" class="form-label">
+                                First Name
+                            </label>
+
+                            <input
+                                type="text"
+                                id="parent_first_name"
+                                name="parent_first_name"
+                                class="form-control"
+                                value="{{ request.form.get('parent_first_name', '') }}"
+                                placeholder="e.g. Kwame"
+                                maxlength="100"
+                                autocomplete="given-name"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="parent_surname" class="form-label">
+                                Surname
+                            </label>
+
+                            <input
+                                type="text"
+                                id="parent_surname"
+                                name="parent_surname"
+                                class="form-control"
+                                value="{{ request.form.get('parent_surname', '') }}"
+                                placeholder="e.g. Mensah"
+                                maxlength="100"
+                                autocomplete="family-name"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="parent_phone" class="form-label">
+                                Phone Number
+                            </label>
+
+                            <input
+                                type="tel"
+                                id="parent_phone"
+                                name="parent_phone"
+                                class="form-control"
+                                value="{{ request.form.get('parent_phone', '') }}"
+                                placeholder="e.g. 024 123 4567"
+                                maxlength="30"
+                                autocomplete="tel"
+                                required
+                            >
+
+                            <div class="parent-help-text">
+                                This number will be used by the parent to verify access to the student's outstanding fees.
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="parent_email" class="form-label">
+                                Email
+                                <span class="optional">(Optional)</span>
+                            </label>
+
+                            <input
+                                type="email"
+                                id="parent_email"
+                                name="parent_email"
+                                class="form-control"
+                                value="{{ request.form.get('parent_email', '') }}"
+                                placeholder="e.g. parent@example.com"
+                                maxlength="200"
+                                autocomplete="email"
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="parent_relationship" class="form-label">
+                                Relationship
+                            </label>
+
+                            <select
+                                id="parent_relationship"
+                                name="parent_relationship"
+                                class="form-control"
+                                required
+                            >
+                                <option value="">Select relationship</option>
+                                <option value="Mother" {% if request.form.get('parent_relationship') == 'Mother' %}selected{% endif %}>Mother</option>
+                                <option value="Father" {% if request.form.get('parent_relationship') == 'Father' %}selected{% endif %}>Father</option>
+                                <option value="Guardian" {% if request.form.get('parent_relationship') == 'Guardian' %}selected{% endif %}>Guardian</option>
+                                <option value="Uncle" {% if request.form.get('parent_relationship') == 'Uncle' %}selected{% endif %}>Uncle</option>
+                                <option value="Aunt" {% if request.form.get('parent_relationship') == 'Aunt' %}selected{% endif %}>Aunt</option>
+                                <option value="Other" {% if request.form.get('parent_relationship') == 'Other' %}selected{% endif %}>Other</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                Primary Guardian
+                            </label>
+
+                            <label class="parent-primary-option">
+                                <input
+                                    type="checkbox"
+                                    name="parent_is_primary"
+                                    value="1"
+                                    {% if request.form.get('parent_is_primary') == '1' %}checked{% endif %}
+                                >
+                                <span>Mark as primary parent / guardian</span>
+                            </label>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     SYSTEM NOTE
+                     ================================================= -->
+
+                <div class="system-note">
+
+                    <div class="system-note-icon">
+                        🔒
+                    </div>
+
+                    <p>
+
+                        <strong>
+                            Student and parent records are protected.
+                        </strong>
+
+                        The system will first check whether this
+                        student already exists. Existing students
+                        keep their original BTA student code, while
+                        a new student receives a permanent BTA code
+                        automatically. Parent or guardian information
+                        is securely linked to the student.
+
+                    </p>
+
+                </div>
+
+
+                <!-- =================================================
+                     SUBMIT
+                     ================================================= -->
+
+                <div class="submit-area">
+
+                    <button
+                        type="submit"
+                        name="check_student"
+                        value="1"
+                        class="btn-add-student"
+                    >
+
+                        <span>
+                            +
+                        </span>
+
+                        Add Student
+
+                    </button>
+
+                </div>
+
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    {% endif %}
+
+
+    <!-- =====================================================
+         EXISTING STUDENT RESULT
+         ===================================================== -->
+
+    {% if student_found and matching_students %}
+
+        <div
+            class="result-area"
+            id="studentResult"
+        >
+
+            <div class="result-card existing">
+
+                <div class="result-header">
+
+                    <div class="result-icon">
+                        ✓
+                    </div>
+
+                    <div>
+
+                        <h3>
+                            Student Already Registered
+                        </h3>
+
+                        <p>
+                            We found an existing BTA student record
+                            matching the information you entered.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                {% for student in matching_students %}
+
+                    <div class="matched-student">
+
+                        <div class="matched-student-info">
+
+                            <div class="matched-avatar">
+                                👨‍🎓
+                            </div>
+
+                            <div>
+
+                                <p class="matched-name">
+
+                                    {{ student.first_name }}
+
+                                    {% if student.other_name %}
+
+                                        {{ student.other_name }}
+
+                                    {% endif %}
+
+                                    {{ student.surname }}
+
+                                </p>
+
+
+                                {% if student.school %}
+
+                                    <p class="matched-school">
+                                        {{ student.school }}
+                                    </p>
+
+                                {% else %}
+
+                                    <p class="matched-school">
+                                        Existing BTA student
+                                    </p>
+
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+
+                        <div>
+
+                            <span class="result-student-code">
+                                {{ student.student_code }}
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="result-actions">
+
+                        <form
+                            method="POST"
+                            action="{{ url_for(
+                                'extra_class_teacher.add_class_student',
+                                class_id=extra_subject.id
+                            ) }}"
+                        >
+
+                            <input
+                                type="hidden"
+                                name="csrf_token"
+                                value="{{ csrf_token() }}"
+                            >
+
+                            <input
+                                type="hidden"
+                                name="action"
+                                value="enroll_existing"
+                            >
+
+                            <input
+                                type="hidden"
+                                name="student_id"
+                                value="{{ student.id }}"
+                            >
+
+                            <input
+                                type="hidden"
+                                name="parent_first_name"
+                                value="{{ request.form.get('parent_first_name', '') }}"
+                            >
+
+                            <input
+                                type="hidden"
+                                name="parent_surname"
+                                value="{{ request.form.get('parent_surname', '') }}"
+                            >
+
+                            <input
+                                type="hidden"
+                                name="parent_phone"
+                                value="{{ request.form.get('parent_phone', '') }}"
+                            >
+
+                            <input
+                                type="hidden"
+                                name="parent_email"
+                                value="{{ request.form.get('parent_email', '') }}"
+                            >
+
+                            <input
+                                type="hidden"
+                                name="parent_relationship"
+                                value="{{ request.form.get('parent_relationship', '') }}"
+                            >
+
+                            <input
+                                type="hidden"
+                                name="parent_is_primary"
+                                value="{{ request.form.get('parent_is_primary', '') }}"
+                            >
+
+                            <button
+                                type="submit"
+                                class="btn-continue"
+                            >
+                                Select Student & Continue →
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+    {% endif %}
+
+
+    <!-- =====================================================
+         NO MATCH RESULT
+         ===================================================== -->
+
+    {% if no_match %}
+
+        <div
+            class="result-area"
+            id="studentResult"
+        >
+
+            <div class="result-card new">
+
+                <div class="result-header">
+
+                    <div class="result-icon">
+                        +
+                    </div>
+
+                    <div>
+
+                        <h3>
+                            Ready to Register
+                        </h3>
+
+                        <p>
+                            No existing student record was found
+                            with the information provided.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="no-match-message">
+
+                    <strong>
+                        A new student record can now be created.
+                    </strong>
+
+                    <br>
+
+                    The system will automatically generate a
+                    permanent BTA student code for this student.
+
+                </div>
+
+
+                <div class="new-student-action">
+
+                    <form
+                        method="POST"
+                        action="{{ url_for(
+                            'extra_class_teacher.add_class_student',
+                            class_id=extra_subject.id
+                        ) }}"
+                    >
+
+                        <input
+                            type="hidden"
+                            name="csrf_token"
+                            value="{{ csrf_token() }}"
+                        >
+
+                        <input
+                            type="hidden"
+                            name="first_name"
+                            value="{{ request.form.get('first_name', '') }}"
+                        >
+
+                        <input
+                            type="hidden"
+                            name="surname"
+                            value="{{ request.form.get('surname', '') }}"
+                        >
+
+                        <input
+                            type="hidden"
+                            name="other_name"
+                            value="{{ request.form.get('other_name', '') }}"
+                        >
+
+                        <input
+                            type="hidden"
+                            name="school"
+                            value="{{ request.form.get('school', '') }}"
+                        >
+
+                        <input
+                            type="hidden"
+                            name="phone"
+                            value="{{ request.form.get('phone', '') }}"
+                        >
+
+                        <input
+                            type="hidden"
+                            name="email"
+                            value="{{ request.form.get('email', '') }}"
+                        >
+
+                        <input
+                            type="hidden"
+                            name="parent_first_name"
+                            value="{{ request.form.get('parent_first_name', '') }}"
+                        >
+
+                        <input
+                            type="hidden"
+                            name="parent_surname"
+                            value="{{ request.form.get('parent_surname', '') }}"
+                        >
+
+                        <input
+                            type="hidden"
+                            name="parent_phone"
+                            value="{{ request.form.get('parent_phone', '') }}"
+                        >
+
+                        <input
+                            type="hidden"
+                            name="parent_email"
+                            value="{{ request.form.get('parent_email', '') }}"
+                        >
+
+                        <input
+                            type="hidden"
+                            name="parent_relationship"
+                            value="{{ request.form.get('parent_relationship', '') }}"
+                        >
+
+                        <input
+                            type="hidden"
+                            name="parent_is_primary"
+                            value="{{ request.form.get('parent_is_primary', '') }}"
+                        >
+
+                        <input
+                            type="hidden"
+                            name="action"
+                            value="create_new"
+                        >
+
+                        <button
+                            type="submit"
+                            class="btn-create-new"
+                        >
+                            Create Student & Continue →
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    {% endif %}
+
+
+    <!-- =====================================================
+         BOTTOM NAVIGATION
+         ===================================================== -->
+
+    <div class="bottom-navigation">
+
+        <a
+            href="{{ url_for(
+                'extra_class_teacher.manage_class',
+                class_id=extra_subject.id
+            ) }}"
+            class="back-to-class"
+        >
+
+            ← Back to My Class
+
+        </a>
+
+    </div>
+
+
+</div>
+
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    /*
+     * Automatically scroll to the result when the
+     * backend returns a matching/no-match result.
+     */
+
+    const result =
+        document.getElementById("studentResult");
+
+    if (result) {
+
+        setTimeout(function () {
+
+            result.scrollIntoView({
+                behavior: "smooth",
+                block: "center"
+            });
+
+        }, 150);
+
+    }
+
+
+    /*
+     * Prevent accidental double submission.
+     */
+
+    const form =
+        document.getElementById("addStudentForm");
+
+    if (form) {
+
+        form.addEventListener(
+            "submit",
+            function () {
+
+                const button =
+                    form.querySelector(
+                        'button[name="check_student"]'
+                    );
+
+                if (button) {
+
+                    button.disabled = true;
+
+                    button.style.opacity = "0.65";
+
+                    button.innerHTML =
+                        "Checking student...";
+
+                }
+
+            }
+        );
+
+    }
+
+});
+
+</script>
+
+{% endblock %}

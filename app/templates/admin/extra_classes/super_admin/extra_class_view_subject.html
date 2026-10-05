@@ -1,0 +1,646 @@
+{% extends "admin/extra_classes/super_admin/extra_class_super_admin_base.html" %}
+
+{% block title %}
+    {{ extra_subject.subject.name }} - Extra Class Subject
+{% endblock %}
+
+{% block page_title %}
+    Subject Details
+{% endblock %}
+
+{% block page_subtitle %}
+    View Extra Class subject information
+{% endblock %}
+
+{% block header_heading %}
+    {{ extra_subject.subject.name }}
+{% endblock %}
+
+{% block header_description %}
+    Extra Class subject configuration and assignment details.
+{% endblock %}
+
+{% block page_actions %}
+
+    <a
+        href="{{ url_for('extra_class.subjects') }}"
+        class="btn btn-light"
+    >
+        <i class="bi bi-arrow-left"></i>
+        Back to Subjects
+    </a>
+
+    <a
+        href="{{ url_for(
+            'extra_class.edit_subject',
+            extra_subject_id=extra_subject.id
+        ) }}"
+        class="btn btn-light"
+    >
+        <i class="bi bi-pencil-square"></i>
+        Edit Subject
+    </a>
+
+{% endblock %}
+
+
+{% block extra_css %}
+
+<style>
+
+    .subject-wrapper {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .subject-card {
+        background: #fff;
+        border-radius: 18px;
+        border: 1px solid #f0e1e3;
+        box-shadow: 0 8px 30px rgba(92, 0, 8, 0.08);
+        overflow: hidden;
+        margin-bottom: 24px;
+    }
+
+    .subject-header {
+        padding: 30px;
+        background: linear-gradient(
+            135deg,
+            #fff5f6 0%,
+            #ffffff 100%
+        );
+        border-bottom: 1px solid #f0e1e3;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .subject-icon {
+        width: 70px;
+        height: 70px;
+        border-radius: 16px;
+        background: linear-gradient(
+            135deg,
+            #b00018,
+            #78000d
+        );
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        flex-shrink: 0;
+        box-shadow: 0 6px 18px rgba(120, 0, 13, 0.20);
+    }
+
+    .subject-title h2 {
+        margin: 0 0 7px;
+        color: #5c0008;
+        font-size: 25px;
+        font-weight: 800;
+    }
+
+    .subject-title p {
+        margin: 0;
+        color: #777;
+        font-size: 13px;
+    }
+
+    .status-badge {
+        margin-left: auto;
+        padding: 7px 13px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+    .status-active {
+        background: #e9f8ef;
+        color: #137333;
+    }
+
+    .status-inactive {
+        background: #fcebed;
+        color: #a00015;
+    }
+
+    .details-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 18px;
+        padding: 28px;
+    }
+
+    .detail-item {
+        padding: 18px;
+        border: 1px solid #eee;
+        border-radius: 12px;
+        background: #fff;
+    }
+
+    .detail-label {
+        display: block;
+        margin-bottom: 7px;
+        color: #888;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .4px;
+    }
+
+    .detail-value {
+        color: #3d1014;
+        font-size: 16px;
+        font-weight: 800;
+    }
+
+    .detail-value small {
+        color: #888;
+        font-size: 11px;
+        font-weight: 500;
+    }
+
+    .fee-value {
+        color: #8b0012;
+        font-size: 22px;
+        font-weight: 900;
+    }
+
+    .section-card {
+        background: #fff;
+        border-radius: 18px;
+        border: 1px solid #f0e1e3;
+        box-shadow: 0 8px 25px rgba(92, 0, 8, 0.06);
+        padding: 25px 28px;
+        margin-bottom: 24px;
+    }
+
+    .section-title {
+        margin: 0 0 18px;
+        color: #5c0008;
+        font-size: 17px;
+        font-weight: 800;
+    }
+
+    .section-title i {
+        margin-right: 7px;
+    }
+
+    .teacher-box {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 18px;
+        border-radius: 12px;
+        background: #fff8f9;
+        border: 1px solid #f0dfe2;
+    }
+
+    .teacher-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: #5c0008;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 17px;
+        flex-shrink: 0;
+    }
+
+    .teacher-info h4 {
+        margin: 0 0 4px;
+        color: #3d1014;
+        font-size: 15px;
+        font-weight: 800;
+    }
+
+    .teacher-info p {
+        margin: 0;
+        color: #888;
+        font-size: 12px;
+    }
+
+    .no-teacher {
+        padding: 18px;
+        border-radius: 12px;
+        background: #fff7e8;
+        border: 1px solid #f2dfb3;
+        color: #795900;
+        font-size: 13px;
+    }
+
+    .action-bar {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        padding-top: 20px;
+        border-top: 1px solid #eee;
+    }
+
+    .btn-action {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        min-height: 42px;
+        padding: 9px 17px;
+        border-radius: 9px;
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: 800;
+    }
+
+    .btn-edit {
+        background: linear-gradient(
+            135deg,
+            #b00018,
+            #78000d
+        );
+        color: #fff;
+        box-shadow: 0 5px 14px rgba(120, 0, 13, .18);
+    }
+
+    .btn-edit:hover {
+        color: #fff;
+        transform: translateY(-1px);
+    }
+
+    .btn-back {
+        border: 1px solid #ddd;
+        background: #fff;
+        color: #555;
+    }
+
+    .btn-back:hover {
+        background: #f7f7f7;
+        color: #333;
+    }
+
+    @media (max-width: 700px) {
+
+        .subject-header {
+            flex-wrap: wrap;
+            padding: 22px;
+        }
+
+        .status-badge {
+            margin-left: 0;
+        }
+
+        .details-grid {
+            grid-template-columns: 1fr;
+            padding: 20px;
+        }
+
+        .section-card {
+            padding: 20px;
+        }
+
+        .action-bar {
+            flex-direction: column;
+        }
+
+        .btn-action {
+            width: 100%;
+            justify-content: center;
+        }
+
+    }
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="subject-wrapper">
+
+    <!-- MAIN SUBJECT CARD -->
+
+    <div class="subject-card">
+
+        <div class="subject-header">
+
+            <div class="subject-icon">
+
+                {% if extra_subject.subject.icon %}
+                    {{ extra_subject.subject.icon }}
+                {% else %}
+                    <i class="bi bi-book"></i>
+                {% endif %}
+
+            </div>
+
+            <div class="subject-title">
+
+                <h2>
+                    {{ extra_subject.subject.name }}
+                </h2>
+
+                <p>
+
+                    {% if extra_subject.subject.code %}
+                        {{ extra_subject.subject.code }}
+                        &nbsp; • &nbsp;
+                    {% endif %}
+
+                    Extra Class Subject
+
+                </p>
+
+            </div>
+
+            {% if extra_subject.is_active %}
+
+                <span class="status-badge status-active">
+                    <i class="bi bi-check-circle-fill"></i>
+                    ACTIVE
+                </span>
+
+            {% else %}
+
+                <span class="status-badge status-inactive">
+                    <i class="bi bi-x-circle-fill"></i>
+                    INACTIVE
+                </span>
+
+            {% endif %}
+
+        </div>
+
+
+        <div class="details-grid">
+
+            <!-- SUBJECT -->
+
+            <div class="detail-item">
+
+                <span class="detail-label">
+                    BTA Subject
+                </span>
+
+                <div class="detail-value">
+                    {{ extra_subject.subject.name }}
+                </div>
+
+            </div>
+
+
+            <!-- SUBJECT CODE -->
+
+            <div class="detail-item">
+
+                <span class="detail-label">
+                    Subject Code
+                </span>
+
+                <div class="detail-value">
+
+                    {{ extra_subject.subject.code or "Not assigned" }}
+
+                </div>
+
+            </div>
+
+
+            <!-- MONTHLY FEE -->
+
+            <div class="detail-item">
+
+                <span class="detail-label">
+                    Monthly Class Fee
+                </span>
+
+                <div class="fee-value">
+
+                    GH₵ {{ "%.2f"|format(extra_subject.monthly_fee|float) }}
+
+                </div>
+
+            </div>
+
+
+            <!-- STATUS -->
+
+            <div class="detail-item">
+
+                <span class="detail-label">
+                    Current Status
+                </span>
+
+                <div class="detail-value">
+
+                    {% if extra_subject.is_active %}
+                        Active
+                    {% else %}
+                        Inactive
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <!-- EXTRA CLASS ID -->
+
+            <div class="detail-item">
+
+                <span class="detail-label">
+                    Extra Class Subject ID
+                </span>
+
+                <div class="detail-value">
+                    #{{ extra_subject.id }}
+                </div>
+
+            </div>
+
+
+            <!-- CREATED -->
+
+            <div class="detail-item">
+
+                <span class="detail-label">
+                    Added On
+                </span>
+
+                <div class="detail-value">
+
+                    {{ extra_subject.created_at.strftime("%d %B %Y") }}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- TEACHER -->
+
+    <div class="section-card">
+
+        <h3 class="section-title">
+            <i class="bi bi-person-badge-fill"></i>
+            Assigned Teacher
+        </h3>
+
+
+        {% if extra_subject.teacher %}
+
+            <div class="teacher-box">
+
+                <div class="teacher-avatar">
+
+                    {{ extra_subject.teacher.first_name[0]|upper }}
+                    {{ extra_subject.teacher.surname[0]|upper }}
+
+                </div>
+
+                <div class="teacher-info">
+
+                    <h4>
+
+                        {{ extra_subject.teacher.first_name }}
+                        {{ extra_subject.teacher.surname }}
+
+                    </h4>
+
+                    <p>
+
+                        {% if extra_subject.teacher.teacher_code %}
+                            Teacher Code:
+                            {{ extra_subject.teacher.teacher_code }}
+                        {% else %}
+                            Teacher code not assigned
+                        {% endif %}
+
+                        {% if extra_subject.teacher.phone %}
+                            &nbsp; • &nbsp;
+                            {{ extra_subject.teacher.phone }}
+                        {% endif %}
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        {% else %}
+
+            <div class="no-teacher">
+
+                <i class="bi bi-info-circle-fill"></i>
+
+                No teacher has been assigned to this subject yet.
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+
+
+    <!-- ACTIONS -->
+
+<div class="section-card">
+
+    <div class="action-bar">
+
+        <a
+            href="{{ url_for('extra_class.subjects') }}"
+            class="btn-action btn-back"
+        >
+            <i class="bi bi-arrow-left"></i>
+            Back to Subjects
+        </a>
+
+        <a
+            href="{{ url_for(
+                'extra_class.edit_subject',
+                extra_subject_id=extra_subject.id
+            ) }}"
+            class="btn-action btn-edit"
+        >
+            <i class="bi bi-pencil-square"></i>
+            Edit Subject
+        </a>
+
+        {% if extra_subject.is_active %}
+
+            <form
+                method="POST"
+                action="{{ url_for(
+                    'extra_class.toggle_subject_status',
+                    extra_subject_id=extra_subject.id
+                ) }}"
+                onsubmit="return confirm(
+                    'Are you sure you want to deactivate {{ extra_subject.subject.name }}? New students should not be enrolled in an inactive subject.'
+                );"
+                style="display:inline;"
+            >
+
+                {% if csrf_token %}
+                    <input
+                        type="hidden"
+                        name="csrf_token"
+                        value="{{ csrf_token() }}"
+                    >
+                {% endif %}
+
+                <button
+                    type="submit"
+                    class="btn-action btn-deactivate"
+                >
+                    <i class="bi bi-toggle-off"></i>
+                    Deactivate Subject
+                </button>
+
+            </form>
+
+        {% else %}
+
+            <form
+                method="POST"
+                action="{{ url_for(
+                    'extra_class.toggle_subject_status',
+                    extra_subject_id=extra_subject.id
+                ) }}"
+                onsubmit="return confirm(
+                    'Are you sure you want to activate {{ extra_subject.subject.name }}?'
+                );"
+                style="display:inline;"
+            >
+
+                {% if csrf_token %}
+                    <input
+                        type="hidden"
+                        name="csrf_token"
+                        value="{{ csrf_token() }}"
+                    >
+                {% endif %}
+
+                <button
+                    type="submit"
+                    class="btn-action btn-activate"
+                >
+                    <i class="bi bi-toggle-on"></i>
+                    Activate Subject
+                </button>
+
+            </form>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}
+
