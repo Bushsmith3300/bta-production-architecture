@@ -88,6 +88,101 @@
     font-size: 13px;
 }
 
+
+.fee-setting-panel {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 18px;
+    padding: 18px 21px;
+    margin-bottom: 22px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 17px;
+    box-shadow: 0 6px 20px rgba(15,23,42,.05);
+}
+
+.fee-setting-copy h2 {
+    margin: 0 0 5px;
+    color: var(--text);
+    font-size: 17px;
+    font-weight: 800;
+}
+
+.fee-setting-copy p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.fee-setting-form {
+    display: flex;
+    align-items: flex-end;
+    gap: 9px;
+}
+
+.fee-input-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+}
+
+.fee-input {
+    width: 150px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    background: #fff;
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 800;
+    outline: none;
+}
+
+.fee-input:focus {
+    border-color: var(--maroon);
+    box-shadow: 0 0 0 3px rgba(128,0,0,.08);
+}
+
+.save-fee-btn {
+    padding: 10px 14px;
+    border: 1px solid var(--maroon);
+    border-radius: 9px;
+    background: var(--maroon);
+    color: white;
+    font-size: 12px;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.save-fee-btn:hover {
+    opacity: .92;
+}
+
+@media (max-width: 700px) {
+    .fee-setting-panel {
+        grid-template-columns: 1fr;
+    }
+
+    .fee-setting-form {
+        width: 100%;
+    }
+
+    .fee-input-group {
+        flex: 1;
+    }
+
+    .fee-input {
+        width: 100%;
+        box-sizing: border-box;
+    }
+}
+
 .summary-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -355,6 +450,54 @@
 
 </div>
 
+
+
+<div class="fee-setting-panel">
+
+    <div class="fee-setting-copy">
+        <h2>Set Monthly Fee</h2>
+        <p>
+            Set the current agreed monthly fee for this class.
+            New student fee records will use this amount.
+            Existing monthly fee records are kept unchanged.
+        </p>
+    </div>
+
+    <form
+        method="POST"
+        action="{{ url_for(
+            'extra_class_teacher.class_fees',
+            class_id=extra_subject.id
+        ) }}"
+        class="fee-setting-form"
+    >
+        <input
+            type="hidden"
+            name="csrf_token"
+            value="{{ csrf_token() }}"
+        >
+
+        <div class="fee-input-group">
+            <label for="monthly_fee">Monthly Fee (GH¢)</label>
+            <input
+                type="number"
+                id="monthly_fee"
+                name="monthly_fee"
+                class="fee-input"
+                min="0.01"
+                max="1000000"
+                step="0.01"
+                value="{{ '%.2f'|format(extra_subject.monthly_fee or 0) }}"
+                required
+            >
+        </div>
+
+        <button type="submit" class="save-fee-btn">
+            Save Fee
+        </button>
+    </form>
+
+</div>
 
 <div class="summary-grid">
 

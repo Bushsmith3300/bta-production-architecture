@@ -1,4 +1,5 @@
 from datetime import date, datetime, timezone
+from decimal import Decimal, InvalidOperation
 import calendar
 
 from flask import (
@@ -837,7 +838,7 @@ def teacher_classes():
 
 @extra_class_teacher_bp.route(
     "/classes/<int:class_id>/view",
-    methods=["GET"]
+    methods=["GET", "POST"]
 )
 @extra_class_teacher_required
 def view_class(class_id):
@@ -3159,7 +3160,7 @@ def class_payments(class_id):
 
 @extra_class_teacher_bp.route(
     "/classes/<int:class_id>/fees",
-    methods=["GET"]
+    methods=["GET", "POST"]
 )
 @extra_class_teacher_required
 def class_fees(class_id):
@@ -3175,11 +3176,11 @@ def class_fees(class_id):
     - Only SUCCESS payments count as money received.
     """
 
+    # ---------------------------------------------------------
+    # 0. Verify the class belongs to the logged-in teacher
+    # ---------------------------------------------------------
     teacher_id = session.get("extra_class_teacher_id")
 
-    # ---------------------------------------------------------
-    # 1. Verify the class belongs to the logged-in teacher
-    # ---------------------------------------------------------
     extra_subject = (
         ExtraClassSubject.query
         .filter(
@@ -3189,6 +3190,70 @@ def class_fees(class_id):
         .first_or_404()
     )
 
+    # ---------------------------------------------------------
+    # 1. Set / update the current agreed monthly fee
+    # ---------------------------------------------------------
+    if request.method == "POST":
+        raw_fee = (request.form.get("monthly_fee") or "").strip()
+
+        try:
+            monthly_fee = Decimal(raw_fee)
+        except (InvalidOperation, ValueError):
+            flash("Please enter a valid monthly fee amount.", "danger")
+            return redirect(
+                url_for(
+                    "extra_class_teacher.class_fees",
+                    class_id=extra_subject.id
+                )
+            )
+
+        if monthly_fee <= Decimal("0"):
+            flash("Monthly fee must be greater than GH¢ 0.00.", "danger")
+            return redirect(
+                url_for(
+                    "extra_class_teacher.class_fees",
+                    class_id=extra_subject.id
+                )
+            )
+
+        if monthly_fee > Decimal("1000000.00"):
+            flash("Monthly fee is too high. Please enter a reasonable amount.", "danger")
+            return redirect(
+                url_for(
+                    "extra_class_teacher.class_fees",
+                    class_id=extra_subject.id
+                )
+            )
+
+        monthly_fee = monthly_fee.quantize(Decimal("0.01"))
+
+        try:
+            extra_subject.monthly_fee = monthly_fee
+            db.session.commit()
+
+            flash(
+                f"Monthly fee for {extra_subject.subject.name} has been set to "
+                f"GH¢ {monthly_fee:,.2f}. Existing monthly fee records were not changed.",
+                "success"
+            )
+
+        except Exception as exc:
+            db.session.rollback()
+            print("SET MONTHLY FEE ERROR:", str(exc))
+            flash("Unable to save the monthly fee. Please try again.", "danger")
+
+        return redirect(
+            url_for(
+                "extra_class_teacher.class_fees",
+                class_id=extra_subject.id
+            )
+        )
+
+    # ---------------------------------------------------------
+    # 2. Verify the class belongs to the logged-in teacher
+    # ---------------------------------------------------------
+    # extra_subject was already verified above.
+    # ---------------------------------------------------------
     teacher = (
         ExtraClassTeacher.query
         .filter_by(id=teacher_id)
