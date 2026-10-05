@@ -1,0 +1,811 @@
+{% extends "admin/extra_classes/extra_class_admin_base.html" %}
+
+
+{% block title %}
+View Parent | BTA Extra Classes
+{% endblock %}
+
+
+{% block page_title %}
+Parent Details
+{% endblock %}
+
+
+{% block page_subtitle %}
+View parent information and linked students.
+{% endblock %}
+
+
+{% block page_actions %}
+
+<div class="d-flex flex-wrap gap-2">
+
+    <a
+        href="{{ url_for('extra_class.link_parent_student_form', parent_id=parent.id) }}"
+        class="btn btn-primary"
+    >
+        <i class="bi bi-person-plus-fill me-1"></i>
+        Link Student
+    </a>
+
+
+    <a
+        href="{{ url_for('extra_class.edit_parent', parent_id=parent.id) }}"
+        class="btn btn-outline-primary"
+    >
+        <i class="bi bi-pencil-square me-1"></i>
+        Edit Parent
+    </a>
+
+
+    <a
+        href="{{ url_for('extra_class.parents') }}"
+        class="btn btn-outline-secondary"
+    >
+        <i class="bi bi-arrow-left me-1"></i>
+        Back to Parents
+    </a>
+
+</div>
+
+{% endblock %}
+
+
+{% block extra_css %}
+
+<style>
+
+    /* =========================================================
+       PAGE
+       ========================================================= */
+
+    .parent-page {
+        width: 100%;
+    }
+
+
+    /* =========================================================
+       DETAIL CARD
+       ========================================================= */
+
+    .detail-card {
+        background: #ffffff;
+        border: none;
+        border-radius: 18px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
+        overflow: hidden;
+        margin-bottom: 24px;
+    }
+
+
+    .detail-card-header {
+        padding: 20px 22px;
+        border-bottom: 1px solid #edf0f5;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+    }
+
+
+    .detail-card-header h5 {
+        margin: 0;
+        font-size: 17px;
+        font-weight: 700;
+        color: #102a43;
+    }
+
+
+    .detail-card-body {
+        padding: 22px;
+    }
+
+
+    /* =========================================================
+       PARENT PROFILE
+       ========================================================= */
+
+    .parent-profile {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        margin-bottom: 25px;
+    }
+
+
+    .parent-avatar-large {
+        width: 72px;
+        height: 72px;
+        border-radius: 18px;
+        background: #eafaf1;
+        color: #198754;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 27px;
+        font-weight: 700;
+        flex-shrink: 0;
+    }
+
+
+    .parent-profile h3 {
+        margin: 0 0 5px;
+        font-size: 23px;
+        font-weight: 700;
+        color: #102a43;
+    }
+
+
+    .parent-profile-subtitle {
+        font-size: 13px;
+        color: #6c757d;
+    }
+
+
+    /* =========================================================
+       DETAILS
+       ========================================================= */
+
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+        padding: 13px 0;
+        border-bottom: 1px solid #edf0f5;
+    }
+
+
+    .detail-row:last-child {
+        border-bottom: none;
+    }
+
+
+    .detail-label {
+        color: #7a869a;
+        font-size: 13px;
+    }
+
+
+    .detail-value {
+        color: #102a43;
+        font-size: 13px;
+        font-weight: 600;
+        text-align: right;
+    }
+
+
+    /* =========================================================
+       STATUS
+       ========================================================= */
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+
+    .status-active {
+        background: #e8f7ef;
+        color: #198754;
+    }
+
+
+    .status-inactive {
+        background: #ffe9e9;
+        color: #dc3545;
+    }
+
+
+    /* =========================================================
+       LINKED STUDENTS
+       ========================================================= */
+
+    .student-item {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        padding: 14px 0;
+        border-bottom: 1px solid #edf0f5;
+    }
+
+
+    .student-item:last-child {
+        border-bottom: none;
+    }
+
+
+    .student-avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: #e8f0ff;
+        color: #155eef;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        flex-shrink: 0;
+    }
+
+
+    .student-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+
+    .student-name {
+        font-size: 14px;
+        font-weight: 600;
+        color: #102a43;
+        margin-bottom: 3px;
+    }
+
+
+    .student-meta {
+        font-size: 12px;
+        color: #7a869a;
+    }
+
+
+    .relationship-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 8px;
+        border-radius: 15px;
+        background: #f3e8ff;
+        color: #7b2cbf;
+        font-size: 10px;
+        font-weight: 600;
+        margin-right: 5px;
+    }
+
+
+    .primary-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 8px;
+        border-radius: 15px;
+        background: #fff4e5;
+        color: #b26a00;
+        font-size: 10px;
+        font-weight: 600;
+    }
+
+
+    /* =========================================================
+       STUDENT ACTION
+       ========================================================= */
+
+    .student-action {
+        flex-shrink: 0;
+    }
+
+
+    /* =========================================================
+       EMPTY STATE
+       ========================================================= */
+
+    .empty-state {
+        text-align: center;
+        padding: 35px 15px;
+        color: #8a94a6;
+    }
+
+
+    .empty-state i {
+        display: block;
+        font-size: 35px;
+        margin-bottom: 10px;
+    }
+
+
+    .empty-state p {
+        margin: 0 0 15px;
+        font-size: 13px;
+    }
+
+
+    /* =========================================================
+       NAVIGATION FOOTER
+       ========================================================= */
+
+    .navigation-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        margin-top: 5px;
+        padding-top: 20px;
+        border-top: 1px solid #edf0f5;
+    }
+
+
+    /* =========================================================
+       RESPONSIVE
+       ========================================================= */
+
+    @media (max-width: 768px) {
+
+        .parent-profile {
+            align-items: flex-start;
+        }
+
+
+        .parent-avatar-large {
+            width: 60px;
+            height: 60px;
+            font-size: 23px;
+        }
+
+
+        .parent-profile h3 {
+            font-size: 19px;
+        }
+
+
+        .detail-row {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+        }
+
+
+        .detail-value {
+            text-align: left;
+        }
+
+
+        .student-item {
+            align-items: flex-start;
+        }
+
+
+        .student-action {
+            display: none;
+        }
+
+
+        .navigation-footer {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+
+        .navigation-footer > div {
+            display: flex;
+            flex-direction: column;
+        }
+
+
+        .navigation-footer .btn {
+            width: 100%;
+        }
+
+    }
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="parent-page">
+
+    <div class="row g-4">
+
+        <!-- =================================================
+             PARENT INFORMATION
+             ================================================= -->
+
+        <div class="col-xl-6">
+
+            <div class="detail-card">
+
+                <div class="detail-card-header">
+
+                    <h5>
+                        <i class="bi bi-person-vcard me-2"></i>
+                        Parent Information
+                    </h5>
+
+                </div>
+
+
+                <div class="detail-card-body">
+
+                    <!-- Profile -->
+
+                    <div class="parent-profile">
+
+                        <div class="parent-avatar-large">
+
+                            {{ parent.first_name[:1]|upper }}
+
+                        </div>
+
+
+                        <div>
+
+                            <h3>
+
+                                {{ parent.first_name }}
+
+                                {{ parent.surname }}
+
+                            </h3>
+
+
+                            <div class="parent-profile-subtitle">
+
+                                Parent / Guardian
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- First Name -->
+
+                    <div class="detail-row">
+
+                        <span class="detail-label">
+                            First Name
+                        </span>
+
+                        <span class="detail-value">
+                            {{ parent.first_name }}
+                        </span>
+
+                    </div>
+
+
+                    <!-- Surname -->
+
+                    <div class="detail-row">
+
+                        <span class="detail-label">
+                            Surname
+                        </span>
+
+                        <span class="detail-value">
+                            {{ parent.surname }}
+                        </span>
+
+                    </div>
+
+
+                    <!-- Phone -->
+
+                    <div class="detail-row">
+
+                        <span class="detail-label">
+                            Phone
+                        </span>
+
+                        <span class="detail-value">
+
+                            {% if parent.phone %}
+
+                                {{ parent.phone }}
+
+                            {% else %}
+
+                                —
+
+                            {% endif %}
+
+                        </span>
+
+                    </div>
+
+
+                    <!-- Email -->
+
+                    <div class="detail-row">
+
+                        <span class="detail-label">
+                            Email
+                        </span>
+
+                        <span class="detail-value">
+
+                            {% if parent.email %}
+
+                                {{ parent.email }}
+
+                            {% else %}
+
+                                —
+
+                            {% endif %}
+
+                        </span>
+
+                    </div>
+
+
+                    <!-- Status -->
+
+                    <div class="detail-row">
+
+                        <span class="detail-label">
+                            Status
+                        </span>
+
+                        <span class="detail-value">
+
+                            {% if parent.is_active %}
+
+                                <span class="status-badge status-active">
+
+                                    <i class="bi bi-check-circle me-1"></i>
+
+                                    Active
+
+                                </span>
+
+                            {% else %}
+
+                                <span class="status-badge status-inactive">
+
+                                    <i class="bi bi-x-circle me-1"></i>
+
+                                    Inactive
+
+                                </span>
+
+                            {% endif %}
+
+                        </span>
+
+                    </div>
+
+
+                    <!-- Created -->
+
+                    {% if parent.created_at %}
+
+                    <div class="detail-row">
+
+                        <span class="detail-label">
+                            Date Added
+                        </span>
+
+                        <span class="detail-value">
+
+                            {{ parent.created_at.strftime("%d %b %Y") }}
+
+                        </span>
+
+                    </div>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             LINKED STUDENTS
+             ================================================= -->
+
+        <div class="col-xl-6">
+
+            <div class="detail-card">
+
+                <div class="detail-card-header">
+
+                    <h5>
+
+                        <i class="bi bi-mortarboard-fill me-2"></i>
+
+                        Linked Students
+
+                    </h5>
+
+
+                    <span class="badge bg-primary">
+
+                        {{ parent.student_links|length }}
+
+                    </span>
+
+                </div>
+
+
+                <div class="detail-card-body">
+
+                    {% if parent.student_links %}
+
+                        {% for link in parent.student_links %}
+
+                        <div class="student-item">
+
+                            <!-- Avatar -->
+
+                            <div class="student-avatar">
+
+                                {{ link.student.first_name[:1]|upper }}
+
+                            </div>
+
+
+                            <!-- Information -->
+
+                            <div class="student-info">
+
+                                <div class="student-name">
+
+                                    {{ link.student.first_name }}
+
+                                    {% if link.student.other_name %}
+
+                                        {{ link.student.other_name }}
+
+                                    {% endif %}
+
+                                    {{ link.student.surname }}
+
+                                </div>
+
+
+                                <div class="student-meta">
+
+                                    {{ link.student.student_code }}
+
+                                    {% if link.student.school %}
+
+                                        · {{ link.student.school }}
+
+                                    {% endif %}
+
+                                </div>
+
+
+                                <div class="mt-1">
+
+                                    {% if link.relationship %}
+
+                                        <span class="relationship-badge">
+
+                                            {{ link.relationship }}
+
+                                        </span>
+
+                                    {% endif %}
+
+
+                                    {% if link.is_primary %}
+
+                                        <span class="primary-badge">
+
+                                            <i class="bi bi-star-fill me-1"></i>
+
+                                            Primary
+
+                                        </span>
+
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- View Student -->
+
+                            <div class="student-action">
+
+                                <a
+                                    href="{{ url_for('extra_class.view_student', student_id=link.student.id) }}"
+                                    class="btn btn-sm btn-outline-primary"
+                                    title="View Student"
+                                >
+
+                                    <i class="bi bi-eye"></i>
+
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                        {% endfor %}
+
+                    {% else %}
+
+                        <div class="empty-state">
+
+                            <i class="bi bi-mortarboard"></i>
+
+                            <p>
+                                No student has been linked to this parent yet.
+                            </p>
+
+
+                            <a
+                                href="{{ url_for('extra_class.link_parent_student_form', parent_id=parent.id) }}"
+                                class="btn btn-primary btn-sm"
+                            >
+
+                                <i class="bi bi-person-plus-fill me-1"></i>
+
+                                Link Student
+
+                            </a>
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         NAVIGATION FOOTER
+         ===================================================== -->
+
+    <div class="navigation-footer">
+
+        <a
+            href="{{ url_for('extra_class.parents') }}"
+            class="btn btn-outline-secondary"
+        >
+
+            <i class="bi bi-arrow-left me-1"></i>
+
+            Back to Parents
+
+        </a>
+
+
+        <div class="d-flex gap-2">
+
+            <a
+                href="{{ url_for('extra_class.edit_parent', parent_id=parent.id) }}"
+                class="btn btn-outline-primary"
+            >
+
+                <i class="bi bi-pencil-square me-1"></i>
+
+                Edit Parent
+
+            </a>
+
+
+            <a
+                href="{{ url_for('extra_class.link_parent_student_form', parent_id=parent.id) }}"
+                class="btn btn-primary"
+            >
+
+                <i class="bi bi-person-plus-fill me-1"></i>
+
+                Link Student
+
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

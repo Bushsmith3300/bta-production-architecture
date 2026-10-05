@@ -1,0 +1,429 @@
+{% extends "admin/extra_classes/super_admin/extra_class_super_admin_base.html" %}
+
+{% block title %}Link Parent | Extra Classes{% endblock %}
+
+{% block page_title %}Link Parent{% endblock %}
+
+{% block page_subtitle %}
+Connect a parent or guardian to this student.
+{% endblock %}
+
+{% block header_heading %}
+Link Parent / Guardian
+{% endblock %}
+
+{% block header_description %}
+Associate an existing parent or guardian with this student.
+{% endblock %}
+
+{% block page_actions %}
+
+<a href="{{ url_for(
+    'extra_class.super_admin_view_student',
+    student_id=student.id
+) }}"
+   class="btn btn-light">
+
+    <i class="bi bi-arrow-left me-1"></i>
+    Back to Student
+
+</a>
+
+{% endblock %}
+
+
+{% block extra_css %}
+
+<style>
+
+    .link-card {
+        background: #ffffff;
+        border-radius: 18px;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.06);
+        padding: 30px;
+    }
+
+    .student-summary {
+        background: #800000;
+        color: #ffffff;
+        border-radius: 14px;
+        padding: 20px;
+        margin-bottom: 28px;
+    }
+
+    .student-avatar {
+        width: 55px;
+        height: 55px;
+        border-radius: 50%;
+        background: #ffffff;
+        color: #800000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+    }
+
+    .student-name {
+        font-weight: 700;
+        font-size: 1.15rem;
+    }
+
+    .student-code {
+        font-size: 0.85rem;
+        opacity: 0.9;
+    }
+
+    .form-section-title {
+        color: #800000;
+        font-size: 1.08rem;
+        font-weight: 700;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #f1e4e4;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #343a40;
+        margin-bottom: 7px;
+    }
+
+    .form-control,
+    .form-select {
+        border-radius: 10px;
+        padding: 11px 14px;
+        border: 1px solid #ced4da;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #800000;
+        box-shadow: 0 0 0 0.2rem rgba(128,0,0,0.12);
+    }
+
+    .required {
+        color: #dc3545;
+    }
+
+    .form-help {
+        color: #6c757d;
+        font-size: 0.84rem;
+        margin-top: 5px;
+    }
+
+    .primary-box {
+        background: #fff8f8;
+        border: 1px solid #ead4d4;
+        border-radius: 12px;
+        padding: 15px;
+    }
+
+    .primary-box .form-check-label {
+        font-weight: 600;
+    }
+
+    .btn-maroon {
+        background: #800000;
+        color: #ffffff;
+        border: none;
+        border-radius: 10px;
+        padding: 11px 22px;
+        font-weight: 600;
+    }
+
+    .btn-maroon:hover {
+        background: #660000;
+        color: #ffffff;
+    }
+
+    .btn-cancel {
+        border-radius: 10px;
+        padding: 11px 22px;
+        font-weight: 600;
+    }
+
+    .no-parents {
+        background: #fff8f8;
+        border: 1px dashed #d8baba;
+        border-radius: 12px;
+        padding: 30px;
+        text-align: center;
+    }
+
+    .no-parents i {
+        color: #800000;
+    }
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="link-card">
+
+
+    <!-- STUDENT SUMMARY -->
+
+    <div class="student-summary">
+
+        <div class="d-flex align-items-center gap-3">
+
+            <div class="student-avatar">
+
+                {{ student.first_name[:1]|upper }}{{ student.surname[:1]|upper }}
+
+            </div>
+
+
+            <div>
+
+                <div class="student-name">
+
+                    {{ student.first_name }}
+
+                    {% if student.other_name %}
+                        {{ student.other_name }}
+                    {% endif %}
+
+                    {{ student.surname }}
+
+                </div>
+
+
+                <div class="student-code">
+
+                    <i class="bi bi-upc-scan me-1"></i>
+
+                    Student Code:
+                    {{ student.student_code }}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    {% if parents %}
+
+        <form method="POST"
+              action="{{ url_for(
+                  'extra_class.super_admin_link_student_parent',
+                  student_id=student.id
+              ) }}">
+
+            <input type="hidden"
+                   name="csrf_token"
+                   value="{{ csrf_token() }}">
+
+
+            <!-- PARENT -->
+
+            <div class="mb-4">
+
+                <div class="form-section-title">
+
+                    <i class="bi bi-person-plus-fill me-2"></i>
+                    Select Parent / Guardian
+
+                </div>
+
+
+                <label for="parent_id"
+                       class="form-label">
+
+                    Parent / Guardian
+                    <span class="required">*</span>
+
+                </label>
+
+
+                {% set linked_parent_ids = student.parent_links
+                    | map(attribute='parent_id')
+                    | list %}
+
+
+                <select class="form-select"
+                        id="parent_id"
+                        name="parent_id"
+                        required>
+
+                    <option value="">
+                        -- Select Parent / Guardian --
+                    </option>
+
+
+                    {% for parent in parents %}
+
+                        <option value="{{ parent.id }}"
+                            {% if parent.id in linked_parent_ids %}
+                                disabled
+                            {% endif %}>
+
+                            {{ parent.first_name }}
+                            {{ parent.surname }}
+
+                            {% if parent.phone %}
+                                — {{ parent.phone }}
+                            {% endif %}
+
+                            {% if parent.id in linked_parent_ids %}
+                                (Already Linked)
+                            {% endif %}
+
+                        </option>
+
+                    {% endfor %}
+
+                </select>
+
+
+                <div class="form-help">
+
+                    Select an existing parent or guardian.
+                    Parents who are already linked to this student
+                    cannot be selected again.
+
+                </div>
+
+            </div>
+
+
+            <!-- RELATIONSHIP -->
+
+            <div class="mb-4">
+
+                <label for="relationship"
+                       class="form-label">
+
+                    Relationship
+                    <span class="required">*</span>
+
+                </label>
+
+
+                <input type="text"
+                       class="form-control"
+                       id="relationship"
+                       name="relationship"
+                       value="{{ request.form.get('relationship', '') }}"
+                       placeholder="e.g. Father, Mother, Guardian, Uncle"
+                       required>
+
+
+                <div class="form-help">
+
+                    Enter the relationship between the parent/guardian
+                    and the student.
+
+                </div>
+
+            </div>
+
+
+            <!-- PRIMARY -->
+
+            <div class="primary-box mb-4">
+
+                <div class="form-check">
+
+                    <input type="hidden"
+                           name="is_primary"
+                           value="0">
+
+
+                    <input class="form-check-input"
+                           type="checkbox"
+                           id="is_primary"
+                           name="is_primary"
+                           value="1"
+                           {% if request.form.get('is_primary') == '1' %}
+                               checked
+                           {% endif %}>
+
+
+                    <label class="form-check-label"
+                           for="is_primary">
+
+                        Set as primary parent / guardian
+
+                    </label>
+
+                </div>
+
+
+                <div class="form-help ms-4">
+
+                    The primary parent or guardian will be treated
+                    as the main contact for this student.
+
+                </div>
+
+            </div>
+
+
+            <!-- ACTIONS -->
+
+            <div class="d-flex justify-content-end gap-2 mt-4 pt-4 border-top">
+
+                <a href="{{ url_for(
+                    'extra_class.super_admin_view_student',
+                    student_id=student.id
+                ) }}"
+                   class="btn btn-outline-secondary btn-cancel">
+
+                    <i class="bi bi-x-circle me-1"></i>
+                    Cancel
+
+                </a>
+
+
+                <button type="submit"
+                        class="btn btn-maroon">
+
+                    <i class="bi bi-link-45deg me-1"></i>
+                    Link Parent
+
+                </button>
+
+            </div>
+
+        </form>
+
+
+    {% else %}
+
+        <div class="no-parents">
+
+            <i class="bi bi-people-fill fs-1 d-block mb-3"></i>
+
+            <h5>
+                No Parents Available
+            </h5>
+
+            <p class="text-muted">
+                There are currently no parents or guardians available
+                to link to this student.
+            </p>
+
+
+            <a href="{{ url_for('extra_class.super_admin_add_parent') }}"
+               class="btn btn-maroon">
+
+                <i class="bi bi-person-plus-fill me-1"></i>
+                Add Parent
+
+            </a>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

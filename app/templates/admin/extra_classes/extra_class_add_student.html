@@ -1,0 +1,497 @@
+{% extends "admin/extra_classes/extra_class_admin_base.html" %}
+
+
+{% block title %}
+    Add Student | BTA Extra Classes
+{% endblock %}
+
+
+{% block page_title %}
+    Add Extra Class Student
+{% endblock %}
+
+
+{% block page_subtitle %}
+    Register a new student for the Extra Classes system.
+{% endblock %}
+
+
+
+{% block extra_css %}
+
+<style>
+
+    /* =====================================================
+       FORM CARD
+    ===================================================== */
+
+    .form-card {
+        background: white;
+        border-radius: 14px;
+        padding: 30px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+
+    /* =====================================================
+       SECTION TITLE
+    ===================================================== */
+
+    .section-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 20px;
+    }
+
+
+    /* =====================================================
+       FORM
+    ===================================================== */
+
+    .form-label {
+        font-weight: 600;
+        color: #374151;
+    }
+
+
+    .required {
+        color: #dc2626;
+    }
+
+
+    .form-control {
+        padding: 11px 13px;
+        border-radius: 8px;
+    }
+
+
+    .form-control:focus {
+        border-color: #1565c0;
+        box-shadow: 0 0 0 0.2rem rgba(
+            21,
+            101,
+            192,
+            0.15
+        );
+    }
+
+
+    /* =====================================================
+       INFORMATION BOX
+    ===================================================== */
+
+    .info-box {
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+        border-radius: 10px;
+        padding: 15px;
+        color: #1e40af;
+        margin-bottom: 25px;
+    }
+
+
+    /* =====================================================
+       RESPONSIVE
+    ===================================================== */
+
+    @media (max-width: 768px) {
+
+        .form-card {
+            padding: 20px;
+        }
+
+    }
+
+</style>
+
+{% endblock %}
+
+
+
+{% block content %}
+
+<div class="form-card">
+
+
+    <!-- =================================================
+         INFORMATION BOX
+    ================================================== -->
+
+    <div class="info-box">
+
+        <i class="bi bi-info-circle me-2"></i>
+
+        <strong>Student Code</strong> must be unique.
+        It will be used to identify the student when
+        parents access the Extra Classes payment system.
+
+    </div>
+
+
+
+    <!-- =================================================
+         FORM
+    ================================================== -->
+
+    <form
+        method="POST"
+        action="{{ url_for('extra_class.add_student') }}"
+    >
+
+        <!-- CSRF TOKEN -->
+
+        <input
+            type="hidden"
+            name="csrf_token"
+            value="{{ csrf_token() }}"
+        >
+
+
+
+        <!-- =================================================
+             STUDENT INFORMATION
+        ================================================== -->
+
+        <div class="section-title">
+
+            <i class="bi bi-person me-2"></i>
+
+            Student Information
+
+        </div>
+
+
+        <div class="row g-4">
+
+
+            <!-- Student Code -->
+
+            <div class="col-md-6">
+
+                <label
+                    for="student_code"
+                    class="form-label"
+                >
+
+                    Student Code
+
+                    <span class="required">
+                        *
+                    </span>
+
+                </label>
+
+
+                <input
+                    type="text"
+                    id="student_code"
+                    name="student_code"
+                    class="form-control"
+                    value="{{ student_code|default('') }}"
+                    placeholder="e.g. BTA-2026-001"
+                    required
+                >
+
+
+                <div class="form-text">
+
+                    Enter a unique code for this student.
+
+                </div>
+
+            </div>
+
+
+
+            <!-- First Name -->
+
+            <div class="col-md-6">
+
+                <label
+                    for="first_name"
+                    class="form-label"
+                >
+
+                    First Name
+
+                    <span class="required">
+                        *
+                    </span>
+
+                </label>
+
+
+                <input
+                    type="text"
+                    id="first_name"
+                    name="first_name"
+                    class="form-control"
+                    value="{{ first_name|default('') }}"
+                    placeholder="Enter first name"
+                    required
+                >
+
+            </div>
+
+
+
+            <!-- Surname -->
+
+            <div class="col-md-6">
+
+                <label
+                    for="surname"
+                    class="form-label"
+                >
+
+                    Surname
+
+                    <span class="required">
+                        *
+                    </span>
+
+                </label>
+
+
+                <input
+                    type="text"
+                    id="surname"
+                    name="surname"
+                    class="form-control"
+                    value="{{ surname|default('') }}"
+                    placeholder="Enter surname"
+                    required
+                >
+
+            </div>
+
+
+
+            <!-- Other Name -->
+
+            <div class="col-md-6">
+
+                <label
+                    for="other_name"
+                    class="form-label"
+                >
+
+                    Other Name
+
+                    <span class="text-muted">
+                        (Optional)
+                    </span>
+
+                </label>
+
+
+                <input
+                    type="text"
+                    id="other_name"
+                    name="other_name"
+                    class="form-control"
+                    value="{{ other_name|default('') }}"
+                    placeholder="Enter other name"
+                >
+
+            </div>
+
+
+        </div>
+
+
+
+        <hr class="my-5">
+
+
+
+        <!-- =================================================
+             SCHOOL INFORMATION
+        ================================================== -->
+
+        <div class="section-title">
+
+            <i class="bi bi-building me-2"></i>
+
+            School Information
+
+        </div>
+
+
+        <div class="row g-4">
+
+
+            <!-- School -->
+
+            <div class="col-md-6">
+
+                <label
+                    for="school"
+                    class="form-label"
+                >
+
+                    School
+
+                </label>
+
+
+                <input
+                    type="text"
+                    id="school"
+                    name="school"
+                    class="form-control"
+                    value="{{ school|default('') }}"
+                    placeholder="Enter school name"
+                >
+
+            </div>
+
+
+
+            <!-- Class -->
+
+            <div class="col-md-6">
+
+                <label
+                    for="class_name"
+                    class="form-label"
+                >
+
+                    Class
+
+                </label>
+
+
+                <input
+                    type="text"
+                    id="class_name"
+                    name="class_name"
+                    class="form-control"
+                    value="{{ class_name|default('') }}"
+                    placeholder="e.g. SHS 2"
+                >
+
+            </div>
+
+
+        </div>
+
+
+
+        <hr class="my-5">
+
+
+
+        <!-- =================================================
+             CONTACT INFORMATION
+        ================================================== -->
+
+        <div class="section-title">
+
+            <i class="bi bi-telephone me-2"></i>
+
+            Contact Information
+
+        </div>
+
+
+        <div class="row g-4">
+
+
+            <!-- Phone -->
+
+            <div class="col-md-6">
+
+                <label
+                    for="phone"
+                    class="form-label"
+                >
+
+                    Phone Number
+
+                </label>
+
+
+                <input
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    class="form-control"
+                    value="{{ phone|default('') }}"
+                    placeholder="e.g. 0241234567"
+                >
+
+            </div>
+
+
+
+            <!-- Email -->
+
+            <div class="col-md-6">
+
+                <label
+                    for="email"
+                    class="form-label"
+                >
+
+                    Email
+
+                </label>
+
+
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    class="form-control"
+                    value="{{ email|default('') }}"
+                    placeholder="student@example.com"
+                >
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- =================================================
+             BUTTONS
+        ================================================== -->
+
+        <div
+            class="d-flex justify-content-end gap-2 mt-5"
+        >
+
+            <a
+                href="{{ url_for('extra_class.students') }}"
+                class="btn btn-outline-secondary"
+            >
+
+                <i class="bi bi-arrow-left me-1"></i>
+
+                Cancel
+
+            </a>
+
+
+            <button
+                type="submit"
+                class="btn btn-primary"
+            >
+
+                <i class="bi bi-person-plus me-1"></i>
+
+                Register Student
+
+            </button>
+
+        </div>
+
+
+    </form>
+
+</div>
+
+{% endblock %}

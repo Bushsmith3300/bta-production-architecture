@@ -1,0 +1,625 @@
+{% extends "admin/extra_classes/super_admin/extra_class_super_admin_base.html" %}
+
+{% block title %}
+    Extra Class Terms
+{% endblock %}
+
+{% block page_title %}
+    Extra Class Terms
+{% endblock %}
+
+{% block page_subtitle %}
+    Manage extra class terms, semesters, and their active periods.
+{% endblock %}
+
+{% block header_heading %}
+    Extra Class Terms
+{% endblock %}
+
+{% block header_description %}
+    Create and manage the periods in which extra classes are offered.
+{% endblock %}
+
+{% block page_actions %}
+    <a
+        href="{{ url_for('extra_class.super_admin_add_term') }}"
+        class="btn btn-light fw-semibold"
+    >
+        <i class="bi bi-plus-circle me-1"></i>
+        Add Term
+    </a>
+{% endblock %}
+
+
+{% block extra_css %}
+
+<style>
+
+    /* ========================================================
+       TERM PAGE
+       ======================================================== */
+
+    .term-card {
+        border: none;
+        border-radius: 18px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+    }
+
+
+    /* ========================================================
+       CARD HEADER
+       ======================================================== */
+
+    .term-card-header {
+        padding: 20px 24px;
+        background: #ffffff;
+        border-bottom: 1px solid #eeeeee;
+    }
+
+    .term-card-title {
+        margin: 0;
+        color: #4a1c2f;
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+
+    .term-count {
+        margin-top: 4px;
+        color: #777777;
+        font-size: 0.88rem;
+    }
+
+
+    /* ========================================================
+       TABLE
+       ======================================================== */
+
+    .term-table {
+        margin-bottom: 0;
+    }
+
+    .term-table thead th {
+        background: #f8f4f6;
+        color: #4a1c2f;
+        font-size: 0.78rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        padding: 15px 16px;
+        border-bottom: 1px solid #e8dfe3;
+        white-space: nowrap;
+    }
+
+    .term-table tbody td {
+        padding: 16px;
+        vertical-align: middle;
+        border-bottom: 1px solid #eeeeee;
+    }
+
+    .term-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .term-table tbody tr {
+        transition: background-color 0.2s ease;
+    }
+
+    .term-table tbody tr:hover {
+        background: #fcf9fa;
+    }
+
+
+    /* ========================================================
+       TERM NAME
+       ======================================================== */
+
+    .term-name {
+        color: #5a1830;
+        font-weight: 700;
+        font-size: 0.95rem;
+    }
+
+    .term-id {
+        color: #999999;
+        font-size: 0.76rem;
+        margin-top: 3px;
+    }
+
+
+    /* ========================================================
+       DATES
+       ======================================================== */
+
+    .term-date {
+        color: #555555;
+        font-size: 0.9rem;
+        white-space: nowrap;
+    }
+
+
+    /* ========================================================
+       DURATION
+       ======================================================== */
+
+    .duration-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 12px;
+        border-radius: 20px;
+        background: #f3e8ee;
+        color: #6b1d3a;
+        font-size: 0.82rem;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+
+    /* ========================================================
+       STATUS
+       ======================================================== */
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 12px;
+        border-radius: 20px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .status-active {
+        background: #e8f7ee;
+        color: #18794e;
+    }
+
+    .status-inactive {
+        background: #f1f1f1;
+        color: #666666;
+    }
+
+
+    /* ========================================================
+       ACTION BUTTONS
+       ======================================================== */
+
+    .action-buttons {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .action-btn {
+        width: 36px;
+        height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        border-radius: 9px;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+    .action-btn:hover {
+        transform: translateY(-1px);
+    }
+
+    .edit-btn {
+        background: #f3e8ee;
+        color: #6b1d3a;
+    }
+
+    .edit-btn:hover {
+        background: #e8d5de;
+        color: #53152d;
+    }
+
+    .toggle-btn {
+        background: #f1f1f1;
+        color: #555555;
+    }
+
+    .toggle-btn:hover {
+        background: #e2e2e2;
+        color: #333333;
+    }
+
+
+    /* ========================================================
+       EMPTY STATE
+       ======================================================== */
+
+    .empty-state {
+        padding: 70px 25px;
+        text-align: center;
+    }
+
+    .empty-state-icon {
+        width: 75px;
+        height: 75px;
+        margin: 0 auto 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: #f3e8ee;
+        color: #6b1d3a;
+        font-size: 2rem;
+    }
+
+    .empty-state h5 {
+        margin-bottom: 8px;
+        color: #4a1c2f;
+        font-weight: 700;
+    }
+
+    .empty-state p {
+        max-width: 560px;
+        margin: 0 auto 22px;
+        color: #777777;
+        line-height: 1.6;
+    }
+
+    .add-first-btn {
+        background: #6b1d3a;
+        border: none;
+        color: #ffffff;
+        padding: 10px 20px;
+        border-radius: 9px;
+        font-weight: 600;
+    }
+
+    .add-first-btn:hover {
+        background: #53152d;
+        color: #ffffff;
+    }
+
+
+    /* ========================================================
+       MOBILE
+       ======================================================== */
+
+    @media (max-width: 768px) {
+
+        .term-card-header {
+            padding: 18px;
+        }
+
+        .term-table {
+            min-width: 900px;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+    }
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container-fluid px-0">
+
+    <div class="term-card bg-white">
+
+        <!-- ==================================================
+             CARD HEADER
+             ================================================== -->
+
+        <div class="term-card-header
+                    d-flex
+                    justify-content-between
+                    align-items-center
+                    flex-wrap
+                    gap-2">
+
+            <div>
+
+                <h5 class="term-card-title">
+                    <i class="bi bi-calendar3 me-2"></i>
+                    Term List
+                </h5>
+
+                <div class="term-count">
+
+                    {{ terms|length }}
+
+                    {% if terms|length == 1 %}
+                        term
+                    {% else %}
+                        terms
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        {% if terms %}
+
+        <!-- ==================================================
+             TERMS TABLE
+             ================================================== -->
+
+        <div class="table-responsive">
+
+            <table class="table term-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Term
+                        </th>
+
+                        <th>
+                            Start Date
+                        </th>
+
+                        <th>
+                            End Date
+                        </th>
+
+                        <th>
+                            Duration
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                        <th class="text-center">
+                            Actions
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                {% for term in terms %}
+
+                    <tr>
+
+                        <!-- ==================================
+                             TERM
+                             ================================== -->
+
+                        <td>
+
+                            <div class="term-name">
+                                {{ term.name }}
+                            </div>
+
+                            <div class="term-id">
+                                Term #{{ term.id }}
+                            </div>
+
+                        </td>
+
+
+                        <!-- ==================================
+                             START DATE
+                             ================================== -->
+
+                        <td>
+
+                            <div class="term-date">
+
+                                {{ term.start_date.strftime('%d %b %Y') }}
+
+                            </div>
+
+                        </td>
+
+
+                        <!-- ==================================
+                             END DATE
+                             ================================== -->
+
+                        <td>
+
+                            <div class="term-date">
+
+                                {{ term.end_date.strftime('%d %b %Y') }}
+
+                            </div>
+
+                        </td>
+
+
+                        <!-- ==================================
+                             DURATION
+                             ================================== -->
+
+                        <td>
+
+                            <span class="duration-badge">
+
+                                <i class="bi bi-clock"></i>
+
+                                {{ term.duration_display }}
+
+                            </span>
+
+                        </td>
+
+
+                        <!-- ==================================
+                             STATUS
+                             ================================== -->
+
+                        <td>
+
+                            {% if term.is_active %}
+
+                                <span
+                                    class="status-badge status-active"
+                                >
+
+                                    <i class="bi bi-check-circle-fill"></i>
+
+                                    Active
+
+                                </span>
+
+                            {% else %}
+
+                                <span
+                                    class="status-badge status-inactive"
+                                >
+
+                                    <i class="bi bi-dash-circle-fill"></i>
+
+                                    Inactive
+
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- ==================================
+                             ACTIONS
+                             ================================== -->
+
+                        <td>
+
+                            <div class="action-buttons">
+
+                                <!-- EDIT TERM -->
+
+                                <a
+                                    href="{{ url_for(
+                                        'extra_class.super_admin_edit_term',
+                                        term_id=term.id
+                                    ) }}"
+                                    class="action-btn edit-btn"
+                                    title="Edit Term"
+                                >
+
+                                    <i class="bi bi-pencil"></i>
+
+                                </a>
+
+
+                                <!-- TOGGLE STATUS -->
+
+                                <form
+                                    method="POST"
+                                    action="{{ url_for(
+                                        'extra_class.super_admin_toggle_term_status',
+                                        term_id=term.id
+                                    ) }}"
+                                    class="d-inline"
+                                    onsubmit="return confirm(
+                                        'Are you sure you want to {% if term.is_active %}deactivate{% else %}activate{% endif %} this term?'
+                                    );"
+                                >
+
+                                    {% if csrf_token is defined %}
+
+                                        <input
+                                            type="hidden"
+                                            name="csrf_token"
+                                            value="{{ csrf_token() }}"
+                                        >
+
+                                    {% endif %}
+
+                                    <button
+                                        type="submit"
+                                        class="action-btn toggle-btn"
+                                        title="{% if term.is_active %}Deactivate Term{% else %}Activate Term{% endif %}"
+                                    >
+
+                                        {% if term.is_active %}
+
+                                            <i class="bi bi-toggle-on"></i>
+
+                                        {% else %}
+
+                                            <i class="bi bi-toggle-off"></i>
+
+                                        {% endif %}
+
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        {% else %}
+
+        <!-- ==================================================
+             EMPTY STATE
+             ================================================== -->
+
+        <div class="empty-state">
+
+            <div class="empty-state-icon">
+
+                <i class="bi bi-calendar3"></i>
+
+            </div>
+
+            <h5>
+                No Extra Class Terms Yet
+            </h5>
+
+            <p>
+                No extra class term has been created yet.
+                Create a term to define the period during which
+                extra classes will operate and monthly fees will
+                be generated.
+            </p>
+
+            <a
+                href="{{ url_for('extra_class.super_admin_add_term') }}"
+                class="btn add-first-btn"
+            >
+
+                <i class="bi bi-plus-circle me-1"></i>
+
+                Add First Term
+
+            </a>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

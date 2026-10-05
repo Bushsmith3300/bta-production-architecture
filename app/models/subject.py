@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from app import db
+from app.extensions import db
 
 
 class Subject(db.Model):
@@ -67,13 +67,21 @@ class Subject(db.Model):
         onupdate=datetime.utcnow
     )
     
-    # RELATIONSHIPS (FIXED)
-    # ======================================
     
+# ======================================    
+    # RELATIONSHIPS
+# ======================================
+
     questions = db.relationship(
-    "Question",
-    back_populates="subject_ref"
+        "Question",
+        back_populates="subject_ref"
     )
+
+    extra_class_subjects = db.relationship(
+        "ExtraClassSubject",
+        back_populates="subject"
+    )
+    
 
     def __repr__(self):
         return f"<Subject {self.name}>"

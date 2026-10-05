@@ -1,0 +1,516 @@
+{% extends "admin/extra_classes/super_admin/extra_class_super_admin_base.html" %}
+
+{% block title %}
+    Edit Extra Class Subject
+{% endblock %}
+
+{% block page_title %}
+    Edit Extra Class Subject
+{% endblock %}
+
+{% block page_subtitle %}
+    Update the teacher and monthly fee
+{% endblock %}
+
+{% block header_heading %}
+    Edit Extra Class Subject
+{% endblock %}
+
+{% block header_description %}
+    Update the Extra Classes settings for this subject.
+{% endblock %}
+
+{% block page_actions %}
+
+    <a
+        href="{{ url_for('extra_class.view_subject', extra_subject_id=extra_subject.id) }}"
+        class="btn btn-light"
+    >
+        <i class="bi bi-arrow-left"></i>
+        Back to Subject
+    </a>
+
+{% endblock %}
+
+
+{% block extra_css %}
+
+<style>
+
+    .form-wrapper {
+        max-width: 850px;
+        margin: 0 auto;
+    }
+
+    .form-card {
+        background: #fff;
+        border-radius: 18px;
+        box-shadow: 0 8px 30px rgba(92, 0, 8, 0.08);
+        border: 1px solid #f0e1e3;
+        overflow: hidden;
+    }
+
+    .form-card-header {
+        padding: 24px 28px;
+        background: linear-gradient(
+            135deg,
+            #fff5f6 0%,
+            #ffffff 100%
+        );
+        border-bottom: 1px solid #f0e1e3;
+    }
+
+    .form-card-header h3 {
+        margin: 0 0 6px;
+        color: #5c0008;
+        font-size: 20px;
+        font-weight: 800;
+    }
+
+    .form-card-header p {
+        margin: 0;
+        color: #777;
+        font-size: 13px;
+    }
+
+    .form-body {
+        padding: 30px;
+    }
+
+    .form-group {
+        margin-bottom: 24px;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 8px;
+        color: #3d1014;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .required {
+        color: #c00018;
+    }
+
+    .form-control,
+    .form-select {
+        width: 100%;
+        min-height: 48px;
+        padding: 12px 14px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        background: #fff;
+        color: #333;
+        font-size: 14px;
+        transition: all 0.2s ease;
+        box-sizing: border-box;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        outline: none;
+        border-color: #a00015;
+        box-shadow: 0 0 0 3px rgba(160, 0, 21, 0.08);
+    }
+
+    .form-help {
+        display: block;
+        margin-top: 7px;
+        color: #888;
+        font-size: 11px;
+    }
+
+    /* -----------------------------------------
+       SUBJECT INFORMATION
+    ----------------------------------------- */
+
+    .subject-info {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 18px;
+        margin-bottom: 28px;
+        background: #fff7f8;
+        border: 1px solid #f0dfe2;
+        border-radius: 12px;
+    }
+
+    .subject-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #5c0008;
+        color: #fff;
+        font-size: 25px;
+        flex-shrink: 0;
+    }
+
+    .subject-details h3 {
+        margin: 0 0 4px;
+        color: #5c0008;
+        font-size: 18px;
+        font-weight: 800;
+    }
+
+    .subject-details p {
+        margin: 0;
+        color: #777;
+        font-size: 12px;
+    }
+
+    /* -----------------------------------------
+       FEE
+    ----------------------------------------- */
+
+    .fee-input-wrapper {
+        position: relative;
+    }
+
+    .fee-prefix {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #5c0008;
+        font-weight: 800;
+        font-size: 14px;
+        pointer-events: none;
+    }
+
+    .fee-input {
+        padding-left: 50px;
+    }
+
+    /* -----------------------------------------
+       INFO BOX
+    ----------------------------------------- */
+
+    .info-box {
+        margin-top: 10px;
+        padding: 15px 18px;
+        border-radius: 10px;
+        background: #fff7e8;
+        border: 1px solid #f2dfb3;
+        color: #795900;
+        font-size: 12px;
+        line-height: 1.6;
+    }
+
+    .info-box i {
+        margin-right: 6px;
+    }
+
+    /* -----------------------------------------
+       ACTIONS
+    ----------------------------------------- */
+
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        margin-top: 30px;
+        padding-top: 22px;
+        border-top: 1px solid #eee;
+    }
+
+    .btn-cancel,
+    .btn-submit {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        min-height: 44px;
+        padding: 10px 20px;
+        border-radius: 9px;
+        font-size: 13px;
+        font-weight: 800;
+        text-decoration: none;
+        box-sizing: border-box;
+    }
+
+    .btn-cancel {
+        border: 1px solid #ddd;
+        background: #fff;
+        color: #555;
+    }
+
+    .btn-cancel:hover {
+        background: #f7f7f7;
+        color: #333;
+    }
+
+    .btn-submit {
+        border: none;
+        background: linear-gradient(
+            135deg,
+            #b00018,
+            #78000d
+        );
+        color: #fff;
+        cursor: pointer;
+        box-shadow: 0 5px 15px rgba(120, 0, 13, 0.20);
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 7px 18px rgba(120, 0, 13, 0.28);
+    }
+
+    @media (max-width: 600px) {
+
+        .form-body {
+            padding: 20px;
+        }
+
+        .form-card-header {
+            padding: 20px;
+        }
+
+        .subject-info {
+            align-items: flex-start;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+
+        .btn-cancel,
+        .btn-submit {
+            width: 100%;
+        }
+
+    }
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="form-wrapper">
+
+    <div class="form-card">
+
+        <div class="form-card-header">
+
+            <h3>
+                <i class="bi bi-pencil-square"></i>
+                Update Subject Settings
+            </h3>
+
+            <p>
+                Change the teacher assignment or monthly class fee.
+            </p>
+
+        </div>
+
+
+        <div class="form-body">
+
+            <!-- SUBJECT INFORMATION -->
+
+            <div class="subject-info">
+
+                <div class="subject-icon">
+
+                    {% if extra_subject.subject.icon %}
+                        {{ extra_subject.subject.icon }}
+                    {% else %}
+                        <i class="bi bi-book"></i>
+                    {% endif %}
+
+                </div>
+
+                <div class="subject-details">
+
+                    <h3>
+                        {{ extra_subject.subject.name }}
+                    </h3>
+
+                    <p>
+
+                        {% if extra_subject.subject.code %}
+                            Code: {{ extra_subject.subject.code }}
+                            &nbsp; • &nbsp;
+                        {% endif %}
+
+                        Extra Class Subject ID:
+                        {{ extra_subject.id }}
+
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <form method="POST">
+
+                {% if csrf_token %}
+                    <input
+                        type="hidden"
+                        name="csrf_token"
+                        value="{{ csrf_token() }}"
+                    >
+                {% endif %}
+
+
+                <!-- TEACHER -->
+
+                <div class="form-group">
+
+                    <label class="form-label">
+                        Extra Class Teacher
+                    </label>
+
+                    <select
+                        name="teacher_id"
+                        class="form-select"
+                    >
+
+                        <option value="">
+                            -- No Teacher Assigned --
+                        </option>
+
+                        {% for teacher in teachers %}
+
+                            <option
+                                value="{{ teacher.id }}"
+                                {% if extra_subject.teacher_id == teacher.id %}
+                                    selected
+                                {% endif %}
+                            >
+
+                                {{ teacher.first_name }}
+                                {{ teacher.surname }}
+
+                                {% if teacher.teacher_code %}
+                                    — {{ teacher.teacher_code }}
+                                {% endif %}
+
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                    <span class="form-help">
+                        Select the teacher responsible for this Extra Class subject.
+                    </span>
+
+                </div>
+
+
+                <!-- MONTHLY FEE -->
+
+                <div class="form-group">
+
+                    <label class="form-label">
+                        Monthly Class Fee
+                        <span class="required">*</span>
+                    </label>
+
+                    <div class="fee-input-wrapper">
+
+                        <span class="fee-prefix">
+                            GH₵
+                        </span>
+
+                        <input
+                            type="number"
+                            name="monthly_fee"
+                            class="form-control fee-input"
+                            value="{{ extra_subject.monthly_fee }}"
+                            min="0"
+                            step="0.01"
+                            required
+                        >
+
+                    </div>
+
+                    <span class="form-help">
+                        This is the standard monthly fee for every student
+                        enrolled in this subject.
+                    </span>
+
+                    <div class="info-box">
+
+                        <i class="bi bi-info-circle-fill"></i>
+
+                        Changing the fee here should affect future monthly
+                        billing. Existing monthly fee records and completed
+                        payments should remain unchanged.
+
+                    </div>
+
+                </div>
+
+
+                <!-- STATUS INFORMATION -->
+
+                <div class="form-group">
+
+                    <label class="form-label">
+                        Subject Status
+                    </label>
+
+                    <div class="info-box">
+
+                        <i class="bi bi-toggle-on"></i>
+
+                        This subject is currently
+
+                        {% if extra_subject.is_active %}
+                            <strong>Active</strong>.
+                            Students can be enrolled in it.
+                        {% else %}
+                            <strong>Inactive</strong>.
+                            New enrollments should not be made.
+                        {% endif %}
+
+                        <br><br>
+
+                        Use the status control on the Subject details page
+                        to activate or deactivate this subject.
+
+                    </div>
+
+                </div>
+
+
+                <!-- ACTIONS -->
+
+                <div class="form-actions">
+
+                    <a
+                        href="{{ url_for('extra_class.view_subject', extra_subject_id=extra_subject.id) }}"
+                        class="btn-cancel"
+                    >
+                        <i class="bi bi-x-circle"></i>
+                        Cancel
+                    </a>
+
+                    <button
+                        type="submit"
+                        class="btn-submit"
+                    >
+                        <i class="bi bi-check-circle"></i>
+                        Save Changes
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

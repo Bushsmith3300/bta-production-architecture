@@ -1,0 +1,1100 @@
+{% extends "admin/extra_classes/super_admin/extra_class_super_admin_base.html" %}
+
+{% block title %}{{ teacher.first_name }} {{ teacher.surname }} | Teacher{% endblock %}
+
+{% block page_title %}
+    Teacher Profile
+{% endblock %}
+
+{% block page_subtitle %}
+    View teacher information and assigned subjects
+{% endblock %}
+
+{% block page_actions %}
+
+<a href="{{ url_for('extra_class.teachers') }}" class="back-button">
+    <i class="bi bi-arrow-left"></i>
+    Back to Teachers
+</a>
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="teacher-profile-page">
+
+    <!-- PROFILE HEADER -->
+    <section class="profile-hero">
+
+        <div class="profile-avatar">
+            {{ teacher.first_name[0]|upper }}
+        </div>
+
+        <div class="profile-main">
+
+            <div class="profile-name-row">
+
+                <h2>
+                    {{ teacher.first_name }}
+
+                    {{ teacher.surname }}
+                </h2>
+
+                {% if teacher.is_active %}
+
+                    <span class="status-badge active">
+                        <i class="bi bi-circle-fill"></i>
+                        Active
+                    </span>
+
+                {% else %}
+
+                    <span class="status-badge inactive">
+                        <i class="bi bi-circle-fill"></i>
+                        Inactive
+                    </span>
+
+                {% endif %}
+
+            </div>
+
+            <p class="teacher-code">
+
+                <i class="bi bi-upc-scan"></i>
+
+                {% if teacher.teacher_code %}
+                    {{ teacher.teacher_code }}
+                {% else %}
+                    No teacher code assigned
+                {% endif %}
+
+            </p>
+
+        </div>
+
+
+        <div class="profile-actions">
+
+            <a
+                href="{{ url_for('extra_class.edit_teacher', teacher_id=teacher.id) }}"
+                class="edit-button">
+
+                <i class="bi bi-pencil-square"></i>
+                Edit Teacher
+
+            </a>
+
+
+            <form
+                method="POST"
+                action="{{ url_for('extra_class.toggle_teacher_status', teacher_id=teacher.id) }}"
+                onsubmit="return confirmStatusChange();">
+
+                {% if csrf_token is defined %}
+                    <input
+                        type="hidden"
+                        name="csrf_token"
+                        value="{{ csrf_token() }}">
+                {% endif %}
+
+                {% if teacher.is_active %}
+
+                    <button
+                        type="submit"
+                        class="status-button deactivate">
+
+                        <i class="bi bi-pause-circle-fill"></i>
+                        Deactivate
+
+                    </button>
+
+                {% else %}
+
+                    <button
+                        type="submit"
+                        class="status-button activate">
+
+                        <i class="bi bi-play-circle-fill"></i>
+                        Activate
+
+                    </button>
+
+                {% endif %}
+
+            </form>
+
+        </div>
+
+    </section>
+
+
+    <!-- INFORMATION CARDS -->
+    <section class="information-grid">
+
+        <!-- Contact Information -->
+        <div class="information-card">
+
+            <div class="card-heading">
+
+                <div class="heading-icon">
+                    <i class="bi bi-person-lines-fill"></i>
+                </div>
+
+                <div>
+                    <h3>Contact Information</h3>
+                    <p>Teacher contact details</p>
+                </div>
+
+            </div>
+
+
+            <div class="detail-list">
+
+                <div class="detail-row">
+
+                    <div class="detail-icon">
+                        <i class="bi bi-telephone-fill"></i>
+                    </div>
+
+                    <div>
+                        <span>Phone Number</span>
+
+                        <strong>
+                            {{ teacher.phone or "Not provided" }}
+                        </strong>
+                    </div>
+
+                </div>
+
+
+                <div class="detail-row">
+
+                    <div class="detail-icon">
+                        <i class="bi bi-envelope-fill"></i>
+                    </div>
+
+                    <div>
+                        <span>Email Address</span>
+
+                        <strong>
+                            {{ teacher.email or "Not provided" }}
+                        </strong>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Teacher Information -->
+        <div class="information-card">
+
+            <div class="card-heading">
+
+                <div class="heading-icon">
+                    <i class="bi bi-person-badge-fill"></i>
+                </div>
+
+                <div>
+                    <h3>Teacher Information</h3>
+                    <p>Registration details</p>
+                </div>
+
+            </div>
+
+
+            <div class="detail-list">
+
+                <div class="detail-row">
+
+                    <div class="detail-icon">
+                        <i class="bi bi-upc-scan"></i>
+                    </div>
+
+                    <div>
+                        <span>Teacher Code</span>
+
+                        <strong>
+                            {{ teacher.teacher_code or "Not assigned" }}
+                        </strong>
+                    </div>
+
+                </div>
+
+
+                <div class="detail-row">
+
+                    <div class="detail-icon">
+                        <i class="bi bi-calendar3"></i>
+                    </div>
+
+                    <div>
+                        <span>Added On</span>
+
+                        <strong>
+
+                            {% if teacher.created_at %}
+                                {{ teacher.created_at.strftime("%d %B %Y") }}
+                            {% else %}
+                                Not available
+                            {% endif %}
+
+                        </strong>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- SUBJECTS -->
+    <section class="information-card subjects-card">
+
+        <div class="card-heading">
+
+            <div class="heading-icon">
+                <i class="bi bi-book-fill"></i>
+            </div>
+
+            <div>
+                <h3>Assigned Subjects</h3>
+                <p>Extra Class subjects currently assigned to this teacher</p>
+            </div>
+
+        </div>
+
+
+        {% if teacher.subjects %}
+
+            <div class="subjects-grid">
+
+                {% for extra_subject in teacher.subjects %}
+
+                    <div class="subject-card">
+
+                        <div class="subject-icon">
+
+                            {% if extra_subject.subject
+                                  and extra_subject.subject.icon %}
+
+                                {{ extra_subject.subject.icon }}
+
+                            {% else %}
+
+                                <i class="bi bi-book"></i>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <div class="subject-information">
+
+                            <strong>
+
+                                {% if extra_subject.subject %}
+                                    {{ extra_subject.subject.name }}
+                                {% else %}
+                                    Subject
+                                {% endif %}
+
+                            </strong>
+
+
+                            {% if extra_subject.monthly_fee is not none %}
+
+                                <span>
+                                    GH¢
+                                    {{ "%.2f"|format(extra_subject.monthly_fee|float) }}
+                                    / month
+                                </span>
+
+                            {% else %}
+
+                                <span>
+                                    Monthly fee not set
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        {% if extra_subject.is_active %}
+
+                            <span class="subject-status active">
+                                Active
+                            </span>
+
+                        {% else %}
+
+                            <span class="subject-status inactive">
+                                Inactive
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <div class="empty-subjects">
+
+                <div class="empty-icon">
+                    <i class="bi bi-book"></i>
+                </div>
+
+                <h4>No Subjects Assigned</h4>
+
+                <p>
+                    This teacher has not been assigned an Extra Class
+                    subject yet.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+    </section>
+
+
+    <!-- FOOTER NAVIGATION -->
+    <div class="bottom-navigation">
+
+        <a
+            href="{{ url_for('extra_class.teachers') }}"
+            class="secondary-button">
+
+            <i class="bi bi-arrow-left"></i>
+            Back to Teachers
+
+        </a>
+
+
+        <a
+            href="{{ url_for('extra_class.edit_teacher', teacher_id=teacher.id) }}"
+            class="primary-button">
+
+            <i class="bi bi-pencil-square"></i>
+            Edit Teacher
+
+        </a>
+
+    </div>
+
+</div>
+
+
+<script>
+
+function confirmStatusChange() {
+
+    {% if teacher.is_active %}
+
+        return confirm(
+            "Are you sure you want to deactivate {{ teacher.first_name }} {{ teacher.surname }}?"
+        );
+
+    {% else %}
+
+        return confirm(
+            "Are you sure you want to activate {{ teacher.first_name }} {{ teacher.surname }}?"
+        );
+
+    {% endif %}
+}
+
+</script>
+
+
+<style>
+
+/* ==========================================
+   PAGE
+========================================== */
+
+.teacher-profile-page {
+    max-width: 1150px;
+    margin: 0 auto;
+}
+
+
+/* ==========================================
+   PROFILE HERO
+========================================== */
+
+.profile-hero {
+    background: linear-gradient(
+        135deg,
+        #b00018,
+        #e20b2d,
+        #78000d
+    );
+
+    color: #fff;
+
+    border-radius: 18px;
+
+    padding: 25px 28px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 18px;
+
+    margin-bottom: 20px;
+
+    box-shadow:
+        0 12px 30px rgba(92,0,8,.18);
+}
+
+.profile-avatar {
+    width: 68px;
+    height: 68px;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+
+    background: rgba(255,255,255,.17);
+
+    border: 2px solid rgba(255,255,255,.3);
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    font-size: 25px;
+
+    font-weight: 800;
+}
+
+.profile-main {
+    flex: 1;
+
+    min-width: 0;
+}
+
+.profile-name-row {
+    display: flex;
+
+    align-items: center;
+
+    flex-wrap: wrap;
+
+    gap: 10px;
+}
+
+.profile-name-row h2 {
+    margin: 0;
+
+    font-size: 23px;
+
+    font-weight: 800;
+}
+
+.teacher-code {
+    margin: 7px 0 0;
+
+    font-size: 11px;
+
+    opacity: .88;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 6px;
+}
+
+
+/* ==========================================
+   STATUS
+========================================== */
+
+.status-badge {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 5px;
+
+    padding: 6px 10px;
+
+    border-radius: 20px;
+
+    font-size: 10px;
+
+    font-weight: 700;
+}
+
+.status-badge.active {
+    background: rgba(255,255,255,.17);
+
+    color: #fff;
+}
+
+.status-badge.inactive {
+    background: rgba(0,0,0,.2);
+
+    color: #fff;
+}
+
+.status-badge i {
+    font-size: 7px;
+}
+
+
+/* ==========================================
+   ACTIONS
+========================================== */
+
+.profile-actions {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 8px;
+
+    flex-shrink: 0;
+}
+
+.profile-actions form {
+    margin: 0;
+}
+
+.edit-button,
+.status-button {
+    width: 145px;
+
+    min-height: 38px;
+
+    box-sizing: border-box;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 7px;
+
+    border-radius: 8px;
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    text-decoration: none;
+}
+
+.edit-button {
+    background: #fff;
+
+    color: #9d0015;
+
+    border: 1px solid #fff;
+}
+
+.edit-button:hover {
+    background: #f8f8f8;
+
+    color: #78000d;
+}
+
+.status-button {
+    width: 145px;
+
+    border: 1px solid rgba(255,255,255,.3);
+}
+
+.status-button.deactivate {
+    background: rgba(0,0,0,.16);
+
+    color: #fff;
+}
+
+.status-button.activate {
+    background: rgba(255,255,255,.14);
+
+    color: #fff;
+}
+
+.status-button:hover {
+    background: rgba(255,255,255,.23);
+}
+
+
+/* ==========================================
+   INFORMATION GRID
+========================================== */
+
+.information-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 18px;
+
+    margin-bottom: 18px;
+}
+
+.information-card {
+    background: #fff;
+
+    border: 1px solid #eee;
+
+    border-radius: 15px;
+
+    padding: 21px;
+
+    box-shadow:
+        0 6px 20px rgba(0,0,0,.04);
+}
+
+.subjects-card {
+    margin-bottom: 18px;
+}
+
+
+/* ==========================================
+   CARD HEADER
+========================================== */
+
+.card-heading {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    padding-bottom: 15px;
+
+    margin-bottom: 17px;
+
+    border-bottom: 1px solid #eee;
+}
+
+.heading-icon {
+    width: 40px;
+    height: 40px;
+
+    flex-shrink: 0;
+
+    border-radius: 11px;
+
+    background: #fcecef;
+
+    color: #9d0015;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+}
+
+.card-heading h3 {
+    margin: 0;
+
+    color: #333;
+
+    font-size: 16px;
+}
+
+.card-heading p {
+    margin: 3px 0 0;
+
+    color: #888;
+
+    font-size: 10px;
+}
+
+
+/* ==========================================
+   DETAILS
+========================================== */
+
+.detail-list {
+    display: flex;
+
+    flex-direction: column;
+}
+
+.detail-row {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 12px 0;
+
+    border-bottom: 1px solid #f1f1f1;
+}
+
+.detail-row:last-child {
+    border-bottom: none;
+}
+
+.detail-icon {
+    width: 35px;
+    height: 35px;
+
+    border-radius: 9px;
+
+    background: #fafafa;
+
+    color: #9d0015;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    font-size: 13px;
+}
+
+.detail-row > div:last-child {
+    min-width: 0;
+}
+
+.detail-row span {
+    display: block;
+
+    color: #888;
+
+    font-size: 10px;
+
+    margin-bottom: 3px;
+}
+
+.detail-row strong {
+    display: block;
+
+    color: #333;
+
+    font-size: 12px;
+
+    word-break: break-word;
+}
+
+
+/* ==========================================
+   SUBJECTS
+========================================== */
+
+.subjects-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 12px;
+}
+
+.subject-card {
+    display: flex;
+
+    align-items: center;
+
+    gap: 11px;
+
+    padding: 13px;
+
+    border: 1px solid #eee;
+
+    border-radius: 11px;
+
+    transition: .2s ease;
+}
+
+.subject-card:hover {
+    border-color: #e7b0b7;
+
+    background: #fffafb;
+}
+
+.subject-icon {
+    width: 40px;
+    height: 40px;
+
+    flex-shrink: 0;
+
+    border-radius: 10px;
+
+    background: #fcecef;
+
+    color: #9d0015;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    font-size: 17px;
+}
+
+.subject-information {
+    flex: 1;
+
+    min-width: 0;
+}
+
+.subject-information strong {
+    display: block;
+
+    color: #333;
+
+    font-size: 12px;
+}
+
+.subject-information span {
+    display: block;
+
+    color: #888;
+
+    font-size: 10px;
+
+    margin-top: 3px;
+}
+
+.subject-status {
+    padding: 5px 8px;
+
+    border-radius: 15px;
+
+    font-size: 9px;
+
+    font-weight: 700;
+}
+
+.subject-status.active {
+    background: #eaf8ef;
+
+    color: #16833b;
+}
+
+.subject-status.inactive {
+    background: #f1f1f1;
+
+    color: #777;
+}
+
+
+/* ==========================================
+   EMPTY STATE
+========================================== */
+
+.empty-subjects {
+    text-align: center;
+
+    padding: 35px 20px;
+}
+
+.empty-icon {
+    width: 50px;
+    height: 50px;
+
+    margin: 0 auto 10px;
+
+    border-radius: 50%;
+
+    background: #f5f5f5;
+
+    color: #aaa;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    font-size: 20px;
+}
+
+.empty-subjects h4 {
+    margin: 0 0 5px;
+
+    color: #555;
+
+    font-size: 14px;
+}
+
+.empty-subjects p {
+    margin: 0;
+
+    color: #999;
+
+    font-size: 11px;
+}
+
+
+/* ==========================================
+   BOTTOM NAVIGATION
+========================================== */
+
+.bottom-navigation {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 12px;
+
+    margin-top: 5px;
+
+    margin-bottom: 25px;
+}
+
+.secondary-button,
+.primary-button {
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 7px;
+
+    padding: 10px 16px;
+
+    border-radius: 9px;
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    text-decoration: none;
+}
+
+.secondary-button {
+    background: #f5f5f5;
+
+    color: #666;
+
+    border: 1px solid #e5e5e5;
+}
+
+.secondary-button:hover {
+    background: #eee;
+
+    color: #333;
+}
+
+.primary-button {
+    background: linear-gradient(
+        135deg,
+        #b00018,
+        #e20b2d
+    );
+
+    color: #fff;
+
+    box-shadow:
+        0 5px 14px rgba(176,0,24,.18);
+}
+
+.primary-button:hover {
+    color: #fff;
+
+    transform: translateY(-1px);
+}
+
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
+
+@media (max-width: 850px) {
+
+    .profile-hero {
+        flex-wrap: wrap;
+    }
+
+    .profile-actions {
+        width: 100%;
+
+        flex-direction: row;
+
+        margin-top: 8px;
+    }
+
+    .edit-button,
+    .status-button {
+        flex: 1;
+
+        width: auto;
+    }
+
+    .subjects-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+@media (max-width: 650px) {
+
+    .information-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .profile-hero {
+        padding: 20px;
+    }
+
+    .profile-avatar {
+        width: 55px;
+        height: 55px;
+
+        font-size: 21px;
+    }
+
+    .profile-name-row h2 {
+        font-size: 19px;
+    }
+
+    .profile-actions {
+        flex-direction: column;
+    }
+
+    .edit-button,
+    .status-button {
+        width: 100%;
+    }
+
+}
+
+
+@media (max-width: 450px) {
+
+    .bottom-navigation {
+        flex-direction: column-reverse;
+    }
+
+    .secondary-button,
+    .primary-button {
+        width: 100%;
+    }
+
+}
+
+</style>
+
+{% endblock %}

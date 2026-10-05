@@ -1,0 +1,971 @@
+{% extends "admin/extra_classes/super_admin/extra_class_super_admin_base.html" %}
+
+{% block title %}Edit Teacher | Extra Classes{% endblock %}
+
+{% block page_title %}
+    Edit Teacher
+{% endblock %}
+
+{% block page_subtitle %}
+    Update teacher information
+{% endblock %}
+
+{% block page_actions %}
+
+<a
+    href="{{ url_for('extra_class.view_teacher', teacher_id=teacher.id) }}"
+    class="back-button">
+
+    <i class="bi bi-arrow-left"></i>
+    Back to Teacher
+
+</a>
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="form-page">
+
+    <!-- Introduction -->
+    <div class="form-introduction">
+
+        <div class="introduction-icon">
+            <i class="bi bi-pencil-square"></i>
+        </div>
+
+        <div>
+
+            <h2>Edit Teacher Information</h2>
+
+            <p>
+                Update the information below and save your changes.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- Teacher Identity -->
+    <div class="teacher-identity">
+
+        <div class="teacher-avatar">
+            {{ teacher.first_name[0]|upper }}
+        </div>
+
+        <div class="teacher-identity-info">
+
+            <strong>
+                {{ teacher.first_name }}
+                
+                {{ teacher.surname }}
+            </strong>
+
+            <span>
+                {% if teacher.teacher_code %}
+                    {{ teacher.teacher_code }}
+                {% else %}
+                    No teacher code
+                {% endif %}
+            </span>
+
+        </div>
+
+
+        <div class="identity-status">
+
+            {% if teacher.is_active %}
+
+                <span class="status-active">
+                    <i class="bi bi-circle-fill"></i>
+                    Active
+                </span>
+
+            {% else %}
+
+                <span class="status-inactive">
+                    <i class="bi bi-circle-fill"></i>
+                    Inactive
+                </span>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <!-- Form -->
+    <div class="form-card">
+
+        <form
+            method="POST"
+            action="{{ url_for('extra_class.edit_teacher', teacher_id=teacher.id) }}">
+
+            {% if csrf_token is defined %}
+                <input
+                    type="hidden"
+                    name="csrf_token"
+                    value="{{ csrf_token() }}">
+            {% endif %}
+
+
+            <!-- Personal Information -->
+            <div class="form-section">
+
+                <div class="section-heading">
+
+                    <div class="section-heading-icon">
+                        <i class="bi bi-person-fill"></i>
+                    </div>
+
+                    <div>
+
+                        <h3>Personal Information</h3>
+
+                        <p>
+                            Update the teacher's personal details.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-grid">
+
+                    <!-- First Name -->
+                    <div class="form-group">
+
+                        <label for="first_name">
+                            First Name
+                            <span class="required">*</span>
+                        </label>
+
+                        <div class="input-wrapper">
+
+                            <i class="bi bi-person"></i>
+
+                            <input
+                                type="text"
+                                id="first_name"
+                                name="first_name"
+                                value="{{ request.form.get('first_name', teacher.first_name or '') }}"
+                                required
+                                autocomplete="given-name">
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Surname -->
+                    <div class="form-group">
+
+                        <label for="surname">
+                            Surname
+                            <span class="required">*</span>
+                        </label>
+
+                        <div class="input-wrapper">
+
+                            <i class="bi bi-person"></i>
+
+                            <input
+                                type="text"
+                                id="surname"
+                                name="surname"
+                                value="{{ request.form.get('surname', teacher.surname or '') }}"
+                                required
+                                autocomplete="family-name">
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Contact / Identification -->
+            <div class="form-section">
+
+                <div class="section-heading">
+
+                    <div class="section-heading-icon">
+                        <i class="bi bi-person-badge-fill"></i>
+                    </div>
+
+                    <div>
+
+                        <h3>Teacher Information</h3>
+
+                        <p>
+                            Update identification and contact information.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-grid">
+
+                    <!-- Teacher Code -->
+                    <div class="form-group">
+
+                        <label for="teacher_code">
+                            Teacher Code
+                            <span class="optional">(Optional)</span>
+                        </label>
+
+                        <div class="input-wrapper">
+
+                            <i class="bi bi-upc-scan"></i>
+
+                            <input
+                                type="text"
+                                id="teacher_code"
+                                name="teacher_code"
+                                value="{{ request.form.get('teacher_code', teacher.teacher_code or '') }}"
+                                autocomplete="off">
+
+                        </div>
+
+                        <small class="field-help">
+                            Teacher codes must be unique.
+                        </small>
+
+                    </div>
+
+
+                    <!-- Phone -->
+                    <div class="form-group">
+
+                        <label for="phone">
+                            Phone Number
+                            <span class="required">*</span>
+                        </label>
+
+                        <div class="input-wrapper">
+
+                            <i class="bi bi-telephone-fill"></i>
+
+                            <input
+                                type="tel"
+                                id="phone"
+                                name="phone"
+                                value="{{ request.form.get('phone', teacher.phone or '') }}"
+                                required
+                                autocomplete="tel">
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Email -->
+                    <div class="form-group full-width">
+
+                        <label for="email">
+                            Email Address
+                            <span class="optional">(Optional)</span>
+                        </label>
+
+                        <div class="input-wrapper">
+
+                            <i class="bi bi-envelope-fill"></i>
+
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                value="{{ request.form.get('email', teacher.email or '') }}"
+                                autocomplete="email">
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Current Status -->
+            <div class="current-status-box">
+
+                <div class="current-status-icon">
+
+                    {% if teacher.is_active %}
+                        <i class="bi bi-check-circle-fill"></i>
+                    {% else %}
+                        <i class="bi bi-pause-circle-fill"></i>
+                    {% endif %}
+
+                </div>
+
+
+                <div class="current-status-text">
+
+                    <strong>Teacher Status</strong>
+
+                    {% if teacher.is_active %}
+
+                        <p>
+                            This teacher is currently
+                            <strong>Active</strong>.
+                        </p>
+
+                    {% else %}
+
+                        <p>
+                            This teacher is currently
+                            <strong>Inactive</strong>.
+                        </p>
+
+                    {% endif %}
+
+                    <small>
+                        Use the status control on the Teachers page
+                        to activate or deactivate this teacher.
+                    </small>
+
+                </div>
+
+
+                {% if teacher.is_active %}
+
+                    <span class="status-active">
+                        <i class="bi bi-circle-fill"></i>
+                        Active
+                    </span>
+
+                {% else %}
+
+                    <span class="status-inactive">
+                        <i class="bi bi-circle-fill"></i>
+                        Inactive
+                    </span>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- Actions -->
+            <div class="form-actions">
+
+                <a
+                    href="{{ url_for('extra_class.view_teacher', teacher_id=teacher.id) }}"
+                    class="cancel-button">
+
+                    <i class="bi bi-x-lg"></i>
+                    Cancel
+
+                </a>
+
+
+                <button
+                    type="submit"
+                    class="submit-button">
+
+                    <i class="bi bi-check-lg"></i>
+                    Save Changes
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<style>
+
+/* ==========================================
+   FORM PAGE
+========================================== */
+
+.form-page {
+    max-width: 1050px;
+    margin: 0 auto;
+}
+
+
+/* ==========================================
+   INTRODUCTION
+========================================== */
+
+.form-introduction {
+    background: linear-gradient(
+        135deg,
+        #b00018,
+        #e20b2d,
+        #78000d
+    );
+
+    color: #fff;
+
+    border-radius: 18px;
+
+    padding: 25px 28px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 18px;
+
+    margin-bottom: 18px;
+
+    box-shadow:
+        0 12px 30px rgba(92,0,8,.18);
+}
+
+.introduction-icon {
+    width: 52px;
+    height: 52px;
+
+    border-radius: 14px;
+
+    background: rgba(255,255,255,.16);
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    font-size: 23px;
+}
+
+.form-introduction h2 {
+    margin: 0 0 5px;
+
+    font-size: 22px;
+
+    font-weight: 800;
+}
+
+.form-introduction p {
+    margin: 0;
+
+    font-size: 13px;
+
+    opacity: .9;
+}
+
+
+/* ==========================================
+   TEACHER IDENTITY
+========================================== */
+
+.teacher-identity {
+    background: #fff;
+
+    border: 1px solid #eee;
+
+    border-radius: 14px;
+
+    padding: 16px 19px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 13px;
+
+    margin-bottom: 18px;
+
+    box-shadow:
+        0 5px 18px rgba(0,0,0,.04);
+}
+
+.teacher-avatar {
+    width: 45px;
+    height: 45px;
+
+    border-radius: 50%;
+
+    background: #fcecef;
+
+    color: #9d0015;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    font-size: 17px;
+
+    font-weight: 800;
+}
+
+.teacher-identity-info {
+    flex: 1;
+}
+
+.teacher-identity-info strong {
+    display: block;
+
+    color: #333;
+
+    font-size: 14px;
+}
+
+.teacher-identity-info span {
+    display: block;
+
+    color: #9d0015;
+
+    font-size: 10px;
+
+    margin-top: 3px;
+}
+
+
+/* ==========================================
+   STATUS BADGES
+========================================== */
+
+.status-active,
+.status-inactive {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 5px;
+
+    padding: 6px 10px;
+
+    border-radius: 20px;
+
+    font-size: 10px;
+
+    font-weight: 700;
+}
+
+.status-active {
+    background: #eaf8ef;
+
+    color: #16833b;
+}
+
+.status-inactive {
+    background: #f1f1f1;
+
+    color: #777;
+}
+
+.status-active i,
+.status-inactive i {
+    font-size: 7px;
+}
+
+
+/* ==========================================
+   FORM CARD
+========================================== */
+
+.form-card {
+    background: #fff;
+
+    border: 1px solid #eee;
+
+    border-radius: 16px;
+
+    padding: 28px;
+
+    box-shadow:
+        0 7px 25px rgba(0,0,0,.05);
+}
+
+
+/* ==========================================
+   FORM SECTION
+========================================== */
+
+.form-section {
+    margin-bottom: 30px;
+}
+
+.section-heading {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    padding-bottom: 15px;
+
+    margin-bottom: 20px;
+
+    border-bottom: 1px solid #eee;
+}
+
+.section-heading-icon {
+    width: 40px;
+    height: 40px;
+
+    border-radius: 11px;
+
+    background: #fcecef;
+
+    color: #9d0015;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+}
+
+.section-heading h3 {
+    margin: 0;
+
+    font-size: 16px;
+
+    color: #333;
+}
+
+.section-heading p {
+    margin: 3px 0 0;
+
+    font-size: 11px;
+
+    color: #888;
+}
+
+
+/* ==========================================
+   GRID
+========================================== */
+
+.form-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 20px;
+}
+
+.form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+
+/* ==========================================
+   LABEL
+========================================== */
+
+.form-group label {
+    display: block;
+
+    margin-bottom: 7px;
+
+    color: #444;
+
+    font-size: 12px;
+
+    font-weight: 700;
+}
+
+.required {
+    color: #c0001b;
+}
+
+.optional {
+    color: #999;
+
+    font-size: 10px;
+
+    font-weight: 400;
+}
+
+
+/* ==========================================
+   INPUT
+========================================== */
+
+.input-wrapper {
+    position: relative;
+}
+
+.input-wrapper > i {
+    position: absolute;
+
+    left: 13px;
+
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    color: #9d0015;
+
+    font-size: 14px;
+
+    pointer-events: none;
+}
+
+.input-wrapper input {
+    width: 100%;
+
+    height: 45px;
+
+    box-sizing: border-box;
+
+    padding:
+        0 14px 0 39px;
+
+    border: 1px solid #ddd;
+
+    border-radius: 9px;
+
+    outline: none;
+
+    color: #333;
+
+    font-size: 12px;
+
+    transition: .2s ease;
+}
+
+.input-wrapper input:focus {
+    border-color: #b00018;
+
+    box-shadow:
+        0 0 0 3px rgba(176,0,24,.08);
+}
+
+.field-help {
+    display: block;
+
+    margin-top: 5px;
+
+    color: #999;
+
+    font-size: 10px;
+}
+
+
+/* ==========================================
+   CURRENT STATUS
+========================================== */
+
+.current-status-box {
+    display: flex;
+
+    align-items: center;
+
+    gap: 13px;
+
+    padding: 16px 17px;
+
+    background: #fdf6f7;
+
+    border: 1px solid #f2d9dd;
+
+    border-radius: 11px;
+
+    margin-bottom: 25px;
+}
+
+.current-status-icon {
+    width: 38px;
+    height: 38px;
+
+    border-radius: 50%;
+
+    background: #fff;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    color: #9d0015;
+
+    font-size: 17px;
+}
+
+.current-status-text {
+    flex: 1;
+}
+
+.current-status-text > strong {
+    display: block;
+
+    color: #333;
+
+    font-size: 12px;
+}
+
+.current-status-text p {
+    margin: 3px 0;
+
+    color: #666;
+
+    font-size: 10px;
+}
+
+.current-status-text p strong {
+    color: #9d0015;
+}
+
+.current-status-text small {
+    color: #999;
+
+    font-size: 9px;
+}
+
+
+/* ==========================================
+   ACTIONS
+========================================== */
+
+.form-actions {
+    display: flex;
+
+    justify-content: flex-end;
+
+    gap: 10px;
+
+    padding-top: 20px;
+
+    border-top: 1px solid #eee;
+}
+
+.cancel-button,
+.submit-button,
+.back-button {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 7px;
+
+    border-radius: 9px;
+
+    padding: 10px 16px;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    text-decoration: none;
+
+    cursor: pointer;
+
+    transition: .2s ease;
+}
+
+.cancel-button {
+    background: #f5f5f5;
+
+    color: #666;
+
+    border: 1px solid #e5e5e5;
+}
+
+.cancel-button:hover {
+    background: #eee;
+
+    color: #333;
+}
+
+.submit-button {
+    background: linear-gradient(
+        135deg,
+        #b00018,
+        #e20b2d
+    );
+
+    color: #fff;
+
+    border: none;
+
+    box-shadow:
+        0 5px 14px rgba(176,0,24,.18);
+}
+
+.submit-button:hover {
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 7px 18px rgba(176,0,24,.25);
+}
+
+.back-button {
+    background: rgba(255,255,255,.12);
+
+    color: #fff;
+
+    border: 1px solid rgba(255,255,255,.25);
+}
+
+.back-button:hover {
+    background: rgba(255,255,255,.2);
+
+    color: #fff;
+}
+
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
+
+@media (max-width: 700px) {
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-group.full-width {
+        grid-column: auto;
+    }
+
+    .form-card {
+        padding: 20px;
+    }
+
+    .form-introduction {
+        padding: 20px;
+    }
+
+    .current-status-box {
+        align-items: flex-start;
+
+        flex-wrap: wrap;
+    }
+
+    .current-status-box .status-active,
+    .current-status-box .status-inactive {
+        margin-left: 51px;
+    }
+
+}
+
+
+@media (max-width: 500px) {
+
+    .form-actions {
+        flex-direction: column-reverse;
+    }
+
+    .cancel-button,
+    .submit-button {
+        width: 100%;
+    }
+
+}
+
+</style>
+
+{% endblock %}

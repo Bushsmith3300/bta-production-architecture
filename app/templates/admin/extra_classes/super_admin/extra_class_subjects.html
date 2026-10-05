@@ -1,0 +1,974 @@
+{% extends "admin/extra_classes/super_admin/extra_class_super_admin_base.html" %}
+
+
+{% block title %}
+    Extra Class Subjects
+{% endblock %}
+
+
+{% block page_title %}
+    Subjects
+{% endblock %}
+
+
+{% block page_subtitle %}
+    Manage Extra Class subjects, teachers and monthly fees
+{% endblock %}
+
+
+{% block header_heading %}
+    Extra Class Subjects
+{% endblock %}
+
+
+{% block header_description %}
+    Manage the subjects offered through the Extra Classes programme.
+{% endblock %}
+
+
+{% block page_actions %}
+
+    <a
+        href="{{ url_for('extra_class.add_subject') }}"
+        class="btn-primary"
+    >
+        <i class="bi bi-plus-circle"></i>
+        Add Subject
+    </a>
+
+{% endblock %}
+
+
+{% block extra_css %}
+
+<style>
+
+    /* ============================================================
+       SUBJECT PAGE
+    ============================================================ */
+
+    .subjects-container {
+        width: 100%;
+    }
+
+
+    /* ============================================================
+       STAT CARDS
+    ============================================================ */
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 18px;
+        margin-bottom: 25px;
+    }
+
+    .stat-card {
+        background: #fff;
+        border: 1px solid #f0e1e3;
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 6px 22px rgba(92, 0, 8, 0.06);
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .stat-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 13px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(
+            135deg,
+            #b00018,
+            #78000d
+        );
+        color: #fff;
+        font-size: 21px;
+        flex-shrink: 0;
+    }
+
+    .stat-info {
+        min-width: 0;
+    }
+
+    .stat-info span {
+        display: block;
+        color: #888;
+        font-size: 11px;
+        font-weight: 700;
+        margin-bottom: 4px;
+    }
+
+    .stat-info strong {
+        display: block;
+        color: #4b0007;
+        font-size: 23px;
+        font-weight: 900;
+    }
+
+
+    /* ============================================================
+       MAIN CARD
+    ============================================================ */
+
+    .subjects-card {
+        background: #fff;
+        border: 1px solid #f0e1e3;
+        border-radius: 18px;
+        box-shadow: 0 8px 28px rgba(92, 0, 8, 0.07);
+        overflow: hidden;
+    }
+
+
+    .subjects-card-header {
+        padding: 22px 25px;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+    }
+
+    .subjects-card-header h3 {
+        margin: 0;
+        color: #5c0008;
+        font-size: 18px;
+        font-weight: 800;
+    }
+
+    .subjects-card-header p {
+        margin: 5px 0 0;
+        color: #888;
+        font-size: 12px;
+    }
+
+
+    /* ============================================================
+       TABLE
+    ============================================================ */
+
+    .table-wrapper {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .subjects-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 850px;
+    }
+
+    .subjects-table th {
+        padding: 14px 18px;
+        background: #fff8f9;
+        color: #6a3338;
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+        text-align: left;
+        border-bottom: 1px solid #f0e1e3;
+        white-space: nowrap;
+    }
+
+    .subjects-table td {
+        padding: 16px 18px;
+        border-bottom: 1px solid #f3eeee;
+        vertical-align: middle;
+        color: #444;
+        font-size: 13px;
+    }
+
+    .subjects-table tbody tr {
+        transition: background .2s ease;
+    }
+
+    .subjects-table tbody tr:hover {
+        background: #fffafb;
+    }
+
+    .subjects-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+
+    /* ============================================================
+       SUBJECT NAME
+    ============================================================ */
+
+    .subject-cell {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 190px;
+    }
+
+    .subject-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 11px;
+        background: linear-gradient(
+            135deg,
+            #b00018,
+            #78000d
+        );
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 19px;
+        flex-shrink: 0;
+    }
+
+    .subject-name {
+        min-width: 0;
+    }
+
+    .subject-name strong {
+        display: block;
+        color: #3d1014;
+        font-size: 13px;
+        font-weight: 800;
+        margin-bottom: 3px;
+    }
+
+    .subject-name span {
+        color: #999;
+        font-size: 10px;
+    }
+
+
+    /* ============================================================
+       TEACHER
+    ============================================================ */
+
+    .teacher-cell {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+    }
+
+    .teacher-avatar {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: #f4e5e7;
+        color: #78000d;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: 900;
+        flex-shrink: 0;
+    }
+
+    .teacher-details strong {
+        display: block;
+        color: #444;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .teacher-details span {
+        display: block;
+        color: #999;
+        font-size: 10px;
+        margin-top: 2px;
+    }
+
+    .no-teacher {
+        color: #aaa;
+        font-size: 11px;
+        font-style: italic;
+    }
+
+
+    /* ============================================================
+       FEE
+    ============================================================ */
+
+    .fee {
+        color: #8b0012;
+        font-size: 14px;
+        font-weight: 900;
+        white-space: nowrap;
+    }
+
+
+    /* ============================================================
+       STATUS
+    ============================================================ */
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 6px 10px;
+        border-radius: 20px;
+        font-size: 10px;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+    .status-active {
+        background: #e9f8ef;
+        color: #137333;
+    }
+
+    .status-inactive {
+        background: #fcebed;
+        color: #a00015;
+    }
+
+
+    /* ============================================================
+       ACTIONS
+    ============================================================ */
+
+    .actions {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+
+    .action-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        min-height: 34px;
+        padding: 6px 10px;
+        border-radius: 7px;
+        border: 1px solid transparent;
+        text-decoration: none;
+        font-size: 10px;
+        font-weight: 800;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: all .2s ease;
+    }
+
+    .action-view {
+        background: #f5f5f5;
+        color: #555;
+        border-color: #ddd;
+    }
+
+    .action-view:hover {
+        background: #eee;
+        color: #333;
+    }
+
+    .action-edit {
+        background: #fff3f5;
+        color: #8b0012;
+        border-color: #f0d3d7;
+    }
+
+    .action-edit:hover {
+        background: #fce5e8;
+        color: #78000d;
+    }
+
+    .action-deactivate {
+        background: #fff4f5;
+        color: #a00015;
+        border-color: #f0c9ce;
+    }
+
+    .action-deactivate:hover {
+        background: #fce5e8;
+        color: #78000d;
+    }
+
+    .action-activate {
+        background: #eefaf1;
+        color: #137333;
+        border-color: #b9dfc5;
+    }
+
+    .action-activate:hover {
+        background: #dff4e5;
+        color: #0b5d27;
+    }
+
+    .action-form {
+        display: inline;
+        margin: 0;
+    }
+
+
+    /* ============================================================
+       EMPTY STATE
+    ============================================================ */
+
+    .empty-state {
+        padding: 65px 25px;
+        text-align: center;
+    }
+
+    .empty-icon {
+        width: 70px;
+        height: 70px;
+        margin: 0 auto 18px;
+        border-radius: 18px;
+        background: #fff0f2;
+        color: #8b0012;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 30px;
+    }
+
+    .empty-state h3 {
+        margin: 0 0 7px;
+        color: #5c0008;
+        font-size: 18px;
+        font-weight: 800;
+    }
+
+    .empty-state p {
+        margin: 0 0 20px;
+        color: #888;
+        font-size: 12px;
+    }
+
+    .btn-primary {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 10px 17px;
+        min-height: 40px;
+        border-radius: 8px;
+        background: linear-gradient(
+            135deg,
+            #b00018,
+            #78000d
+        );
+        color: #fff;
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: 800;
+        box-shadow: 0 5px 15px rgba(120, 0, 13, .18);
+    }
+
+    .btn-primary:hover {
+        color: #fff;
+        transform: translateY(-1px);
+    }
+
+
+    /* ============================================================
+       MOBILE
+    ============================================================ */
+
+    @media (max-width: 1000px) {
+
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+    }
+
+    @media (max-width: 600px) {
+
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .subjects-card-header {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .subjects-card-header .btn-primary {
+            width: 100%;
+            justify-content: center;
+        }
+
+    }
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="subjects-container">
+
+
+    <!-- ========================================================
+         STATISTICS
+    ========================================================= -->
+
+    <div class="stats-grid">
+
+        <!-- TOTAL -->
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                <i class="bi bi-book-half"></i>
+            </div>
+
+            <div class="stat-info">
+
+                <span>Total Subjects</span>
+
+                <strong>
+                    {{ total_subjects }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <!-- ACTIVE -->
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                <i class="bi bi-check-circle-fill"></i>
+            </div>
+
+            <div class="stat-info">
+
+                <span>Active Subjects</span>
+
+                <strong>
+                    {{ active_subjects }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <!-- INACTIVE -->
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                <i class="bi bi-pause-circle-fill"></i>
+            </div>
+
+            <div class="stat-info">
+
+                <span>Inactive Subjects</span>
+
+                <strong>
+                    {{ inactive_subjects }}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <!-- TEACHERS -->
+
+        <div class="stat-card">
+
+            <div class="stat-icon">
+                <i class="bi bi-person-badge-fill"></i>
+            </div>
+
+            <div class="stat-info">
+
+                <span>Teachers Assigned</span>
+
+                <strong>
+                    {{ assigned_teachers }}
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================
+         SUBJECT TABLE
+    ========================================================= -->
+
+    <div class="subjects-card">
+
+        <div class="subjects-card-header">
+
+            <div>
+
+                <h3>
+                    Extra Class Subjects
+                </h3>
+
+                <p>
+                    Subjects currently configured for the Extra Classes programme.
+                </p>
+
+            </div>
+
+            <a
+                href="{{ url_for('extra_class.add_subject') }}"
+                class="btn-primary"
+            >
+                <i class="bi bi-plus-circle"></i>
+                Add Subject
+            </a>
+
+        </div>
+
+
+        {% if subjects %}
+
+            <div class="table-wrapper">
+
+                <table class="subjects-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Subject
+                            </th>
+
+                            <th>
+                                Teacher
+                            </th>
+
+                            <th>
+                                Monthly Fee
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Actions
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for subject in subjects %}
+
+                            <tr>
+
+                                <!-- SUBJECT -->
+
+                                <td>
+
+                                    <div class="subject-cell">
+
+                                        <div class="subject-icon">
+
+                                            {% if subject.subject.icon %}
+
+                                                {{ subject.subject.icon }}
+
+                                            {% else %}
+
+                                                <i class="bi bi-book"></i>
+
+                                            {% endif %}
+
+                                        </div>
+
+
+                                        <div class="subject-name">
+
+                                            <strong>
+                                                {{ subject.subject.name }}
+                                            </strong>
+
+                                            <span>
+
+                                                {% if subject.subject.code %}
+                                                    {{ subject.subject.code }}
+                                                {% else %}
+                                                    No subject code
+                                                {% endif %}
+
+                                            </span>
+
+                                        </div>
+
+                                    </div>
+
+                                </td>
+
+
+                                <!-- TEACHER -->
+
+                                <td>
+
+                                    {% if subject.teacher %}
+
+                                        <div class="teacher-cell">
+
+                                            <div class="teacher-avatar">
+
+                                                {{ subject.teacher.first_name[0]|upper }}
+                                                {{ subject.teacher.surname[0]|upper }}
+
+                                            </div>
+
+
+                                            <div class="teacher-details">
+
+                                                <strong>
+
+                                                    {{ subject.teacher.first_name }}
+                                                    {{ subject.teacher.surname }}
+
+                                                </strong>
+
+                                                <span>
+
+                                                    {% if subject.teacher.teacher_code %}
+
+                                                        {{ subject.teacher.teacher_code }}
+
+                                                    {% else %}
+
+                                                        Teacher code not assigned
+
+                                                    {% endif %}
+
+                                                </span>
+
+                                            </div>
+
+                                        </div>
+
+                                    {% else %}
+
+                                        <span class="no-teacher">
+                                            No teacher assigned
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+
+                                <!-- MONTHLY FEE -->
+
+                                <td>
+
+                                    <span class="fee">
+
+                                        GH₵
+                                        {{ "%.2f"|format(subject.monthly_fee|float) }}
+
+                                    </span>
+
+                                </td>
+
+
+                                <!-- STATUS -->
+
+                                <td>
+
+                                    {% if subject.is_active %}
+
+                                        <span class="status-badge status-active">
+
+                                            <i class="bi bi-check-circle-fill"></i>
+
+                                            Active
+
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="status-badge status-inactive">
+
+                                            <i class="bi bi-x-circle-fill"></i>
+
+                                            Inactive
+
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+
+                                <!-- ACTIONS -->
+
+                                <td>
+
+                                    <div class="actions">
+
+                                        <!-- VIEW -->
+
+                                        <a
+                                            href="{{ url_for(
+                                                'extra_class.view_subject',
+                                                extra_subject_id=subject.id
+                                            ) }}"
+                                            class="action-btn action-view"
+                                        >
+
+                                            <i class="bi bi-eye-fill"></i>
+                                            View
+
+                                        </a>
+
+
+                                        <!-- EDIT -->
+
+                                        <a
+                                            href="{{ url_for(
+                                                'extra_class.edit_subject',
+                                                extra_subject_id=subject.id
+                                            ) }}"
+                                            class="action-btn action-edit"
+                                        >
+
+                                            <i class="bi bi-pencil-square"></i>
+                                            Edit
+
+                                        </a>
+
+
+                                        <!-- STATUS -->
+
+                                        {% if subject.is_active %}
+
+                                            <form
+                                                method="POST"
+                                                action="{{ url_for(
+                                                    'extra_class.toggle_subject_status',
+                                                    extra_subject_id=subject.id
+                                                ) }}"
+                                                class="action-form"
+                                                onsubmit="return confirm(
+                                                    'Are you sure you want to deactivate {{ subject.subject.name }}? New students should not be enrolled in an inactive subject.'
+                                                );"
+                                            >
+
+                                                {% if csrf_token %}
+                                                    <input
+                                                        type="hidden"
+                                                        name="csrf_token"
+                                                        value="{{ csrf_token() }}"
+                                                    >
+                                                {% endif %}
+
+                                                <button
+                                                    type="submit"
+                                                    class="action-btn action-deactivate"
+                                                >
+
+                                                    <i class="bi bi-toggle-off"></i>
+                                                    Deactivate
+
+                                                </button>
+
+                                            </form>
+
+                                        {% else %}
+
+                                            <form
+                                                method="POST"
+                                                action="{{ url_for(
+                                                    'extra_class.toggle_subject_status',
+                                                    extra_subject_id=subject.id
+                                                ) }}"
+                                                class="action-form"
+                                                onsubmit="return confirm(
+                                                    'Are you sure you want to activate {{ subject.subject.name }}?'
+                                                );"
+                                            >
+
+                                                {% if csrf_token %}
+                                                    <input
+                                                        type="hidden"
+                                                        name="csrf_token"
+                                                        value="{{ csrf_token() }}"
+                                                    >
+                                                {% endif %}
+
+                                                <button
+                                                    type="submit"
+                                                    class="action-btn action-activate"
+                                                >
+
+                                                    <i class="bi bi-toggle-on"></i>
+                                                    Activate
+
+                                                </button>
+
+                                            </form>
+
+                                        {% endif %}
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        {% else %}
+
+            <!-- EMPTY STATE -->
+
+            <div class="empty-state">
+
+                <div class="empty-icon">
+
+                    <i class="bi bi-book-half"></i>
+
+                </div>
+
+                <h3>
+                    No Extra Class Subjects Yet
+                </h3>
+
+                <p>
+                    Add your first subject to begin configuring the Extra Classes programme.
+                </p>
+
+                <a
+                    href="{{ url_for('extra_class.add_subject') }}"
+                    class="btn-primary"
+                >
+
+                    <i class="bi bi-plus-circle"></i>
+
+                    Add First Subject
+
+                </a>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

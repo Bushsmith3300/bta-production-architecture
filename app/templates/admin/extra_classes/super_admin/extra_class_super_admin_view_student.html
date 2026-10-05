@@ -1,0 +1,487 @@
+{% extends "admin/extra_classes/super_admin/extra_class_super_admin_base.html" %}
+
+{% block title %}View Student | Extra Classes{% endblock %}
+
+{% block page_title %}Student Details{% endblock %}
+
+{% block page_subtitle %}
+View student information and linked parents or guardians.
+{% endblock %}
+
+{% block header_heading %}
+Student Details
+{% endblock %}
+
+{% block header_description %}
+View the student's profile and parent or guardian relationships.
+{% endblock %}
+
+{% block page_actions %}
+
+<div class="d-flex gap-2 flex-wrap">
+
+    <a href="{{ url_for(
+        'extra_class.super_admin_edit_student',
+        student_id=student.id
+    ) }}"
+       class="btn btn-light">
+
+        <i class="bi bi-pencil-fill me-1"></i>
+        Edit Student
+
+    </a>
+
+
+    <a href="{{ url_for('extra_class.super_admin_students') }}"
+       class="btn btn-light">
+
+        <i class="bi bi-arrow-left me-1"></i>
+        Back to Students
+
+    </a>
+
+</div>
+
+{% endblock %}
+
+
+{% block extra_css %}
+
+<style>
+    .detail-card {
+        background: #ffffff;
+        border-radius: 18px;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.06);
+        padding: 28px;
+        margin-bottom: 24px;
+    }
+
+    .student-header {
+        background: #800000;
+        color: #ffffff;
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 25px;
+    }
+
+    .student-avatar {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        background: #ffffff;
+        color: #800000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+        font-weight: 700;
+        flex-shrink: 0;
+    }
+
+    .student-name {
+        font-size: 1.45rem;
+        font-weight: 700;
+    }
+
+    .student-code {
+        opacity: 0.9;
+        font-size: 0.92rem;
+    }
+
+    .section-title {
+        color: #800000;
+        font-weight: 700;
+        font-size: 1.1rem;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #f1e4e4;
+        margin-bottom: 20px;
+    }
+
+    .detail-label {
+        color: #6c757d;
+        font-size: 0.78rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        margin-bottom: 4px;
+    }
+
+    .detail-value {
+        color: #343a40;
+        font-weight: 500;
+        margin-bottom: 18px;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 6px 13px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .status-active {
+        background: #d1e7dd;
+        color: #0f5132;
+    }
+
+    .status-inactive {
+        background: #f8d7da;
+        color: #842029;
+    }
+
+    .parent-card {
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 17px;
+        margin-bottom: 12px;
+    }
+
+    .parent-avatar {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        background: #f1e4e4;
+        color: #800000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        flex-shrink: 0;
+    }
+
+    .primary-badge {
+        background: #800000;
+        color: #ffffff;
+        border-radius: 15px;
+        padding: 4px 9px;
+        font-size: 0.72rem;
+        font-weight: 600;
+    }
+
+    .empty-parents {
+        background: #fff8f8;
+        border: 1px dashed #d8baba;
+        border-radius: 12px;
+        padding: 30px;
+        text-align: center;
+        color: #6c757d;
+    }
+
+    .empty-parents i {
+        color: #800000;
+    }
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+<!-- STUDENT HEADER -->
+
+<div class="student-header">
+
+    <div class="d-flex align-items-center gap-3">
+
+        <div class="student-avatar">
+
+            {{ student.first_name[:1]|upper }}{{ student.surname[:1]|upper }}
+
+        </div>
+
+        <div>
+
+            <div class="student-name">
+
+                {{ student.first_name }}
+
+                {% if student.other_name %}
+                    {{ student.other_name }}
+                {% endif %}
+
+                {{ student.surname }}
+
+            </div>
+
+            <div class="student-code">
+
+                <i class="bi bi-upc-scan me-1"></i>
+
+                Student Code:
+                <strong>{{ student.student_code }}</strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- STUDENT INFORMATION -->
+
+<div class="detail-card">
+
+    <div class="section-title">
+
+        <i class="bi bi-person-vcard-fill me-2"></i>
+        Student Information
+
+    </div>
+
+
+    <div class="row">
+
+        <div class="col-md-4">
+
+            <div class="detail-label">First Name</div>
+
+            <div class="detail-value">
+                {{ student.first_name }}
+            </div>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <div class="detail-label">Other Name</div>
+
+            <div class="detail-value">
+                {{ student.other_name or '—' }}
+            </div>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <div class="detail-label">Surname</div>
+
+            <div class="detail-value">
+                {{ student.surname }}
+            </div>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <div class="detail-label">Student Code</div>
+
+            <div class="detail-value">
+                {{ student.student_code }}
+            </div>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <div class="detail-label">School</div>
+
+            <div class="detail-value">
+                {{ student.school or '—' }}
+            </div>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <div class="detail-label">Class</div>
+
+            <div class="detail-value">
+                {{ student.class_name or '—' }}
+            </div>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <div class="detail-label">Phone</div>
+
+            <div class="detail-value">
+                {{ student.phone or '—' }}
+            </div>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <div class="detail-label">Email</div>
+
+            <div class="detail-value">
+                {{ student.email or '—' }}
+            </div>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <div class="detail-label">Status</div>
+
+            <div class="detail-value">
+
+                {% if student.is_active %}
+
+                    <span class="status-badge status-active">
+                        <i class="bi bi-check-circle-fill me-1"></i>
+                        Active
+                    </span>
+
+                {% else %}
+
+                    <span class="status-badge status-inactive">
+                        <i class="bi bi-x-circle-fill me-1"></i>
+                        Inactive
+                    </span>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- PARENTS -->
+
+<div class="detail-card">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+
+        <div class="section-title mb-0 flex-grow-1">
+
+            <i class="bi bi-people-fill me-2"></i>
+            Parents / Guardians
+
+        </div>
+
+
+        <a href="{{ url_for(
+            'extra_class.super_admin_link_student_parent',
+            student_id=student.id
+        ) }}"
+           class="btn btn-sm btn-outline-danger ms-3">
+
+            <i class="bi bi-person-plus-fill me-1"></i>
+            Link Parent
+
+        </a>
+
+    </div>
+
+
+    {% if student.parent_links %}
+
+        {% for link in student.parent_links %}
+
+            <div class="parent-card">
+
+                <div class="d-flex align-items-center gap-3">
+
+                    <div class="parent-avatar">
+
+                        {{ link.parent.first_name[:1]|upper }}{{ link.parent.surname[:1]|upper }}
+
+                    </div>
+
+
+                    <div class="flex-grow-1">
+
+                        <div class="fw-bold">
+
+                            {{ link.parent.first_name }}
+                            {{ link.parent.surname }}
+
+                        </div>
+
+                        <div class="text-muted small">
+
+                            <i class="bi bi-telephone me-1"></i>
+
+                            {{ link.parent.phone or 'No phone number' }}
+
+                        </div>
+
+                        {% if link.parent.email %}
+
+                            <div class="text-muted small">
+
+                                <i class="bi bi-envelope me-1"></i>
+
+                                {{ link.parent.email }}
+
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <div class="text-end">
+
+                        {% if link.relationship %}
+
+                            <div class="small fw-semibold mb-1">
+                                {{ link.relationship }}
+                            </div>
+
+                        {% endif %}
+
+
+                        {% if link.is_primary %}
+
+                            <span class="primary-badge">
+                                Primary
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <div class="empty-parents">
+
+            <i class="bi bi-people fs-1 d-block mb-3"></i>
+
+            <strong>No Parent or Guardian Linked</strong>
+
+            <p class="mb-3">
+                This student does not currently have a parent or guardian linked.
+            </p>
+
+            <a href="{{ url_for(
+                'extra_class.super_admin_link_student_parent',
+                student_id=student.id
+            ) }}"
+               class="btn btn-sm btn-outline-danger">
+
+                <i class="bi bi-person-plus-fill me-1"></i>
+                Link Parent
+
+            </a>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

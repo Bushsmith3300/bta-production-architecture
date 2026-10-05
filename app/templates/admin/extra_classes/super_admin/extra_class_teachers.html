@@ -1,0 +1,1609 @@
+{% extends "admin/extra_classes/super_admin/extra_class_super_admin_base.html" %}
+
+
+{% block title %}
+Extra Class Teachers | BTA
+{% endblock %}
+
+
+{% block page_title %}
+Teachers
+{% endblock %}
+
+
+{% block page_subtitle %}
+Manage extra class teachers and their subjects.
+{% endblock %}
+
+
+{% block header_heading %}
+Teachers
+{% endblock %}
+
+
+{% block header_description %}
+Manage teachers responsible for Extra Classes subjects.
+{% endblock %}
+
+
+{% block page_actions %}
+
+<a
+    href="{{ url_for('extra_class.add_teacher') }}"
+    class="btn-super-red"
+>
+
+    <i class="bi bi-person-plus-fill"></i>
+
+    Add Teacher
+
+</a>
+
+{% endblock %}
+
+
+{% block extra_css %}
+
+<style>
+
+    /* =========================================================
+       TEACHER HERO
+    ========================================================== */
+
+    .teacher-hero {
+
+        background: linear-gradient(
+            135deg,
+            #a80016 0%,
+            #df092b 50%,
+            #72000c 100%
+        );
+
+        color: #ffffff;
+
+        border-radius: 14px;
+
+        padding: 26px 28px;
+
+        margin-bottom: 24px;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: space-between;
+
+        gap: 20px;
+
+        box-shadow:
+            0 9px 25px rgba(120, 0, 13, 0.20);
+
+    }
+
+
+    .teacher-hero-left {
+
+        display: flex;
+
+        align-items: center;
+
+        gap: 18px;
+
+    }
+
+
+    .teacher-hero-icon {
+
+        width: 65px;
+        height: 65px;
+
+        flex-shrink: 0;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 14px;
+
+        background: rgba(255, 255, 255, 0.17);
+
+        color: #ffffff;
+
+        font-size: 30px;
+
+        box-shadow:
+            inset 0 0 0 1px rgba(255, 255, 255, 0.10);
+
+    }
+
+
+    .teacher-hero h2 {
+
+        margin: 0 0 6px;
+
+        color: #ffffff;
+
+        font-size: 24px;
+
+        font-weight: 800;
+
+        letter-spacing: 0.2px;
+
+    }
+
+
+    .teacher-hero p {
+
+        margin: 0;
+
+        color: rgba(255, 255, 255, 0.94);
+
+        font-size: 12px;
+
+        font-weight: 400;
+
+    }
+
+
+    .teacher-hero-message {
+
+        color: #ffffff;
+
+        font-size: 12px;
+
+        font-weight: 600;
+
+        text-align: right;
+
+    }
+
+
+    /* =========================================================
+       STATISTICS
+    ========================================================== */
+
+    .teacher-stats {
+
+        display: grid;
+
+        grid-template-columns: repeat(4, 1fr);
+
+        gap: 16px;
+
+        margin-bottom: 24px;
+
+    }
+
+
+    .teacher-stat-card {
+
+        background: #ffffff;
+
+        border-radius: 12px;
+
+        padding: 18px;
+
+        border: 1px solid #eeeeee;
+
+        display: flex;
+
+        align-items: center;
+
+        gap: 14px;
+
+        box-shadow:
+            0 3px 12px rgba(0, 0, 0, 0.04);
+
+    }
+
+
+    .teacher-stat-icon {
+
+        width: 46px;
+        height: 46px;
+
+        flex-shrink: 0;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 10px;
+
+        background: #fff0f2;
+
+        color: #b00018;
+
+        font-size: 19px;
+
+    }
+
+
+    .teacher-stat-info {
+
+        min-width: 0;
+
+    }
+
+
+    .teacher-stat-label {
+
+        color: #777777;
+
+        font-size: 10px;
+
+        font-weight: 500;
+
+        margin-bottom: 3px;
+
+    }
+
+
+    .teacher-stat-value {
+
+        color: #3a0005;
+
+        font-size: 21px;
+
+        font-weight: 800;
+
+        line-height: 1.2;
+
+    }
+
+
+    /* =========================================================
+       TEACHER CARD
+    ========================================================== */
+
+    .teacher-card {
+
+        background: #ffffff;
+
+        border-radius: 14px;
+
+        border: 1px solid #eeeeee;
+
+        box-shadow:
+            0 4px 15px rgba(0, 0, 0, 0.04);
+
+        overflow: hidden;
+
+    }
+
+
+    .teacher-card-header {
+
+        padding: 18px 20px;
+
+        border-bottom: 1px solid #eeeeee;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: space-between;
+
+        gap: 15px;
+
+    }
+
+
+    .teacher-card-title {
+
+        color: #3a0005;
+
+        font-size: 15px;
+
+        font-weight: 700;
+
+    }
+
+
+    .teacher-card-subtitle {
+
+        color: #777777;
+
+        font-size: 10px;
+
+        margin-top: 3px;
+
+    }
+
+
+    /* =========================================================
+       TOOLBAR
+    ========================================================== */
+
+    .teacher-toolbar {
+
+        padding: 15px 20px;
+
+        background: #fafafa;
+
+        border-bottom: 1px solid #eeeeee;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: space-between;
+
+        gap: 12px;
+
+        flex-wrap: wrap;
+
+    }
+
+
+    .teacher-search {
+
+        position: relative;
+
+        flex: 1;
+
+        min-width: 230px;
+
+        max-width: 400px;
+
+    }
+
+
+    .teacher-search i {
+
+        position: absolute;
+
+        left: 12px;
+
+        top: 50%;
+
+        transform: translateY(-50%);
+
+        color: #888888;
+
+        font-size: 14px;
+
+    }
+
+
+    .teacher-search input {
+
+        width: 100%;
+
+        height: 38px;
+
+        border: 1px solid #dddddd;
+
+        border-radius: 8px;
+
+        padding: 0 12px 0 36px;
+
+        font-family: 'Poppins', sans-serif;
+
+        font-size: 11px;
+
+        color: #333333;
+
+        outline: none;
+
+        background: #ffffff;
+
+    }
+
+
+    .teacher-search input::placeholder {
+
+        color: #999999;
+
+    }
+
+
+    .teacher-search input:focus {
+
+        border-color: #b00018;
+
+        box-shadow:
+            0 0 0 3px rgba(176, 0, 24, 0.08);
+
+    }
+
+
+    .teacher-filter {
+
+        height: 38px;
+
+        border: 1px solid #dddddd;
+
+        border-radius: 8px;
+
+        padding: 0 12px;
+
+        font-family: 'Poppins', sans-serif;
+
+        font-size: 11px;
+
+        color: #444444;
+
+        background: #ffffff;
+
+        outline: none;
+
+    }
+
+
+    .teacher-filter:focus {
+
+        border-color: #b00018;
+
+        box-shadow:
+            0 0 0 3px rgba(176, 0, 24, 0.08);
+
+    }
+
+
+    /* =========================================================
+       TABLE
+    ========================================================== */
+
+    .teacher-table-wrapper {
+
+        width: 100%;
+
+        overflow-x: auto;
+
+    }
+
+
+    .teacher-table {
+
+        width: 100%;
+
+        border-collapse: collapse;
+
+        min-width: 850px;
+
+    }
+
+
+    .teacher-table thead th {
+
+        background: #fff8f9;
+
+        color: #666666;
+
+        font-size: 10px;
+
+        font-weight: 700;
+
+        text-transform: uppercase;
+
+        letter-spacing: 0.5px;
+
+        padding: 13px 16px;
+
+        text-align: left;
+
+        border-bottom: 1px solid #eeeeee;
+
+        white-space: nowrap;
+
+    }
+
+
+    .teacher-table tbody td {
+
+        padding: 14px 16px;
+
+        border-bottom: 1px solid #f0f0f0;
+
+        color: #555555;
+
+        font-size: 11px;
+
+        vertical-align: middle;
+
+    }
+
+
+    .teacher-table tbody tr:hover {
+
+        background: #fffafb;
+
+    }
+
+
+    .teacher-table tbody tr:last-child td {
+
+        border-bottom: none;
+
+    }
+
+
+    /* =========================================================
+       TEACHER NAME
+    ========================================================== */
+
+    .teacher-name-wrapper {
+
+        display: flex;
+
+        align-items: center;
+
+        gap: 10px;
+
+    }
+
+
+    .teacher-avatar {
+
+        width: 36px;
+        height: 36px;
+
+        flex-shrink: 0;
+
+        border-radius: 50%;
+
+        background: #fff0f2;
+
+        color: #b00018;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        font-size: 13px;
+
+        font-weight: 700;
+
+    }
+
+
+    .teacher-name {
+
+        color: #333333;
+
+        font-weight: 700;
+
+        font-size: 11px;
+
+    }
+
+
+    .teacher-email {
+
+        color: #888888;
+
+        font-size: 9px;
+
+        margin-top: 2px;
+
+    }
+
+
+    /* =========================================================
+       TEACHER CODE
+    ========================================================== */
+
+    .teacher-code {
+
+        display: inline-block;
+
+        background: #f5f5f5;
+
+        color: #444444;
+
+        padding: 4px 8px;
+
+        border-radius: 5px;
+
+        font-size: 9px;
+
+        font-weight: 700;
+
+        font-family: monospace;
+
+    }
+
+
+    /* =========================================================
+       SUBJECT BADGES
+    ========================================================== */
+
+    .subject-badges {
+
+        display: flex;
+
+        flex-wrap: wrap;
+
+        gap: 4px;
+
+        max-width: 250px;
+
+    }
+
+
+    .subject-badge {
+
+        display: inline-block;
+
+        background: #fff0f2;
+
+        color: #980016;
+
+        border-radius: 5px;
+
+        padding: 4px 7px;
+
+        font-size: 8px;
+
+        font-weight: 600;
+
+    }
+
+
+    .no-subject {
+
+        color: #999999;
+
+        font-size: 10px;
+
+        font-style: italic;
+
+    }
+
+
+    /* =========================================================
+       STATUS
+    ========================================================== */
+
+    .status-badge {
+
+        display: inline-flex;
+
+        align-items: center;
+
+        gap: 5px;
+
+        padding: 5px 9px;
+
+        border-radius: 20px;
+
+        font-size: 9px;
+
+        font-weight: 700;
+
+    }
+
+
+    .status-badge.active {
+
+        background: #eaf8ef;
+
+        color: #198754;
+
+    }
+
+
+    .status-badge.inactive {
+
+        background: #f3f3f3;
+
+        color: #666666;
+
+    }
+
+
+    .status-dot {
+
+        width: 6px;
+        height: 6px;
+
+        border-radius: 50%;
+
+        background: currentColor;
+
+    }
+
+
+    /* =========================================================
+       ACTIONS
+    ========================================================== */
+
+    .teacher-actions {
+
+        display: flex;
+
+        align-items: center;
+
+        gap: 5px;
+
+    }
+
+
+    .teacher-action {
+
+        width: 30px;
+        height: 30px;
+
+        display: inline-flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        border-radius: 7px;
+
+        border: 1px solid #dddddd;
+
+        background: #ffffff;
+
+        color: #666666;
+
+        text-decoration: none;
+
+        font-size: 12px;
+
+        cursor: pointer;
+
+        transition: all 0.2s ease;
+
+    }
+
+
+    .teacher-action:hover {
+
+        color: #b00018;
+
+        border-color: #b00018;
+
+        background: #fff7f8;
+
+    }
+
+
+    .teacher-action.danger:hover {
+
+        color: #dc3545;
+
+        border-color: #dc3545;
+
+        background: #fff5f5;
+
+    }
+
+
+    /* =========================================================
+       EMPTY STATE
+    ========================================================== */
+
+    .teacher-empty {
+
+        padding: 55px 20px;
+
+        text-align: center;
+
+    }
+
+
+    .teacher-empty-icon {
+
+        width: 65px;
+        height: 65px;
+
+        margin: 0 auto 15px;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        border-radius: 50%;
+
+        background: #fff0f2;
+
+        color: #b00018;
+
+        font-size: 25px;
+
+    }
+
+
+    .teacher-empty h4 {
+
+        margin: 0 0 6px;
+
+        color: #444444;
+
+        font-size: 15px;
+
+        font-weight: 700;
+
+    }
+
+
+    .teacher-empty p {
+
+        margin: 0;
+
+        color: #888888;
+
+        font-size: 11px;
+
+    }
+
+
+    /* =========================================================
+       RESPONSIVE
+    ========================================================== */
+
+    @media (max-width: 1100px) {
+
+        .teacher-stats {
+
+            grid-template-columns: repeat(2, 1fr);
+
+        }
+
+    }
+
+
+    @media (max-width: 650px) {
+
+        .teacher-stats {
+
+            grid-template-columns: 1fr;
+
+        }
+
+
+        .teacher-hero {
+
+            align-items: flex-start;
+
+            flex-direction: column;
+
+        }
+
+
+        .teacher-hero-message {
+
+            text-align: left;
+
+        }
+
+
+        .teacher-toolbar {
+
+            align-items: stretch;
+
+            flex-direction: column;
+
+        }
+
+
+        .teacher-search {
+
+            max-width: none;
+
+        }
+
+    }
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+
+<!-- =========================================================
+     TEACHER HERO
+========================================================== -->
+
+<div class="teacher-hero">
+
+    <div class="teacher-hero-left">
+
+        <div class="teacher-hero-icon">
+
+            <i class="bi bi-person-workspace"></i>
+
+        </div>
+
+
+        <div>
+
+            <h2>
+                Extra Class Teachers
+            </h2>
+
+            <p>
+                Manage teachers responsible for Extra Classes subjects.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="teacher-hero-message">
+
+        Great teachers build brighter futures.
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================================================
+     STATISTICS
+========================================================== -->
+
+<div class="teacher-stats">
+
+
+    <!-- Total Teachers -->
+
+    <div class="teacher-stat-card">
+
+        <div class="teacher-stat-icon">
+
+            <i class="bi bi-people-fill"></i>
+
+        </div>
+
+
+        <div class="teacher-stat-info">
+
+            <div class="teacher-stat-label">
+                Total Teachers
+            </div>
+
+            <div class="teacher-stat-value">
+
+                {{ teachers|length }}
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- Active Teachers -->
+
+    <div class="teacher-stat-card">
+
+        <div class="teacher-stat-icon">
+
+            <i class="bi bi-person-check-fill"></i>
+
+        </div>
+
+
+        <div class="teacher-stat-info">
+
+            <div class="teacher-stat-label">
+                Active Teachers
+            </div>
+
+            <div class="teacher-stat-value">
+
+                {{ teachers|selectattr('is_active')|list|length }}
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- Inactive Teachers -->
+
+    <div class="teacher-stat-card">
+
+        <div class="teacher-stat-icon">
+
+            <i class="bi bi-person-dash-fill"></i>
+
+        </div>
+
+
+        <div class="teacher-stat-info">
+
+            <div class="teacher-stat-label">
+                Inactive Teachers
+            </div>
+
+            <div class="teacher-stat-value">
+
+                {{ teachers|rejectattr('is_active')|list|length }}
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- Subjects Covered -->
+
+    <div class="teacher-stat-card">
+
+        <div class="teacher-stat-icon">
+
+            <i class="bi bi-book-fill"></i>
+
+        </div>
+
+
+        <div class="teacher-stat-info">
+
+            <div class="teacher-stat-label">
+                Subjects Covered
+            </div>
+
+            <div class="teacher-stat-value">
+
+                {{ subjects_covered if subjects_covered is defined else 0 }}
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================================================
+     TEACHER DIRECTORY
+========================================================== -->
+
+<div class="teacher-card">
+
+
+    <div class="teacher-card-header">
+
+        <div>
+
+            <div class="teacher-card-title">
+                Teacher Directory
+            </div>
+
+            <div class="teacher-card-subtitle">
+                View and manage all Extra Class teachers.
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- Search / Filter -->
+
+    <div class="teacher-toolbar">
+
+
+        <div class="teacher-search">
+
+            <i class="bi bi-search"></i>
+
+            <input
+                type="text"
+                id="teacherSearch"
+                placeholder="Search by name, code, phone or email..."
+                autocomplete="off"
+            >
+
+        </div>
+
+
+        <select
+            class="teacher-filter"
+            id="teacherStatusFilter"
+        >
+
+            <option value="all">
+                All Teachers
+            </option>
+
+            <option value="active">
+                Active
+            </option>
+
+            <option value="inactive">
+                Inactive
+            </option>
+
+        </select>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         TABLE
+    ====================================================== -->
+
+    {% if teachers %}
+
+        <div class="teacher-table-wrapper">
+
+            <table
+                class="teacher-table"
+                id="teacherTable"
+            >
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Teacher
+                        </th>
+
+                        <th>
+                            Code
+                        </th>
+
+                        <th>
+                            Phone
+                        </th>
+
+                        <th>
+                            Subjects
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                        <th>
+                            Actions
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for teacher in teachers %}
+
+                        <tr
+                            data-status="{{ 'active' if teacher.is_active else 'inactive' }}"
+                        >
+
+
+                            <!-- Teacher -->
+
+                            <td>
+
+                                <div class="teacher-name-wrapper">
+
+
+                                    <div class="teacher-avatar">
+
+                                        {{ teacher.first_name[:1]|upper }}{{ teacher.surname[:1]|upper }}
+
+                                    </div>
+
+
+                                    <div>
+
+                                        <div class="teacher-name">
+
+                                            {{ teacher.first_name }}
+
+                                            {% if teacher.other_name %}
+                                                {{ teacher.other_name }}
+                                            {% endif %}
+
+                                            {{ teacher.surname }}
+
+                                        </div>
+
+
+                                        {% if teacher.email %}
+
+                                            <div class="teacher-email">
+
+                                                {{ teacher.email }}
+
+                                            </div>
+
+                                        {% endif %}
+
+                                    </div>
+
+                                </div>
+
+                            </td>
+
+
+
+                            <!-- Teacher Code -->
+
+                            <td>
+
+                                {% if teacher.teacher_code %}
+
+                                    <span class="teacher-code">
+
+                                        {{ teacher.teacher_code }}
+
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="no-subject">
+
+                                        Not assigned
+
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+
+                            <!-- Phone -->
+
+                            <td>
+
+                                {% if teacher.phone %}
+
+                                    {{ teacher.phone }}
+
+                                {% else %}
+
+                                    <span class="no-subject">
+
+                                        Not provided
+
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+
+                            <!-- Subjects -->
+
+                            <td>
+
+                                <div class="subject-badges">
+
+                                    {% if teacher.subjects %}
+
+                                        {% for teacher_subject in teacher.subjects %}
+
+                                            {% if teacher_subject.subject %}
+
+                                                <span class="subject-badge">
+
+                                                    {{ teacher_subject.subject.name }}
+
+                                                </span>
+
+                                            {% endif %}
+
+                                        {% endfor %}
+
+                                    {% else %}
+
+                                        <span class="no-subject">
+
+                                            No subject assigned
+
+                                        </span>
+
+                                    {% endif %}
+
+                                </div>
+
+                            </td>
+
+
+
+                            <!-- Status -->
+
+                            <td>
+
+                                {% if teacher.is_active %}
+
+                                    <span class="status-badge active">
+
+                                        <span class="status-dot"></span>
+
+                                        Active
+
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="status-badge inactive">
+
+                                        <span class="status-dot"></span>
+
+                                        Inactive
+
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+
+                            <!-- Actions -->
+
+                            <td>
+
+                                <div class="teacher-actions">
+
+
+                                    <!-- View -->
+
+                                    <a
+                                        href="{{ url_for(
+                                            'extra_class.view_teacher',
+                                            teacher_id=teacher.id
+                                        ) }}"
+                                        class="teacher-action"
+                                        title="View Teacher"
+                                    >
+
+                                        <i class="bi bi-eye"></i>
+
+                                    </a>
+
+
+                                    <!-- Edit -->
+
+                                    <a
+                                        href="{{ url_for(
+                                            'extra_class.edit_teacher',
+                                            teacher_id=teacher.id
+                                        ) }}"
+                                        class="teacher-action"
+                                        title="Edit Teacher"
+                                    >
+
+                                        <i class="bi bi-pencil"></i>
+
+                                    </a>
+
+
+                                    <!-- Toggle -->
+
+                                    <form
+                                        method="POST"
+                                        action="{{ url_for(
+                                            'extra_class.toggle_teacher_status',
+                                            teacher_id=teacher.id
+                                        ) }}"
+                                        style="display:inline;"
+                                        onsubmit="return confirm(
+                                            'Are you sure you want to change this teacher status?'
+                                        );"
+                                    >
+
+                                        <input
+                                            type="hidden"
+                                            name="csrf_token"
+                                            value="{{ csrf_token() }}"
+                                        >
+
+
+                                        <button
+                                            type="submit"
+                                            class="teacher-action danger"
+                                            title="{{
+                                                'Deactivate Teacher'
+                                                if teacher.is_active
+                                                else
+                                                'Activate Teacher'
+                                            }}"
+                                        >
+
+                                            {% if teacher.is_active %}
+
+                                                <i class="bi bi-person-dash"></i>
+
+                                            {% else %}
+
+                                                <i class="bi bi-person-check"></i>
+
+                                            {% endif %}
+
+                                        </button>
+
+                                    </form>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+    {% else %}
+
+
+        <!-- =====================================================
+             EMPTY STATE
+        ====================================================== -->
+
+        <div class="teacher-empty">
+
+            <div class="teacher-empty-icon">
+
+                <i class="bi bi-person-workspace"></i>
+
+            </div>
+
+
+            <h4>
+                No Teachers Yet
+            </h4>
+
+
+            <p>
+                Add your first Extra Class teacher to get started.
+            </p>
+
+
+            <div style="margin-top: 18px;">
+
+                <a
+                    href="{{ url_for('extra_class.add_teacher') }}"
+                    class="btn-super-red"
+                >
+
+                    <i class="bi bi-person-plus-fill"></i>
+
+                    Add Teacher
+
+                </a>
+
+            </div>
+
+        </div>
+
+
+    {% endif %}
+
+</div>
+
+
+{% endblock %}
+
+
+
+{% block extra_scripts %}
+
+<script>
+
+    document.addEventListener(
+        'DOMContentLoaded',
+        function () {
+
+
+            const searchInput =
+                document.getElementById('teacherSearch');
+
+
+            const statusFilter =
+                document.getElementById('teacherStatusFilter');
+
+
+            const table =
+                document.getElementById('teacherTable');
+
+
+            const rows =
+                table
+                    ? table.querySelectorAll('tbody tr')
+                    : [];
+
+
+            function filterTeachers() {
+
+
+                const search =
+                    searchInput
+                        ? searchInput.value
+                            .toLowerCase()
+                            .trim()
+                        : '';
+
+
+                const status =
+                    statusFilter
+                        ? statusFilter.value
+                        : 'all';
+
+
+                rows.forEach(function (row) {
+
+
+                    const text =
+                        row.textContent
+                            .toLowerCase();
+
+
+                    const rowStatus =
+                        row.dataset.status;
+
+
+                    const matchesSearch =
+                        !search ||
+                        text.includes(search);
+
+
+                    const matchesStatus =
+                        status === 'all' ||
+                        rowStatus === status;
+
+
+                    row.style.display =
+                        matchesSearch &&
+                        matchesStatus
+                            ? ''
+                            : 'none';
+
+                });
+
+            }
+
+
+            if (searchInput) {
+
+                searchInput.addEventListener(
+                    'input',
+                    filterTeachers
+                );
+
+            }
+
+
+            if (statusFilter) {
+
+                statusFilter.addEventListener(
+                    'change',
+                    filterTeachers
+                );
+
+            }
+
+        }
+    );
+
+</script>
+
+{% endblock %}

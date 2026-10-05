@@ -1,0 +1,781 @@
+{% extends "admin/extra_classes/extra_class_admin_base.html" %}
+
+
+{% block title %}
+Parents | BTA Extra Classes
+{% endblock %}
+
+
+{% block page_title %}
+Parents
+{% endblock %}
+
+
+{% block page_subtitle %}
+Manage parents and guardians linked to extra class students.
+{% endblock %}
+
+
+{% block page_actions %}
+
+<a
+    href="{{ url_for('extra_class.add_parent') }}"
+    class="btn btn-primary"
+>
+    <i class="bi bi-person-plus-fill me-1"></i>
+    Add Parent
+</a>
+
+{% endblock %}
+
+
+{% block extra_css %}
+
+<style>
+
+    /* =========================================================
+       PAGE
+       ========================================================= */
+
+    .parents-page {
+        width: 100%;
+    }
+
+
+    /* =========================================================
+       SEARCH
+       ========================================================= */
+
+    .search-card {
+        background: #ffffff;
+        border: none;
+        border-radius: 18px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
+        padding: 18px 20px;
+        margin-bottom: 20px;
+    }
+
+
+    .search-wrapper {
+        position: relative;
+    }
+
+
+    .search-wrapper i {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #8a94a6;
+        pointer-events: none;
+    }
+
+
+    .search-input {
+        width: 100%;
+        border: 1px solid #dfe4ec;
+        border-radius: 12px;
+        padding: 11px 14px 11px 40px;
+        font-size: 13px;
+        outline: none;
+        transition: all 0.2s ease;
+    }
+
+
+    .search-input:focus {
+        border-color: #155eef;
+        box-shadow: 0 0 0 3px rgba(21, 94, 239, 0.10);
+    }
+
+
+    /* =========================================================
+       TABLE CARD
+       ========================================================= */
+
+    .parents-card {
+        background: #ffffff;
+        border: none;
+        border-radius: 18px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
+        overflow: hidden;
+    }
+
+
+    .parents-card-header {
+        padding: 20px 22px;
+        border-bottom: 1px solid #edf0f5;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+    }
+
+
+    .parents-card-title {
+        margin: 0;
+        font-size: 17px;
+        font-weight: 700;
+        color: #102a43;
+    }
+
+
+    .parents-count {
+        background: #e8f0ff;
+        color: #155eef;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+
+    .parents-card-body {
+        padding: 0;
+    }
+
+
+    /* =========================================================
+       TABLE
+       ========================================================= */
+
+    .parents-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+
+    .parents-table th {
+        background: #f8faff;
+        color: #7a869a;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        font-weight: 600;
+        padding: 13px 16px;
+        border-bottom: 1px solid #edf0f5;
+        white-space: nowrap;
+    }
+
+
+    .parents-table td {
+        padding: 14px 16px;
+        border-bottom: 1px solid #f0f2f6;
+        font-size: 13px;
+        color: #4f5d73;
+        vertical-align: middle;
+    }
+
+
+    .parents-table tr:last-child td {
+        border-bottom: none;
+    }
+
+
+    .parents-table tbody tr {
+        transition: background 0.2s ease;
+    }
+
+
+    .parents-table tbody tr:hover {
+        background: #fafbff;
+    }
+
+
+    /* =========================================================
+       PARENT PROFILE
+       ========================================================= */
+
+    .parent-cell {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+    }
+
+
+    .parent-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #eafaf1;
+        color: #198754;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 13px;
+        flex-shrink: 0;
+    }
+
+
+    .parent-name {
+        font-size: 13px;
+        font-weight: 600;
+        color: #102a43;
+    }
+
+
+    .parent-email {
+        font-size: 11px;
+        color: #8a94a6;
+        margin-top: 2px;
+    }
+
+
+    /* =========================================================
+       STUDENT COUNT
+       ========================================================= */
+
+    .student-count {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: #f1f5ff;
+        color: #155eef;
+        padding: 5px 9px;
+        border-radius: 15px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+
+    /* =========================================================
+       STATUS
+       ========================================================= */
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 5px 9px;
+        border-radius: 20px;
+        font-size: 10px;
+        font-weight: 600;
+    }
+
+
+    .status-active {
+        background: #e8f7ef;
+        color: #198754;
+    }
+
+
+    .status-inactive {
+        background: #ffe9e9;
+        color: #dc3545;
+    }
+
+
+    /* =========================================================
+       ACTIONS
+       ========================================================= */
+
+    .action-buttons {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+
+    .action-btn {
+        width: 34px;
+        height: 34px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 9px;
+        text-decoration: none;
+        border: 1px solid transparent;
+        transition: all 0.2s ease;
+    }
+
+
+    .action-view {
+        background: #eef4ff;
+        color: #155eef;
+    }
+
+
+    .action-view:hover {
+        background: #155eef;
+        color: #ffffff;
+    }
+
+
+    .action-edit {
+        background: #f3e8ff;
+        color: #7b2cbf;
+    }
+
+
+    .action-edit:hover {
+        background: #7b2cbf;
+        color: #ffffff;
+    }
+
+
+    .action-status {
+        background: #fff4e5;
+        color: #b26a00;
+        border: none;
+    }
+
+
+    .action-status:hover {
+        background: #b26a00;
+        color: #ffffff;
+    }
+
+
+    /* =========================================================
+       EMPTY STATE
+       ========================================================= */
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #8a94a6;
+    }
+
+
+    .empty-state i {
+        display: block;
+        font-size: 42px;
+        margin-bottom: 15px;
+    }
+
+
+    .empty-state h5 {
+        color: #4f5d73;
+        font-size: 16px;
+        margin-bottom: 7px;
+    }
+
+
+    .empty-state p {
+        font-size: 13px;
+        margin-bottom: 18px;
+    }
+
+
+    /* =========================================================
+       RESPONSIVE
+       ========================================================= */
+
+    @media (max-width: 900px) {
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+
+        .parents-table {
+            min-width: 800px;
+        }
+
+    }
+
+
+    @media (max-width: 576px) {
+
+        .parents-card-header {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+    }
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="parents-page">
+
+    <!-- =====================================================
+         SEARCH
+         ===================================================== -->
+
+    <div class="search-card">
+
+        <div class="search-wrapper">
+
+            <i class="bi bi-search"></i>
+
+            <input
+                type="text"
+                id="parentSearch"
+                class="search-input"
+                placeholder="Search by name, phone or email..."
+                autocomplete="off"
+            >
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         PARENTS TABLE
+         ===================================================== -->
+
+    <div class="parents-card">
+
+        <div class="parents-card-header">
+
+            <h5 class="parents-card-title">
+                All Parents
+            </h5>
+
+            <span class="parents-count">
+
+                {{ parents|length }}
+
+                {% if parents|length == 1 %}
+                    Parent
+                {% else %}
+                    Parents
+                {% endif %}
+
+            </span>
+
+        </div>
+
+
+        <div class="parents-card-body">
+
+            {% if parents %}
+
+            <div class="table-responsive">
+
+                <table
+                    class="parents-table"
+                    id="parentsTable"
+                >
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Parent
+                            </th>
+
+                            <th>
+                                Phone
+                            </th>
+
+                            <th>
+                                Email
+                            </th>
+
+                            <th>
+                                Students
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                Actions
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for parent in parents %}
+
+                        <tr class="parent-row">
+
+                            <!-- Parent -->
+
+                            <td>
+
+                                <div class="parent-cell">
+
+                                    <div class="parent-avatar">
+
+                                        {{ parent.first_name[:1]|upper }}
+
+                                    </div>
+
+
+                                    <div>
+
+                                        <div class="parent-name">
+
+                                            {{ parent.first_name }}
+
+                                            {{ parent.surname }}
+
+                                        </div>
+
+
+                                        {% if parent.email %}
+
+                                        <div class="parent-email">
+
+                                            {{ parent.email }}
+
+                                        </div>
+
+                                        {% endif %}
+
+                                    </div>
+
+                                </div>
+
+                            </td>
+
+
+                            <!-- Phone -->
+
+                            <td>
+
+                                {% if parent.phone %}
+
+                                    {{ parent.phone }}
+
+                                {% else %}
+
+                                    —
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- Email -->
+
+                            <td>
+
+                                {% if parent.email %}
+
+                                    {{ parent.email }}
+
+                                {% else %}
+
+                                    —
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- Students -->
+
+                            <td>
+
+                                <span class="student-count">
+
+                                    <i class="bi bi-mortarboard-fill"></i>
+
+                                    {{ parent.student_links|length }}
+
+                                </span>
+
+                            </td>
+
+
+                            <!-- Status -->
+
+                            <td>
+
+                                {% if parent.is_active %}
+
+                                    <span class="status-badge status-active">
+
+                                        <i class="bi bi-check-circle me-1"></i>
+
+                                        Active
+
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="status-badge status-inactive">
+
+                                        <i class="bi bi-x-circle me-1"></i>
+
+                                        Inactive
+
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- Actions -->
+
+                            <td>
+
+                                <div class="action-buttons">
+
+                                    <!-- View -->
+
+                                    <a
+                                        href="{{ url_for('extra_class.view_parent', parent_id=parent.id) }}"
+                                        class="action-btn action-view"
+                                        title="View Parent"
+                                    >
+
+                                        <i class="bi bi-eye"></i>
+
+                                    </a>
+
+
+                                    <!-- Edit -->
+
+                                    <a
+                                        href="{{ url_for('extra_class.edit_parent', parent_id=parent.id) }}"
+                                        class="action-btn action-edit"
+                                        title="Edit Parent"
+                                    >
+
+                                        <i class="bi bi-pencil-square"></i>
+
+                                    </a>
+
+
+                                    <!-- Activate / Deactivate -->
+
+                                    <form
+                                        method="POST"
+                                        action="{{ url_for('extra_class.toggle_parent_status', parent_id=parent.id) }}"
+                                        class="d-inline"
+                                        onsubmit="return confirm(
+                                            '{{ "Deactivate" if parent.is_active else "Activate" }} this parent?'
+                                        );"
+                                    >
+
+                                        <input
+                                            type="hidden"
+                                            name="csrf_token"
+                                            value="{{ csrf_token() }}"
+                                        >
+
+                                        <button
+                                            type="submit"
+                                            class="action-btn action-status"
+                                            title="{{ 'Deactivate' if parent.is_active else 'Activate' }} Parent"
+                                        >
+
+                                            {% if parent.is_active %}
+
+                                                <i class="bi bi-person-dash"></i>
+
+                                            {% else %}
+
+                                                <i class="bi bi-person-check"></i>
+
+                                            {% endif %}
+
+                                        </button>
+
+                                    </form>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            {% else %}
+
+                <div class="empty-state">
+
+                    <i class="bi bi-people"></i>
+
+                    <h5>
+                        No Parents Yet
+                    </h5>
+
+                    <p>
+                        Add your first parent or guardian to get started.
+                    </p>
+
+                    <a
+                        href="{{ url_for('extra_class.add_parent') }}"
+                        class="btn btn-primary"
+                    >
+
+                        <i class="bi bi-person-plus-fill me-1"></i>
+
+                        Add Parent
+
+                    </a>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block extra_scripts %}
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const searchInput = document.getElementById("parentSearch");
+    const rows = document.querySelectorAll(".parent-row");
+
+
+    if (!searchInput) {
+        return;
+    }
+
+
+    searchInput.addEventListener("input", function () {
+
+        const searchTerm = this.value
+            .toLowerCase()
+            .trim();
+
+
+        rows.forEach(function (row) {
+
+            const text = row.textContent
+                .toLowerCase();
+
+
+            if (text.includes(searchTerm)) {
+
+                row.style.display = "";
+
+            } else {
+
+                row.style.display = "none";
+
+            }
+
+        });
+
+    });
+
+});
+
+</script>
+
+{% endblock %}

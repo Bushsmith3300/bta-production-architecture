@@ -1,0 +1,410 @@
+{% extends "admin/extra_classes/super_admin/extra_class_super_admin_base.html" %}
+
+{% block title %}View Enrollment{% endblock %}
+
+{% block content %}
+
+<style>
+    .page-header {
+        margin-bottom: 25px;
+    }
+
+    .page-header h1 {
+        margin: 0;
+        color: #5c0008;
+        font-size: 28px;
+    }
+
+    .page-header p {
+        margin-top: 6px;
+        color: #777;
+    }
+
+    .details-card {
+        background: #fff;
+        border-radius: 16px;
+        padding: 30px;
+        max-width: 900px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    }
+
+    .section-title {
+        color: #5c0008;
+        font-size: 18px;
+        font-weight: 700;
+        margin: 0 0 15px;
+    }
+
+    .section {
+        margin-bottom: 30px;
+    }
+
+    .details-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+
+    .detail-item {
+        background: #f8f8f8;
+        padding: 15px;
+        border-radius: 10px;
+    }
+
+    .detail-label {
+        display: block;
+        font-size: 13px;
+        color: #777;
+        margin-bottom: 5px;
+    }
+
+    .detail-value {
+        font-weight: 600;
+        color: #333;
+    }
+
+    .status {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .status-active {
+        background: #e7f7ed;
+        color: #16803c;
+    }
+
+    .status-inactive {
+        background: #fff4d6;
+        color: #946200;
+    }
+
+    .status-completed {
+        background: #e8f0ff;
+        color: #2455a4;
+    }
+
+    .status-cancelled {
+        background: #fde8e8;
+        color: #b42318;
+    }
+
+    .actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 25px;
+    }
+
+    .btn {
+        padding: 11px 18px;
+        border-radius: 9px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 14px;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #6d0009, #970015);
+        color: white;
+    }
+
+    .btn-secondary {
+        background: #eee;
+        color: #333;
+    }
+
+    @media (max-width: 650px) {
+        .details-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .details-card {
+            padding: 20px;
+        }
+    }
+</style>
+
+<div class="page-header">
+    <h1>View Enrollment</h1>
+    <p>View the details of this Extra Class enrollment.</p>
+</div>
+
+<div class="details-card">
+
+    <!-- STUDENT -->
+    <div class="section">
+
+        <h2 class="section-title">
+            Student Information
+        </h2>
+
+        <div class="details-grid">
+
+            <div class="detail-item">
+                <span class="detail-label">
+                    Student Name
+                </span>
+
+                <span class="detail-value">
+                    {{ enrollment.student.first_name }}
+
+                    {% if enrollment.student.other_name %}
+                        {{ enrollment.student.other_name }}
+                    {% endif %}
+
+                    {{ enrollment.student.surname }}
+                </span>
+            </div>
+
+            <div class="detail-item">
+                <span class="detail-label">
+                    Student Code
+                </span>
+
+                <span class="detail-value">
+                    {{ enrollment.student.student_code }}
+                </span>
+            </div>
+
+            <div class="detail-item">
+                <span class="detail-label">
+                    School
+                </span>
+
+                <span class="detail-value">
+                    {{ enrollment.student.school or "Not provided" }}
+                </span>
+            </div>
+
+            <div class="detail-item">
+                <span class="detail-label">
+                    Class
+                </span>
+
+                <span class="detail-value">
+                    {{ enrollment.student.class_name or "Not provided" }}
+                </span>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- SUBJECT -->
+    <div class="section">
+
+        <h2 class="section-title">
+            Extra Class Information
+        </h2>
+
+        <div class="details-grid">
+
+            <div class="detail-item">
+                <span class="detail-label">
+                    Subject
+                </span>
+
+                <span class="detail-value">
+                    {{ enrollment.extra_class_subject.subject.name }}
+                </span>
+            </div>
+
+            <div class="detail-item">
+                <span class="detail-label">
+                    Monthly Fee
+                </span>
+
+                <span class="detail-value">
+                    GH₵ {{ "%.2f"|format(enrollment.extra_class_subject.monthly_fee) }}
+                </span>
+            </div>
+
+            <div class="detail-item">
+                <span class="detail-label">
+                    Assigned Teacher
+                </span>
+
+                <span class="detail-value">
+
+                    {% if enrollment.extra_class_subject.teacher %}
+
+                        {{ enrollment.extra_class_subject.teacher.first_name }}
+                        {{ enrollment.extra_class_subject.teacher.surname }}
+
+                    {% else %}
+
+                        Not Assigned
+
+                    {% endif %}
+
+                </span>
+            </div>
+
+            <div class="detail-item">
+                <span class="detail-label">
+                    Enrollment Status
+                </span>
+
+                <span class="detail-value">
+
+                    {% if enrollment.status == "ACTIVE" %}
+
+                        <span class="status status-active">
+                            ACTIVE
+                        </span>
+
+                    {% elif enrollment.status == "INACTIVE" %}
+
+                        <span class="status status-inactive">
+                            INACTIVE
+                        </span>
+
+                    {% elif enrollment.status == "COMPLETED" %}
+
+                        <span class="status status-completed">
+                            COMPLETED
+                        </span>
+
+                    {% elif enrollment.status == "CANCELLED" %}
+
+                        <span class="status status-cancelled">
+                            CANCELLED
+                        </span>
+
+                    {% else %}
+
+                        {{ enrollment.status }}
+
+                    {% endif %}
+
+                </span>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- DATES -->
+    <div class="section">
+
+        <h2 class="section-title">
+            Enrollment Dates
+        </h2>
+
+        <div class="details-grid">
+
+            <div class="detail-item">
+                <span class="detail-label">
+                    Start Date
+                </span>
+
+                <span class="detail-value">
+                    {{ enrollment.start_date.strftime("%d %B %Y") }}
+                </span>
+            </div>
+
+            <div class="detail-item">
+                <span class="detail-label">
+                    End Date
+                </span>
+
+                <span class="detail-value">
+
+                    {% if enrollment.end_date %}
+                        {{ enrollment.end_date.strftime("%d %B %Y") }}
+                    {% else %}
+                        Not set
+                    {% endif %}
+
+                </span>
+            </div>
+
+            <div class="detail-item">
+                <span class="detail-label">
+                    Created
+                </span>
+
+                <span class="detail-value">
+
+                    {% if enrollment.created_at %}
+                        {{ enrollment.created_at.strftime("%d %B %Y, %I:%M %p") }}
+                    {% else %}
+                        —
+                    {% endif %}
+
+                </span>
+            </div>
+
+            <div class="detail-item">
+                <span class="detail-label">
+                    Last Updated
+                </span>
+
+                <span class="detail-value">
+
+                    {% if enrollment.updated_at %}
+                        {{ enrollment.updated_at.strftime("%d %B %Y, %I:%M %p") }}
+                    {% else %}
+                        —
+                    {% endif %}
+
+                </span>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="actions">
+
+        <a href="{{ url_for('extra_class.edit_enrollment',
+                           enrollment_id=enrollment.id) }}"
+           class="btn btn-primary">
+            Edit Enrollment
+        </a>
+
+        {% if enrollment.status == "ACTIVE" %}
+        <form
+            method="POST"
+            action="{{ url_for(
+                'extra_class.generate_monthly_fees',
+                enrollment_id=enrollment.id
+            ) }}"
+            style="display: inline;"
+            onsubmit="return confirm(
+                'Generate monthly fees for this enrollment? Existing fee records will not be duplicated.'
+            );"
+        >
+            <input
+                type="hidden"
+                name="csrf_token"
+                value="{{ csrf_token() }}"
+            >
+
+            <button
+                type="submit"
+                class="btn btn-primary"
+            >
+                Generate Monthly Fees
+            </button>
+        </form>
+        {% endif %}
+
+        <a href="{{ url_for('extra_class.enrollments') }}"
+           class="btn btn-secondary">
+            ← Back to Enrollments
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

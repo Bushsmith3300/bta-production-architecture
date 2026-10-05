@@ -1,0 +1,1409 @@
+{% extends "admin/extra_classes/super_admin/extra_class_super_admin_base.html" %}
+
+{% block title %}Extra Classes Super Admin Dashboard{% endblock %}
+
+{% block page_title %}
+    Extra Classes Dashboard
+{% endblock %}
+
+{% block page_subtitle %}
+    Overview of students, parents, teachers, subjects, payments and fees.
+{% endblock %}
+
+{% block page_actions %}
+    <span class="current-month">
+        <i class="bi bi-calendar3"></i>
+        {{ current_month }}
+    </span>
+{% endblock %}
+
+{% block content %}
+
+<!-- Welcome Hero -->
+<section class="dashboard-hero">
+    <div>
+        <div class="hero-icon">
+            <i class="bi bi-grid-1x2-fill"></i>
+        </div>
+
+        <h2>Welcome to Extra Classes Management</h2>
+
+        <p>
+            Manage students, parents, teachers, subjects, fees and payments
+            from one central dashboard.
+        </p>
+    </div>
+</section>
+
+
+<!-- Main Statistics -->
+<section class="stats-grid">
+
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="bi bi-people-fill"></i>
+        </div>
+
+        <div class="stat-info">
+            <span>Total Students</span>
+            <strong>{{ total_students }}</strong>
+        </div>
+    </div>
+
+
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="bi bi-person-hearts"></i>
+        </div>
+
+        <div class="stat-info">
+            <span>Total Parents</span>
+            <strong>{{ total_parents }}</strong>
+        </div>
+    </div>
+
+
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="bi bi-person-workspace"></i>
+        </div>
+
+        <div class="stat-info">
+            <span>Total Teachers</span>
+            <strong>{{ total_teachers }}</strong>
+        </div>
+    </div>
+
+
+    <div class="stat-card">
+        <div class="stat-icon">
+            <i class="bi bi-book-fill"></i>
+        </div>
+
+        <div class="stat-info">
+            <span>Extra Class Subjects</span>
+            <strong>{{ total_subjects }}</strong>
+        </div>
+    </div>
+
+</section>
+
+
+<!-- Financial Overview -->
+<section class="section-title">
+    <div>
+        <h3>Financial Overview</h3>
+        <p>{{ current_month }} payment summary</p>
+    </div>
+</section>
+
+
+<section class="finance-grid">
+
+    <div class="finance-card">
+        <div class="finance-icon">
+            <i class="bi bi-receipt"></i>
+        </div>
+
+        <div>
+            <span>Fees Due</span>
+
+            <strong>
+                GH¢ {{ "%.2f"|format(current_month_fees|float) }}
+            </strong>
+
+            <small>
+                {{ current_month_fee_count }} fee record{% if current_month_fee_count != 1 %}s{% endif %}
+            </small>
+        </div>
+    </div>
+
+
+    <div class="finance-card">
+        <div class="finance-icon">
+            <i class="bi bi-cash-stack"></i>
+        </div>
+
+        <div>
+            <span>Payments Received</span>
+
+            <strong>
+                GH¢ {{ "%.2f"|format(payments_received|float) }}
+            </strong>
+
+            <small>
+                {{ successful_payment_count }} successful payment{% if successful_payment_count != 1 %}s{% endif %}
+            </small>
+        </div>
+    </div>
+
+
+    <div class="finance-card">
+        <div class="finance-icon">
+            <i class="bi bi-exclamation-circle"></i>
+        </div>
+
+        <div>
+            <span>Outstanding Fees</span>
+
+            <strong>
+                GH¢ {{ "%.2f"|format(total_outstanding|float) }}
+            </strong>
+
+            <small>
+                Amount remaining to be collected
+            </small>
+        </div>
+    </div>
+
+</section>
+
+
+<!-- Payment Status -->
+<section class="section-title">
+    <div>
+        <h3>Payment Status</h3>
+        <p>Current payment activity</p>
+    </div>
+</section>
+
+
+<section class="payment-status-grid">
+
+    <div class="status-card">
+        <div class="status-number success">
+            {{ successful_payment_count }}
+        </div>
+
+        <div>
+            <strong>Successful</strong>
+            <span>Payments completed</span>
+        </div>
+    </div>
+
+
+    <div class="status-card">
+        <div class="status-number pending">
+            {{ pending_payments }}
+        </div>
+
+        <div>
+            <strong>Pending</strong>
+            <span>Awaiting confirmation</span>
+        </div>
+    </div>
+
+
+    <div class="status-card">
+        <div class="status-number failed">
+            {{ failed_payment_count }}
+        </div>
+
+        <div>
+            <strong>Failed</strong>
+            <span>Payment attempts failed</span>
+        </div>
+    </div>
+
+</section>
+
+
+<!-- Fee Status -->
+<section class="content-grid">
+
+    <div class="panel">
+
+        <div class="panel-header">
+            <div>
+                <h3>Monthly Fee Status</h3>
+                <p>Current month fee collection</p>
+            </div>
+
+            <i class="bi bi-bar-chart-fill"></i>
+        </div>
+
+
+        <div class="fee-status-list">
+
+            <div class="fee-status-item">
+
+                <div class="fee-status-label">
+                    <span>
+                        <i class="bi bi-check-circle-fill"></i>
+                        Paid
+                    </span>
+
+                    <strong>{{ paid_fee_count }}</strong>
+                </div>
+
+                <div class="progress">
+                    {% if fee_count > 0 %}
+                        <div
+                            class="progress-bar"
+                            style="width: {{ (paid_fee_count / fee_count * 100)|round(1) }}%;">
+                        </div>
+                    {% else %}
+                        <div class="progress-bar" style="width:0%;"></div>
+                    {% endif %}
+                </div>
+
+            </div>
+
+
+            <div class="fee-status-item">
+
+                <div class="fee-status-label">
+                    <span>
+                        <i class="bi bi-clock-fill"></i>
+                        Partial
+                    </span>
+
+                    <strong>{{ partial_fee_count }}</strong>
+                </div>
+
+                <div class="progress">
+                    {% if fee_count > 0 %}
+                        <div
+                            class="progress-bar"
+                            style="width: {{ (partial_fee_count / fee_count * 100)|round(1) }}%;">
+                        </div>
+                    {% else %}
+                        <div class="progress-bar" style="width:0%;"></div>
+                    {% endif %}
+                </div>
+
+            </div>
+
+
+            <div class="fee-status-item">
+
+                <div class="fee-status-label">
+                    <span>
+                        <i class="bi bi-hourglass-split"></i>
+                        Unpaid
+                    </span>
+
+                    <strong>{{ unpaid_fee_count }}</strong>
+                </div>
+
+                <div class="progress">
+                    {% if fee_count > 0 %}
+                        <div
+                            class="progress-bar"
+                            style="width: {{ (unpaid_fee_count / fee_count * 100)|round(1) }}%;">
+                        </div>
+                    {% else %}
+                        <div class="progress-bar" style="width:0%;"></div>
+                    {% endif %}
+                </div>
+
+            </div>
+
+
+            <div class="fee-status-item">
+
+                <div class="fee-status-label">
+                    <span>
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        Overdue
+                    </span>
+
+                    <strong>{{ overdue_fee_count }}</strong>
+                </div>
+
+                <div class="progress">
+                    {% if fee_count > 0 %}
+                        <div
+                            class="progress-bar"
+                            style="width: {{ (overdue_fee_count / fee_count * 100)|round(1) }}%;">
+                        </div>
+                    {% else %}
+                        <div class="progress-bar" style="width:0%;"></div>
+                    {% endif %}
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Teacher Settlement -->
+    <div class="panel">
+
+        <div class="panel-header">
+            <div>
+                <h3>Teacher Settlements</h3>
+                <p>{{ current_month }} settlement summary</p>
+            </div>
+
+            <i class="bi bi-wallet2"></i>
+        </div>
+
+
+        <div class="settlement-summary">
+
+            <div class="settlement-row">
+                <span>Total Owed</span>
+
+                <strong>
+                    GH¢ {{ "%.2f"|format(total_teacher_owed|float) }}
+                </strong>
+            </div>
+
+
+            <div class="settlement-row">
+                <span>Total Paid</span>
+
+                <strong>
+                    GH¢ {{ "%.2f"|format(total_teacher_paid|float) }}
+                </strong>
+            </div>
+
+
+            <div class="settlement-row balance">
+                <span>Outstanding Balance</span>
+
+                <strong>
+                    GH¢ {{ "%.2f"|format(total_teacher_balance|float) }}
+                </strong>
+            </div>
+
+        </div>
+
+
+        <a
+            href="{{ url_for('extra_class.settlements') }}"
+            class="panel-button">
+
+            <i class="bi bi-arrow-right"></i>
+            View Teacher Settlements
+
+        </a>
+
+    </div>
+
+</section>
+
+
+<!-- Recent Payments -->
+<section class="panel full-width">
+
+    <div class="panel-header">
+
+        <div>
+            <h3>Recent Payments</h3>
+            <p>Latest payment activity</p>
+        </div>
+
+        <a
+            href="{{ url_for('extra_class.payments') }}"
+            class="view-all">
+
+            View All
+            <i class="bi bi-arrow-right"></i>
+
+        </a>
+
+    </div>
+
+
+    {% if recent_payments %}
+
+    <div class="table-wrapper">
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>Reference</th>
+                    <th>Student</th>
+                    <th>Parent</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+
+
+            <tbody>
+
+            {% for payment in recent_payments %}
+
+                <tr>
+
+                    <td>
+                        <strong>
+                            {{ payment.payment_reference }}
+                        </strong>
+                    </td>
+
+
+                    <td>
+                        {% if payment.student %}
+                            {{ payment.student.first_name }}
+                            {{ payment.student.surname }}
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+
+
+                    <td>
+                        {% if payment.parent %}
+                            {{ payment.parent.first_name }}
+                            {{ payment.parent.surname }}
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+
+
+                    <td>
+                        <strong>
+                            GH¢ {{ "%.2f"|format(payment.amount|float) }}
+                        </strong>
+                    </td>
+
+
+                    <td>
+
+                        {% set status = payment.status|string|upper %}
+
+                        {% if status == "SUCCESS" %}
+
+                            <span class="badge success">
+                                <i class="bi bi-check-circle-fill"></i>
+                                Successful
+                            </span>
+
+                        {% elif status == "PENDING" %}
+
+                            <span class="badge pending">
+                                <i class="bi bi-clock-fill"></i>
+                                Pending
+                            </span>
+
+                        {% elif status == "FAILED" %}
+
+                            <span class="badge failed">
+                                <i class="bi bi-x-circle-fill"></i>
+                                Failed
+                            </span>
+
+                        {% else %}
+
+                            <span class="badge">
+                                {{ status }}
+
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <td>
+
+                        {% if payment.created_at %}
+                            {{ payment.created_at.strftime("%d %b %Y, %H:%M") }}
+                        {% else %}
+                            —
+                        {% endif %}
+
+                    </td>
+
+                </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    {% else %}
+
+        <div class="empty-state">
+
+            <i class="bi bi-receipt"></i>
+
+            <h4>No payments yet</h4>
+
+            <p>
+                Payment activity will appear here once parents begin making payments.
+            </p>
+
+        </div>
+
+    {% endif %}
+
+</section>
+
+
+<!-- Recent Students -->
+<section class="panel full-width">
+
+    <div class="panel-header">
+
+        <div>
+            <h3>Recently Added Students</h3>
+            <p>Latest students registered for Extra Classes</p>
+        </div>
+
+        <a
+            href="{{ url_for('extra_class.students') }}"
+            class="view-all">
+
+            View All
+            <i class="bi bi-arrow-right"></i>
+
+        </a>
+
+    </div>
+
+
+    {% if recent_students %}
+
+    <div class="student-grid">
+
+        {% for student in recent_students %}
+
+        <div class="student-card">
+
+            <div class="student-avatar">
+                {{ student.first_name[0]|upper }}
+            </div>
+
+            <div class="student-info">
+
+                <strong>
+                    {{ student.first_name }}
+                    {{ student.surname }}
+                </strong>
+
+                <span>
+                    {{ student.student_code }}
+                </span>
+
+                {% if student.school %}
+                    <small>{{ student.school }}</small>
+                {% endif %}
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+    {% else %}
+
+        <div class="empty-state">
+
+            <i class="bi bi-people"></i>
+
+            <h4>No students yet</h4>
+
+            <p>
+                Recently added students will appear here.
+            </p>
+
+        </div>
+
+    {% endif %}
+
+</section>
+
+
+<!-- Quick Actions -->
+<section class="section-title">
+    <div>
+        <h3>Quick Actions</h3>
+        <p>Frequently used Extra Classes management tools</p>
+    </div>
+</section>
+
+
+<section class="quick-actions">
+
+    <a
+        href="{{ url_for('extra_class.add_student') }}"
+        class="quick-action">
+
+        <i class="bi bi-person-plus-fill"></i>
+
+        <div>
+            <strong>Add Student</strong>
+            <span>Register a new student</span>
+        </div>
+
+        <i class="bi bi-chevron-right arrow"></i>
+
+    </a>
+
+
+    <a
+        href="{{ url_for('extra_class.add_parent') }}"
+        class="quick-action">
+
+        <i class="bi bi-person-heart"></i>
+
+        <div>
+            <strong>Add Parent</strong>
+            <span>Register a parent or guardian</span>
+        </div>
+
+        <i class="bi bi-chevron-right arrow"></i>
+
+    </a>
+
+
+    <a
+        href="{{ url_for('extra_class.teachers') }}"
+        class="quick-action">
+
+        <i class="bi bi-person-workspace"></i>
+
+        <div>
+            <strong>Manage Teachers</strong>
+            <span>View Extra Classes teachers</span>
+        </div>
+
+        <i class="bi bi-chevron-right arrow"></i>
+
+    </a>
+
+
+    <a
+        href="{{ url_for('extra_class.subjects') }}"
+        class="quick-action">
+
+        <i class="bi bi-book-fill"></i>
+
+        <div>
+            <strong>Manage Subjects</strong>
+            <span>Configure Extra Class subjects</span>
+        </div>
+
+        <i class="bi bi-chevron-right arrow"></i>
+
+    </a>
+
+
+    <a
+        href="{{ url_for('extra_class.enrollments') }}"
+        class="quick-action">
+
+        <i class="bi bi-journal-check"></i>
+
+        <div>
+            <strong>Enrollments</strong>
+            <span>Manage student enrollments</span>
+        </div>
+
+        <i class="bi bi-chevron-right arrow"></i>
+
+    </a>
+
+
+    <a
+        href="{{ url_for('extra_class.payments') }}"
+        class="quick-action">
+
+        <i class="bi bi-credit-card-fill"></i>
+
+        <div>
+            <strong>Payments</strong>
+            <span>View payment transactions</span>
+        </div>
+
+        <i class="bi bi-chevron-right arrow"></i>
+
+    </a>
+
+</section>
+
+
+<style>
+
+/* ================================
+   DASHBOARD
+================================ */
+
+.dashboard-hero {
+    background: linear-gradient(135deg, #b00018, #e20b2d, #78000d);
+    border-radius: 18px;
+    padding: 28px 32px;
+    color: #fff;
+    margin-bottom: 24px;
+    box-shadow: 0 12px 30px rgba(92, 0, 8, .18);
+}
+
+.dashboard-hero h2 {
+    margin: 8px 0 6px;
+    font-size: 25px;
+    font-weight: 800;
+}
+
+.dashboard-hero p {
+    margin: 0;
+    opacity: .9;
+    font-size: 14px;
+}
+
+.hero-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 13px;
+    background: rgba(255,255,255,.18);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 21px;
+}
+
+
+/* ================================
+   MONTH BADGE
+================================ */
+
+.current-month {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 14px;
+    background: rgba(255,255,255,.14);
+    border: 1px solid rgba(255,255,255,.25);
+    border-radius: 10px;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+
+/* ================================
+   STAT CARDS
+================================ */
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    margin-bottom: 28px;
+}
+
+.stat-card {
+    background: #fff;
+    border-radius: 15px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border: 1px solid #eee;
+    box-shadow: 0 6px 20px rgba(0,0,0,.05);
+}
+
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 13px;
+    background: #fcecef;
+    color: #9d0015;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 21px;
+}
+
+.stat-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.stat-info span {
+    color: #777;
+    font-size: 12px;
+}
+
+.stat-info strong {
+    color: #333;
+    font-size: 23px;
+    font-weight: 800;
+}
+
+
+/* ================================
+   SECTION TITLES
+================================ */
+
+.section-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 28px 0 14px;
+}
+
+.section-title h3 {
+    margin: 0;
+    color: #333;
+    font-size: 18px;
+}
+
+.section-title p {
+    margin: 4px 0 0;
+    color: #888;
+    font-size: 12px;
+}
+
+
+/* ================================
+   FINANCIAL CARDS
+================================ */
+
+.finance-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin-bottom: 28px;
+}
+
+.finance-card {
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 15px;
+    padding: 21px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 6px 20px rgba(0,0,0,.05);
+}
+
+.finance-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 13px;
+    background: #fcecef;
+    color: #9d0015;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+}
+
+.finance-card span,
+.finance-card small {
+    display: block;
+    color: #888;
+    font-size: 12px;
+}
+
+.finance-card strong {
+    display: block;
+    color: #333;
+    font-size: 21px;
+    margin: 4px 0;
+}
+
+
+/* ================================
+   PAYMENT STATUS
+================================ */
+
+.payment-status-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin-bottom: 28px;
+}
+
+.status-card {
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 15px;
+    padding: 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.status-number {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 17px;
+}
+
+.status-number.success {
+    background: #eaf8ef;
+    color: #16833b;
+}
+
+.status-number.pending {
+    background: #fff5df;
+    color: #b36b00;
+}
+
+.status-number.failed {
+    background: #fdebed;
+    color: #b00018;
+}
+
+.status-card strong,
+.status-card span {
+    display: block;
+}
+
+.status-card strong {
+    color: #333;
+    font-size: 14px;
+}
+
+.status-card span {
+    color: #888;
+    font-size: 11px;
+    margin-top: 3px;
+}
+
+
+/* ================================
+   PANELS
+================================ */
+
+.content-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.panel {
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 15px;
+    padding: 22px;
+    margin-bottom: 20px;
+    box-shadow: 0 6px 20px rgba(0,0,0,.04);
+}
+
+.full-width {
+    width: 100%;
+}
+
+.panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.panel-header h3 {
+    margin: 0;
+    color: #333;
+    font-size: 17px;
+}
+
+.panel-header p {
+    margin: 4px 0 0;
+    color: #888;
+    font-size: 11px;
+}
+
+.panel-header > i {
+    color: #9d0015;
+    font-size: 20px;
+}
+
+.view-all {
+    color: #9d0015;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.view-all:hover {
+    text-decoration: underline;
+}
+
+
+/* ================================
+   FEE STATUS
+================================ */
+
+.fee-status-item {
+    margin-bottom: 18px;
+}
+
+.fee-status-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 7px;
+    font-size: 12px;
+}
+
+.fee-status-label span {
+    color: #555;
+}
+
+.fee-status-label strong {
+    color: #333;
+}
+
+.fee-status-label i {
+    color: #9d0015;
+    margin-right: 5px;
+}
+
+.progress {
+    height: 8px;
+    background: #f0f0f0;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #b00018, #e20b2d);
+    border-radius: 20px;
+}
+
+
+/* ================================
+   SETTLEMENT
+================================ */
+
+.settlement-summary {
+    margin-bottom: 18px;
+}
+
+.settlement-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+    color: #666;
+    font-size: 13px;
+}
+
+.settlement-row strong {
+    color: #333;
+}
+
+.settlement-row.balance {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.settlement-row.balance strong {
+    color: #b00018;
+}
+
+.panel-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 9px;
+    background: #fcecef;
+    color: #9d0015;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.panel-button:hover {
+    background: #f8dce1;
+}
+
+
+/* ================================
+   TABLE
+================================ */
+
+.table-wrapper {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+thead th {
+    background: #fafafa;
+    color: #777;
+    font-size: 11px;
+    text-align: left;
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+}
+
+tbody td {
+    padding: 13px 12px;
+    color: #555;
+    font-size: 12px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+tbody tr:hover {
+    background: #fffafb;
+}
+
+tbody td strong {
+    color: #333;
+}
+
+
+/* ================================
+   BADGES
+================================ */
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 9px;
+    border-radius: 20px;
+    background: #eee;
+    color: #666;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.badge.success {
+    background: #eaf8ef;
+    color: #16833b;
+}
+
+.badge.pending {
+    background: #fff5df;
+    color: #a96800;
+}
+
+.badge.failed {
+    background: #fdebed;
+    color: #b00018;
+}
+
+
+/* ================================
+   STUDENTS
+================================ */
+
+.student-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.student-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    padding: 13px;
+}
+
+.student-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #fcecef;
+    color: #9d0015;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+}
+
+.student-info strong,
+.student-info span,
+.student-info small {
+    display: block;
+}
+
+.student-info strong {
+    color: #333;
+    font-size: 13px;
+}
+
+.student-info span {
+    color: #9d0015;
+    font-size: 10px;
+    margin-top: 3px;
+}
+
+.student-info small {
+    color: #888;
+    font-size: 10px;
+    margin-top: 2px;
+}
+
+
+/* ================================
+   EMPTY STATE
+================================ */
+
+.empty-state {
+    text-align: center;
+    padding: 35px 20px;
+    color: #888;
+}
+
+.empty-state i {
+    font-size: 32px;
+    color: #ccc;
+}
+
+.empty-state h4 {
+    margin: 10px 0 5px;
+    color: #555;
+}
+
+.empty-state p {
+    margin: 0;
+    font-size: 12px;
+}
+
+
+/* ================================
+   QUICK ACTIONS
+================================ */
+
+.quick-actions {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-bottom: 30px;
+}
+
+.quick-action {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 13px;
+    padding: 16px;
+    color: #333;
+    text-decoration: none;
+    transition: .2s ease;
+}
+
+.quick-action:hover {
+    transform: translateY(-2px);
+    border-color: #e6aab3;
+    box-shadow: 0 8px 20px rgba(92,0,8,.08);
+}
+
+.quick-action > i:first-child {
+    width: 42px;
+    height: 42px;
+    border-radius: 11px;
+    background: #fcecef;
+    color: #9d0015;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.quick-action div {
+    flex: 1;
+}
+
+.quick-action strong,
+.quick-action span {
+    display: block;
+}
+
+.quick-action strong {
+    font-size: 13px;
+}
+
+.quick-action span {
+    color: #888;
+    font-size: 10px;
+    margin-top: 3px;
+}
+
+.quick-action .arrow {
+    color: #aaa;
+    font-size: 13px;
+}
+
+
+/* ================================
+   RESPONSIVE
+================================ */
+
+@media (max-width: 1100px) {
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .finance-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .quick-actions {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+
+@media (max-width: 800px) {
+
+    .content-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .payment-status-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .student-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+@media (max-width: 600px) {
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .quick-actions {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-hero {
+        padding: 22px;
+    }
+
+    .dashboard-hero h2 {
+        font-size: 20px;
+    }
+
+    .panel {
+        padding: 16px;
+    }
+
+}
+
+</style>
+
+{% endblock %}

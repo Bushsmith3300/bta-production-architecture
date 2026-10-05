@@ -1,0 +1,476 @@
+{% extends "admin/extra_classes/extra_class_admin_base.html" %}
+
+{% block title %}
+    Link Student | BTA
+{% endblock %}
+
+
+{% block page_title %}
+    Link Student
+{% endblock %}
+
+
+{% block page_subtitle %}
+    Associate a student with this parent or guardian.
+{% endblock %}
+
+
+{% block extra_css %}
+
+<style>
+
+    /* =====================================================
+       PARENT SUMMARY
+    ===================================================== */
+
+    .parent-summary {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        padding: 18px;
+        background: #f8fafc;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        margin-bottom: 30px;
+    }
+
+
+    .parent-avatar {
+        width: 58px;
+        height: 58px;
+        min-width: 58px;
+        border-radius: 50%;
+        background: #e8f0fe;
+        color: #1565c0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        font-weight: 700;
+    }
+
+
+    .parent-summary-label {
+        font-size: 12px;
+        color: #6b7280;
+        font-weight: 600;
+        margin-bottom: 2px;
+    }
+
+
+    .parent-summary-name {
+        font-size: 18px;
+        font-weight: 700;
+        color: #1f2937;
+    }
+
+
+    .parent-summary-phone {
+        font-size: 13px;
+        color: #6b7280;
+    }
+
+
+    /* =====================================================
+       FORM
+    ===================================================== */
+
+    .form-label {
+        color: #1f2937;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+
+
+    .form-select,
+    .form-control {
+        min-height: 48px;
+        border: 1px solid #d1d5db;
+        border-radius: 9px;
+    }
+
+
+    .form-select:focus,
+    .form-control:focus {
+        border-color: #1565c0;
+        box-shadow: 0 0 0 0.2rem rgba(
+            21,
+            101,
+            192,
+            0.12
+        );
+    }
+
+
+    .form-text {
+        color: #6b7280;
+    }
+
+
+    /* =====================================================
+       PRIMARY PARENT
+    ===================================================== */
+
+    .primary-option {
+        background: #f8fafc;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 18px;
+        transition: 0.2s;
+    }
+
+
+    .primary-option:hover {
+        border-color: #90caf9;
+        background: #f4f9ff;
+    }
+
+
+    .primary-option .form-check-input {
+        width: 20px;
+        height: 20px;
+        margin-top: 2px;
+    }
+
+
+    .primary-option .form-check-input:checked {
+        background-color: #1565c0;
+        border-color: #1565c0;
+    }
+
+
+    .primary-title {
+        font-weight: 600;
+        color: #1f2937;
+    }
+
+
+    .primary-description {
+        font-size: 13px;
+        color: #6b7280;
+        margin-top: 3px;
+    }
+
+
+    /* =====================================================
+       ACTION BUTTONS
+    ===================================================== */
+
+    .action-buttons {
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid #e5e7eb;
+    }
+
+
+    @media (max-width: 768px) {
+
+        .action-buttons .btn {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+    }
+
+</style>
+
+{% endblock %}
+
+
+
+{% block content %}
+
+<div class="content-card">
+
+    <!-- =================================================
+         PARENT SUMMARY
+    ================================================== -->
+
+    <div class="parent-summary">
+
+        <div class="parent-avatar">
+
+            {{ parent.first_name[0]|upper }}
+
+        </div>
+
+
+        <div>
+
+            <div class="parent-summary-label">
+
+                Linking student to
+
+            </div>
+
+
+            <div class="parent-summary-name">
+
+                {{ parent.first_name }}
+                {{ parent.surname }}
+
+            </div>
+
+
+            <div class="parent-summary-phone">
+
+                <i class="bi bi-telephone me-1"></i>
+
+                {{ parent.phone }}
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =================================================
+         FORM
+    ================================================== -->
+
+    <form
+        method="POST"
+        action="{{ url_for(
+            'extra_class.link_parent_student',
+            parent_id=parent.id
+        ) }}"
+    >
+
+        <!-- CSRF -->
+
+        <input
+            type="hidden"
+            name="csrf_token"
+            value="{{ csrf_token() }}"
+        >
+
+
+
+        <!-- =================================================
+             STUDENT
+        ================================================== -->
+
+        <div class="mb-4">
+
+            <label
+                for="student_id"
+                class="form-label"
+            >
+
+                <i class="bi bi-mortarboard me-1"></i>
+
+                Student
+
+                <span class="text-danger">
+                    *
+                </span>
+
+            </label>
+
+
+            <select
+                id="student_id"
+                name="student_id"
+                class="form-select"
+                required
+            >
+
+                <option value="">
+                    -- Select Student --
+                </option>
+
+
+                {% for student in students %}
+
+                    <option value="{{ student.id }}">
+
+                        {{ student.first_name }}
+
+                        {% if student.other_name %}
+                            {{ student.other_name }}
+                        {% endif %}
+
+                        {{ student.surname }}
+
+                        —
+                        {{ student.student_code }}
+
+                        {% if student.school %}
+                            — {{ student.school }}
+                        {% endif %}
+
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+
+            <div class="form-text mt-2">
+
+                <i class="bi bi-info-circle me-1"></i>
+
+                Only active students are available for linking.
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             RELATIONSHIP
+        ================================================== -->
+
+        <div class="mb-4">
+
+            <label
+                for="relationship"
+                class="form-label"
+            >
+
+                <i class="bi bi-people me-1"></i>
+
+                Relationship
+
+                <span class="text-danger">
+                    *
+                </span>
+
+            </label>
+
+
+            <select
+                id="relationship"
+                name="relationship"
+                class="form-select"
+                required
+            >
+
+                <option value="">
+                    -- Select Relationship --
+                </option>
+
+                <option value="Father">
+                    Father
+                </option>
+
+                <option value="Mother">
+                    Mother
+                </option>
+
+                <option value="Guardian">
+                    Guardian
+                </option>
+
+                <option value="Uncle">
+                    Uncle
+                </option>
+
+                <option value="Aunt">
+                    Aunt
+                </option>
+
+                <option value="Grandfather">
+                    Grandfather
+                </option>
+
+                <option value="Grandmother">
+                    Grandmother
+                </option>
+
+                <option value="Other">
+                    Other
+                </option>
+
+            </select>
+
+        </div>
+
+
+
+        <!-- =================================================
+             PRIMARY PARENT
+        ================================================== -->
+
+        <div class="primary-option mb-4">
+
+            <div class="form-check">
+
+                <input
+                    class="form-check-input"
+                    type="checkbox"
+                    id="is_primary"
+                    name="is_primary"
+                    value="1"
+                >
+
+
+                <label
+                    class="form-check-label ms-2"
+                    for="is_primary"
+                >
+
+                    <div class="primary-title">
+
+                        Make this the primary parent
+
+                    </div>
+
+
+                    <div class="primary-description">
+
+                        This parent will be identified as the
+                        student's main parent or guardian.
+
+                    </div>
+
+                </label>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             ACTION BUTTONS
+        ================================================== -->
+
+        <div class="action-buttons">
+
+            <button
+                type="submit"
+                class="btn btn-primary me-2"
+            >
+
+                <i class="bi bi-link-45deg me-1"></i>
+
+                Link Student
+
+            </button>
+
+
+            <a
+                href="{{ url_for(
+                    'extra_class.view_parent',
+                    parent_id=parent.id
+                ) }}"
+                class="btn btn-outline-secondary"
+            >
+
+                <i class="bi bi-x-lg me-1"></i>
+
+                Cancel
+
+            </a>
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

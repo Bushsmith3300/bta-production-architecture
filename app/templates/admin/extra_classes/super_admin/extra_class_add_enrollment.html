@@ -1,0 +1,678 @@
+{% extends "admin/extra_classes/super_admin/extra_class_super_admin_base.html" %}
+
+{% block title %}Add Enrollment{% endblock %}
+
+{% block content %}
+
+<style>
+    .page-header {
+        margin-bottom: 25px;
+    }
+
+    .page-header h1 {
+        margin: 0;
+        color: #5c0008;
+        font-size: 28px;
+    }
+
+    .page-header p {
+        margin-top: 6px;
+        color: #777;
+    }
+
+    .form-card {
+        background: #fff;
+        border-radius: 16px;
+        padding: 30px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+        max-width: 850px;
+    }
+
+    .form-group {
+        margin-bottom: 22px;
+    }
+
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #333;
+    }
+
+    .form-group label span {
+        color: #d0001b;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 13px 14px;
+        border: 1px solid #ddd;
+        border-radius: 9px;
+        font-size: 15px;
+        box-sizing: border-box;
+        background: #fff;
+        transition: 0.2s;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #970015;
+        box-shadow: 0 0 0 3px rgba(151, 0, 21, 0.10);
+    }
+
+    .help-text {
+        margin-top: 6px;
+        font-size: 13px;
+        color: #777;
+    }
+
+    .subject-preview,
+    .term-preview {
+        display: none;
+        margin-top: 12px;
+        padding: 16px;
+        border-radius: 10px;
+        background: #fff6f7;
+        border-left: 4px solid #970015;
+    }
+
+    .subject-preview.show,
+    .term-preview.show {
+        display: block;
+    }
+
+    .preview-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+        padding: 6px 0;
+    }
+
+    .preview-label {
+        color: #777;
+    }
+
+    .preview-value {
+        font-weight: 600;
+        color: #5c0008;
+        text-align: right;
+    }
+
+    .info-box {
+        background: #f8f8f8;
+        border-radius: 10px;
+        padding: 15px 18px;
+        margin-bottom: 25px;
+        border-left: 4px solid #970015;
+    }
+
+    .info-box strong {
+        color: #5c0008;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 30px;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 12px 20px;
+        border-radius: 9px;
+        border: none;
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #6d0009, #970015);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 5px 15px rgba(151, 0, 21, 0.25);
+    }
+
+    .btn-secondary {
+        background: #eee;
+        color: #333;
+    }
+
+    .btn-secondary:hover {
+        background: #ddd;
+    }
+
+    @media (max-width: 600px) {
+        .form-card {
+            padding: 20px;
+        }
+
+        .preview-row {
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .preview-value {
+            text-align: left;
+        }
+    }
+</style>
+
+
+<div class="page-header">
+
+    <h1>Add Enrollment</h1>
+
+    <p>
+        Enroll a student into an active Extra Class subject and term.
+    </p>
+
+</div>
+
+
+<div class="form-card">
+
+    <div class="info-box">
+
+        <strong>Enrollment information</strong><br>
+
+        Select the student, term, and Extra Class subject.
+        The subject's assigned teacher and monthly fee are
+        automatically determined from the subject settings.
+
+    </div>
+
+
+    <form method="POST"
+          action="{{ url_for('extra_class.add_enrollment') }}">
+
+        <input type="hidden"
+               name="csrf_token"
+               value="{{ csrf_token() }}">
+
+
+        <!-- STUDENT -->
+        <div class="form-group">
+
+            <label for="student_id">
+                Student <span>*</span>
+            </label>
+
+            <select id="student_id"
+                    name="student_id"
+                    class="form-control"
+                    required>
+
+                <option value="">
+                    -- Select Student --
+                </option>
+
+                {% for student in students %}
+
+                    <option value="{{ student.id }}">
+
+                        {{ student.first_name }}
+
+                        {% if student.other_name %}
+                            {{ student.other_name }}
+                        {% endif %}
+
+                        {{ student.surname }}
+
+                        — {{ student.student_code }}
+
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+            <div class="help-text">
+                Only active Extra Class students are shown.
+            </div>
+
+        </div>
+
+
+        <!-- TERM -->
+        <div class="form-group">
+
+            <label for="term_id">
+                Extra Class Term <span>*</span>
+            </label>
+
+            <select id="term_id"
+                    name="term_id"
+                    class="form-control"
+                    required>
+
+                <option value="">
+                    -- Select Term --
+                </option>
+
+                {% for term in terms %}
+
+                    <option
+                        value="{{ term.id }}"
+                        data-start="{{ term.start_date.isoformat() }}"
+                        data-end="{{ term.end_date.isoformat() }}"
+                    >
+                        {{ term.name }}
+                        — {{ term.start_date.strftime('%d %b %Y') }}
+                        to {{ term.end_date.strftime('%d %b %Y') }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+            <div class="help-text">
+                Select the term in which this student's Extra Class enrollment will take place.
+            </div>
+
+
+            <!-- TERM PREVIEW -->
+            <div id="termPreview"
+                 class="term-preview">
+
+                <div class="preview-row">
+
+                    <span class="preview-label">
+                        Term
+                    </span>
+
+                    <span class="preview-value"
+                          id="previewTerm">
+                        —
+                    </span>
+
+                </div>
+
+                <div class="preview-row">
+
+                    <span class="preview-label">
+                        Term Start
+                    </span>
+
+                    <span class="preview-value"
+                          id="previewTermStart">
+                        —
+                    </span>
+
+                </div>
+
+                <div class="preview-row">
+
+                    <span class="preview-label">
+                        Term End
+                    </span>
+
+                    <span class="preview-value"
+                          id="previewTermEnd">
+                        —
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- SUBJECT -->
+        <div class="form-group">
+
+            <label for="extra_class_subject_id">
+                Extra Class Subject <span>*</span>
+            </label>
+
+            <select id="extra_class_subject_id"
+                    name="extra_class_subject_id"
+                    class="form-control"
+                    required>
+
+                <option value="">
+                    -- Select Subject --
+                </option>
+
+                {% for extra_subject in extra_subjects %}
+
+                    <option
+                        value="{{ extra_subject.id }}"
+                        data-fee="{{ '%.2f'|format(extra_subject.monthly_fee) }}"
+                        data-teacher="{% if extra_subject.teacher %}{{ extra_subject.teacher.first_name }} {{ extra_subject.teacher.surname }}{% else %}Not Assigned{% endif %}"
+                    >
+
+                        {{ extra_subject.subject.name }}
+
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+            <div class="help-text">
+                Only active Extra Class subjects are shown.
+            </div>
+
+
+            <!-- SUBJECT PREVIEW -->
+            <div id="subjectPreview"
+                 class="subject-preview">
+
+                <div class="preview-row">
+
+                    <span class="preview-label">
+                        Monthly Fee
+                    </span>
+
+                    <span class="preview-value">
+                        GH₵ <span id="previewFee">0.00</span>
+                    </span>
+
+                </div>
+
+                <div class="preview-row">
+
+                    <span class="preview-label">
+                        Assigned Teacher
+                    </span>
+
+                    <span class="preview-value"
+                          id="previewTeacher">
+                        Not Assigned
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- START DATE -->
+        <div class="form-group">
+
+            <label for="start_date">
+                Enrollment Start Date <span>*</span>
+            </label>
+
+            <input type="date"
+                   id="start_date"
+                   name="start_date"
+                   class="form-control"
+                   required>
+
+            <div class="help-text">
+                The enrollment start date must fall within the selected term.
+            </div>
+
+        </div>
+
+
+        <!-- ACTIONS -->
+        <div class="form-actions">
+
+            <a href="{{ url_for('extra_class.enrollments') }}"
+               class="btn btn-secondary">
+                ← Back to Enrollments
+            </a>
+
+            <button type="submit"
+                    class="btn btn-primary">
+                Create Enrollment
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const termSelect =
+            document.getElementById("term_id");
+
+        const startDateInput =
+            document.getElementById("start_date");
+
+        const termPreview =
+            document.getElementById("termPreview");
+
+        const previewTerm =
+            document.getElementById("previewTerm");
+
+        const previewTermStart =
+            document.getElementById("previewTermStart");
+
+        const previewTermEnd =
+            document.getElementById("previewTermEnd");
+
+
+        const subjectSelect =
+            document.getElementById("extra_class_subject_id");
+
+        const subjectPreview =
+            document.getElementById("subjectPreview");
+
+        const previewFee =
+            document.getElementById("previewFee");
+
+        const previewTeacher =
+            document.getElementById("previewTeacher");
+
+
+        // ====================================================
+        // TERM PREVIEW
+        // ====================================================
+
+        function updateTermPreview() {
+
+            const selectedOption =
+                termSelect.options[
+                    termSelect.selectedIndex
+                ];
+
+
+            if (
+                !selectedOption ||
+                !selectedOption.value
+            ) {
+
+                termPreview.classList.remove("show");
+
+                previewTerm.textContent = "—";
+                previewTermStart.textContent = "—";
+                previewTermEnd.textContent = "—";
+
+                startDateInput.removeAttribute("min");
+                startDateInput.removeAttribute("max");
+
+                return;
+            }
+
+
+            const termName =
+                selectedOption.textContent.trim();
+
+            const termStart =
+                selectedOption.dataset.start;
+
+            const termEnd =
+                selectedOption.dataset.end;
+
+
+            previewTerm.textContent =
+                termName;
+
+            previewTermStart.textContent =
+                formatDate(termStart);
+
+            previewTermEnd.textContent =
+                formatDate(termEnd);
+
+
+            startDateInput.min =
+                termStart;
+
+            startDateInput.max =
+                termEnd;
+
+
+            // If an already-selected date is outside
+            // the selected term, clear it.
+
+            if (
+                startDateInput.value &&
+                (
+                    startDateInput.value < termStart ||
+                    startDateInput.value > termEnd
+                )
+            ) {
+
+                startDateInput.value = "";
+
+            }
+
+
+            termPreview.classList.add("show");
+        }
+
+
+        // ====================================================
+        // SUBJECT PREVIEW
+        // ====================================================
+
+        function updateSubjectPreview() {
+
+            const selectedOption =
+                subjectSelect.options[
+                    subjectSelect.selectedIndex
+                ];
+
+
+            if (
+                !selectedOption ||
+                !selectedOption.value
+            ) {
+
+                subjectPreview.classList.remove("show");
+
+                previewFee.textContent = "0.00";
+
+                previewTeacher.textContent =
+                    "Not Assigned";
+
+                return;
+            }
+
+
+            const fee =
+                selectedOption.dataset.fee ||
+                "0.00";
+
+            const teacher =
+                selectedOption.dataset.teacher ||
+                "Not Assigned";
+
+
+            previewFee.textContent =
+                fee;
+
+            previewTeacher.textContent =
+                teacher.trim() ||
+                "Not Assigned";
+
+
+            subjectPreview.classList.add("show");
+        }
+
+
+        // ====================================================
+        // FORMAT DATE
+        // ====================================================
+
+        function formatDate(dateString) {
+
+            if (!dateString) {
+                return "—";
+            }
+
+
+            const parts =
+                dateString.split("-");
+
+
+            if (parts.length !== 3) {
+                return dateString;
+            }
+
+
+            return (
+                parts[2] +
+                " " +
+                getMonthName(parseInt(parts[1], 10)) +
+                " " +
+                parts[0]
+            );
+        }
+
+
+        function getMonthName(monthNumber) {
+
+            const months = [
+                "",
+                "January",
+                "February",
+                "March",
+                "April",
+                "May",
+                "June",
+                "July",
+                "August",
+                "September",
+                "October",
+                "November",
+                "December"
+            ];
+
+
+            return months[monthNumber] || "";
+        }
+
+
+        // ====================================================
+        // EVENTS
+        // ====================================================
+
+        termSelect.addEventListener(
+            "change",
+            updateTermPreview
+        );
+
+        subjectSelect.addEventListener(
+            "change",
+            updateSubjectPreview
+        );
+
+
+        // ====================================================
+        // INITIALISE
+        // ====================================================
+
+        updateTermPreview();
+        updateSubjectPreview();
+
+    });
+</script>
+
+{% endblock %}

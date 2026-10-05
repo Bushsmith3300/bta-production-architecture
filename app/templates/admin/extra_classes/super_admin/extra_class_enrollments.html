@@ -1,0 +1,726 @@
+{% extends "admin/extra_classes/super_admin/extra_class_super_admin_base.html" %}
+
+{% block title %}Enrollments{% endblock %}
+
+{% block content %}
+
+<style>
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+        margin-bottom: 25px;
+        flex-wrap: wrap;
+    }
+
+    .page-header h1 {
+        margin: 0;
+        color: #5c0008;
+        font-size: 28px;
+    }
+
+    .page-header p {
+        margin: 6px 0 0;
+        color: #777;
+    }
+
+    .add-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 18px;
+        border-radius: 9px;
+        background: linear-gradient(
+            135deg,
+            #6d0009,
+            #970015
+        );
+        color: #fff;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 600;
+        transition: 0.2s ease;
+    }
+
+    .add-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 5px 15px rgba(151, 0, 21, 0.25);
+    }
+
+
+    /* ==============================
+       STATISTICS
+       ============================== */
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(
+            auto-fit,
+            minmax(180px, 1fr)
+        );
+        gap: 16px;
+        margin-bottom: 25px;
+    }
+
+    .stat-card {
+        background: #fff;
+        border-radius: 14px;
+        padding: 20px;
+        box-shadow: 0 6px 20px rgba(
+            0,
+            0,
+            0,
+            0.07
+        );
+    }
+
+    .stat-label {
+        color: #777;
+        font-size: 13px;
+        margin-bottom: 8px;
+    }
+
+    .stat-value {
+        color: #5c0008;
+        font-size: 27px;
+        font-weight: 700;
+    }
+
+
+    /* ==============================
+       TABLE CARD
+       ============================== */
+
+    .table-card {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 8px 25px rgba(
+            0,
+            0,
+            0,
+            0.08
+        );
+        overflow: hidden;
+    }
+
+    .table-header {
+        padding: 20px 24px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .table-header h2 {
+        margin: 0;
+        color: #5c0008;
+        font-size: 19px;
+    }
+
+    .table-wrapper {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 900px;
+    }
+
+    th {
+        background: #faf5f6;
+        color: #5c0008;
+        text-align: left;
+        padding: 14px 16px;
+        font-size: 13px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    td {
+        padding: 15px 16px;
+        border-top: 1px solid #eee;
+        font-size: 14px;
+        color: #333;
+        vertical-align: middle;
+    }
+
+    tbody tr:hover {
+        background: #fffafa;
+    }
+
+
+    /* ==============================
+       STUDENT
+       ============================== */
+
+    .student-name {
+        font-weight: 600;
+        color: #333;
+    }
+
+    .student-code {
+        margin-top: 3px;
+        font-size: 12px;
+        color: #777;
+    }
+
+
+    /* ==============================
+       SUBJECT
+       ============================== */
+
+    .subject-name {
+        font-weight: 600;
+        color: #5c0008;
+    }
+
+
+    /* ==============================
+       TEACHER
+       ============================== */
+
+    .teacher-name {
+        font-weight: 500;
+    }
+
+    .not-assigned {
+        color: #999;
+        font-style: italic;
+    }
+
+
+    /* ==============================
+       FEE
+       ============================== */
+
+    .fee {
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+
+    /* ==============================
+       STATUS
+       ============================== */
+
+    .status {
+        display: inline-block;
+        padding: 6px 11px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .status-active {
+        background: #e7f7ed;
+        color: #16803c;
+    }
+
+    .status-inactive {
+        background: #fff4d6;
+        color: #946200;
+    }
+
+    .status-completed {
+        background: #e8f0ff;
+        color: #2455a4;
+    }
+
+    .status-cancelled {
+        background: #fde8e8;
+        color: #b42318;
+    }
+
+
+    /* ==============================
+       ACTION BUTTONS
+       ============================== */
+
+    .action-buttons {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        padding: 8px 12px;
+        border-radius: 7px;
+        border: none;
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.2s ease;
+        white-space: nowrap;
+    }
+
+    .btn-view {
+        background: #f1f1f1;
+        color: #333;
+    }
+
+    .btn-view:hover {
+        background: #ddd;
+    }
+
+    .btn-edit {
+        background: #970015;
+        color: #fff;
+    }
+
+    .btn-edit:hover {
+        background: #6d0009;
+        transform: translateY(-1px);
+    }
+
+
+    /* ==============================
+       EMPTY STATE
+       ============================== */
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #777;
+    }
+
+    .empty-state-icon {
+        font-size: 42px;
+        margin-bottom: 12px;
+    }
+
+    .empty-state h3 {
+        margin: 0 0 8px;
+        color: #5c0008;
+    }
+
+    .empty-state p {
+        margin: 0 0 20px;
+    }
+
+
+    /* ==============================
+       RESPONSIVE
+       ============================== */
+
+    @media (max-width: 700px) {
+
+        .page-header {
+            align-items: flex-start;
+        }
+
+        .page-header h1 {
+            font-size: 24px;
+        }
+
+        .add-btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .stats-grid {
+            grid-template-columns: repeat(
+                2,
+                1fr
+            );
+        }
+
+    }
+
+    @media (max-width: 450px) {
+
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+    }
+
+</style>
+
+
+<!-- ==========================================
+     PAGE HEADER
+     ========================================== -->
+
+<div class="page-header">
+
+    <div>
+        <h1>Enrollments</h1>
+
+        <p>
+            Manage students enrolled in Extra Class subjects.
+        </p>
+    </div>
+
+
+    <a href="{{ url_for('extra_class.add_enrollment') }}"
+       class="add-btn">
+
+        <span>＋</span>
+        Add Enrollment
+
+    </a>
+
+</div>
+
+
+<!-- ==========================================
+     STATISTICS
+     ========================================== -->
+
+<div class="stats-grid">
+
+    <div class="stat-card">
+
+        <div class="stat-label">
+            Total Enrollments
+        </div>
+
+        <div class="stat-value">
+            {{ total_enrollments }}
+        </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <div class="stat-label">
+            Active
+        </div>
+
+        <div class="stat-value">
+            {{ active_enrollments }}
+        </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <div class="stat-label">
+            Inactive
+        </div>
+
+        <div class="stat-value">
+            {{ inactive_enrollments }}
+        </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <div class="stat-label">
+            Completed
+        </div>
+
+        <div class="stat-value">
+            {{ completed_enrollments }}
+        </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <div class="stat-label">
+            Cancelled
+        </div>
+
+        <div class="stat-value">
+            {{ cancelled_enrollments }}
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ==========================================
+     ENROLLMENTS TABLE
+     ========================================== -->
+
+<div class="table-card">
+
+    <div class="table-header">
+
+        <h2>
+            Enrollment Records
+        </h2>
+
+    </div>
+
+
+    {% if enrollments %}
+
+        <div class="table-wrapper">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            #
+                        </th>
+
+                        <th>
+                            Student
+                        </th>
+
+                        <th>
+                            Subject
+                        </th>
+
+                        <th>
+                            Teacher
+                        </th>
+
+                        <th>
+                            Monthly Fee
+                        </th>
+
+                        <th>
+                            Start Date
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                        <th>
+                            Actions
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for enrollment in enrollments %}
+
+                        <tr>
+
+                            <!-- NUMBER -->
+                            <td>
+                                {{ loop.index }}
+                            </td>
+
+
+                            <!-- STUDENT -->
+                            <td>
+
+                                <div class="student-name">
+
+                                    {{ enrollment.student.first_name }}
+
+                                    {% if enrollment.student.other_name %}
+                                        {{ enrollment.student.other_name }}
+                                    {% endif %}
+
+                                    {{ enrollment.student.surname }}
+
+                                </div>
+
+                                <div class="student-code">
+
+                                    {{ enrollment.student.student_code }}
+
+                                </div>
+
+                            </td>
+
+
+                            <!-- SUBJECT -->
+                            <td>
+
+                                <div class="subject-name">
+
+                                    {{ enrollment.extra_class_subject.subject.name }}
+
+                                </div>
+
+                            </td>
+
+
+                            <!-- TEACHER -->
+                            <td>
+
+                                {% if enrollment.extra_class_subject.teacher %}
+
+                                    <span class="teacher-name">
+
+                                        {{ enrollment.extra_class_subject.teacher.first_name }}
+                                        {{ enrollment.extra_class_subject.teacher.surname }}
+
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="not-assigned">
+                                        Not Assigned
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- MONTHLY FEE -->
+                            <td>
+
+                                <span class="fee">
+
+                                    GH₵
+                                    {{ "%.2f"|format(
+                                        enrollment.extra_class_subject.monthly_fee
+                                    ) }}
+
+                                </span>
+
+                            </td>
+
+
+                            <!-- START DATE -->
+                            <td>
+
+                                {% if enrollment.start_date %}
+
+                                    {{ enrollment.start_date.strftime(
+                                        "%d %b %Y"
+                                    ) }}
+
+                                {% else %}
+
+                                    —
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- STATUS -->
+                            <td>
+
+                                {% if enrollment.status == "ACTIVE" %}
+
+                                    <span class="status status-active">
+                                        ACTIVE
+                                    </span>
+
+                                {% elif enrollment.status == "INACTIVE" %}
+
+                                    <span class="status status-inactive">
+                                        INACTIVE
+                                    </span>
+
+                                {% elif enrollment.status == "COMPLETED" %}
+
+                                    <span class="status status-completed">
+                                        COMPLETED
+                                    </span>
+
+                                {% elif enrollment.status == "CANCELLED" %}
+
+                                    <span class="status status-cancelled">
+                                        CANCELLED
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="status">
+                                        {{ enrollment.status }}
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- ACTIONS -->
+                            <td>
+
+                                <div class="action-buttons">
+
+                                    <!-- VIEW -->
+                                    <a href="{{ url_for(
+                                        'extra_class.view_enrollment',
+                                        enrollment_id=enrollment.id
+                                    ) }}"
+                                       class="btn btn-view">
+
+                                        <span>👁</span>
+                                        View
+
+                                    </a>
+
+
+                                    <!-- EDIT -->
+                                    <a href="{{ url_for(
+                                        'extra_class.edit_enrollment',
+                                        enrollment_id=enrollment.id
+                                    ) }}"
+                                       class="btn btn-edit">
+
+                                        <span>✎</span>
+                                        Edit
+
+                                    </a>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    {% else %}
+
+        <!-- EMPTY STATE -->
+
+        <div class="empty-state">
+
+            <div class="empty-state-icon">
+                📋
+            </div>
+
+            <h3>
+                No Enrollments Yet
+            </h3>
+
+            <p>
+                No students have been enrolled in an Extra Class subject yet.
+            </p>
+
+            <a href="{{ url_for('extra_class.add_enrollment') }}"
+               class="add-btn">
+
+                ＋ Add First Enrollment
+
+            </a>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Teacher Login | BTA Extra Classes</title>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #7f1d1d;
+            --primary-dark: #5f1515;
+            --text: #172033;
+            --muted: #64748b;
+            --border: #dbe3ef;
+            --danger: #dc2626;
+            --success: #15803d;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Inter", Arial, sans-serif;
+            background:
+                linear-gradient(
+                    135deg,
+                    #fef2f2 0%,
+                    #fffafa 50%,
+                    #fef2f2 100%
+                );
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 25px 15px;
+            color: var(--text);
+        }
+
+        .page-wrapper {
+            width: 100%;
+            max-width: 980px;
+            min-height: 590px;
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 45% 55%;
+            box-shadow:
+                0 25px 70px rgba(127, 29, 29, 0.14);
+        }
+
+        /* =========================================
+           LEFT BRANDING PANEL
+        ========================================== */
+
+        .brand-panel {
+            position: relative;
+            padding: 50px 45px;
+            background:
+                linear-gradient(
+                    145deg,
+                    #5f1515,
+                    #7f1d1d 55%,
+                    #991b1b
+                );
+            color: white;
+            overflow: hidden;
+        }
+
+        .brand-panel::before {
+            content: "";
+            position: absolute;
+            width: 280px;
+            height: 280px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+            top: -120px;
+            right: -110px;
+        }
+
+        .brand-panel::after {
+            content: "";
+            position: absolute;
+            width: 230px;
+            height: 230px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.06);
+            bottom: -110px;
+            left: -110px;
+        }
+
+        .brand-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .logo {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.16);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 32px;
+            backdrop-filter: blur(10px);
+        }
+
+        .brand-title {
+            font-size: 32px;
+            line-height: 1.15;
+            font-weight: 800;
+            margin: 0 0 16px;
+        }
+
+        .brand-description {
+            font-size: 14px;
+            line-height: 1.7;
+            color: rgba(255, 255, 255, 0.84);
+            margin: 0 0 38px;
+        }
+
+        .portal-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 8px 12px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 25px;
+        }
+
+        .portal-dot {
+            width: 7px;
+            height: 7px;
+            background: #86efac;
+            border-radius: 50%;
+        }
+
+        .feature {
+            display: flex;
+            align-items: flex-start;
+            gap: 13px;
+            margin-bottom: 20px;
+        }
+
+        .feature-icon {
+            width: 36px;
+            height: 36px;
+            flex-shrink: 0;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.13);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+        }
+
+        .feature-text strong {
+            display: block;
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+
+        .feature-text span {
+            display: block;
+            color: rgba(255, 255, 255, 0.70);
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        .brand-footer {
+            position: absolute;
+            bottom: 25px;
+            left: 45px;
+            color: rgba(255, 255, 255, 0.60);
+            font-size: 10px;
+        }
+
+        /* =========================================
+           LOGIN PANEL
+        ========================================== */
+
+        .login-panel {
+            padding: 55px 65px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .login-header {
+            margin-bottom: 28px;
+        }
+
+        .login-header h1 {
+            margin: 0 0 8px;
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--text);
+        }
+
+        .login-header p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        /* =========================================
+           FLASH MESSAGES
+        ========================================== */
+
+        .flash-messages {
+            margin-bottom: 20px;
+        }
+
+        .flash {
+            padding: 12px 14px;
+            border-radius: 10px;
+            font-size: 12px;
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
+
+        .flash-success {
+            background: #ecfdf3;
+            border: 1px solid #bbf7d0;
+            color: var(--success);
+        }
+
+        .flash-danger {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: var(--danger);
+        }
+
+        /* =========================================
+           FORM
+        ========================================== */
+
+        .form-group {
+            margin-bottom: 19px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 7px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #334155;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-size: 14px;
+            pointer-events: none;
+        }
+
+        input {
+            width: 100%;
+            height: 47px;
+            padding: 0 42px 0 40px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: #fbfdff;
+            color: var(--text);
+            font-family: inherit;
+            font-size: 13px;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        input::placeholder {
+            color: #a5afbd;
+        }
+
+        input:hover {
+            border-color: #b8c6d9;
+        }
+
+        input:focus {
+            background: white;
+            border-color: var(--primary);
+            box-shadow:
+                0 0 0 3px rgba(127, 29, 29, 0.10);
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: none;
+            background: none;
+            cursor: pointer;
+            color: #94a3b8;
+            font-family: inherit;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 4px;
+        }
+
+        .password-toggle:hover {
+            color: var(--primary);
+        }
+
+        /* =========================================
+           LOGIN BUTTON
+        ========================================== */
+
+        .login-btn {
+            width: 100%;
+            height: 48px;
+            margin-top: 7px;
+            border: none;
+            border-radius: 10px;
+            background:
+                linear-gradient(
+                    135deg,
+                    #7f1d1d,
+                    #5f1515
+                );
+            color: white;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow:
+                0 8px 18px rgba(127, 29, 29, 0.22);
+            transition: all 0.2s ease;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-1px);
+            box-shadow:
+                0 11px 23px rgba(127, 29, 29, 0.28);
+        }
+
+        .login-btn:active {
+            transform: translateY(0);
+        }
+
+        /* =========================================
+           REGISTER LINK
+        ========================================== */
+
+        .register-link {
+            text-align: center;
+            margin-top: 24px;
+            color: #94a3b8;
+            font-size: 12px;
+        }
+
+        .register-link a {
+            color: var(--primary);
+            font-weight: 700;
+            text-decoration: none;
+            margin-left: 4px;
+        }
+
+        .register-link a:hover {
+            text-decoration: underline;
+        }
+
+        .security-note {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            margin-top: 22px;
+            color: #a0aabb;
+            font-size: 10px;
+        }
+
+        /* =========================================
+           MOBILE
+        ========================================== */
+
+        @media (max-width: 800px) {
+
+            body {
+                padding: 15px 10px;
+            }
+
+            .page-wrapper {
+                max-width: 520px;
+                grid-template-columns: 1fr;
+            }
+
+            .brand-panel {
+                padding: 32px 28px;
+            }
+
+            .brand-title {
+                font-size: 27px;
+            }
+
+            .brand-description {
+                margin-bottom: 25px;
+            }
+
+            .feature {
+                margin-bottom: 12px;
+            }
+
+            .brand-footer {
+                position: static;
+                margin-top: 25px;
+            }
+
+            .login-panel {
+                padding: 38px 28px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="page-wrapper">
+
+    <!-- =========================================
+         BRANDING PANEL
+    ========================================== -->
+
+    <section class="brand-panel">
+
+        <div class="brand-content">
+
+            <div class="logo">
+                BTA
+            </div>
+
+            <div class="portal-badge">
+                <span class="portal-dot"></span>
+                TEACHER PORTAL
+            </div>
+
+            <h2 class="brand-title">
+                Welcome<br>
+                Back, Teacher.
+            </h2>
+
+            <p class="brand-description">
+                Sign in to your BTA Extra Classes account
+                to manage your classes, students and
+                teaching activities.
+            </p>
+
+            <div class="feature">
+
+                <div class="feature-icon">
+                    ✓
+                </div>
+
+                <div class="feature-text">
+                    <strong>Your Classes</strong>
+
+                    <span>
+                        Access and manage your assigned
+                        extra classes.
+                    </span>
+                </div>
+
+            </div>
+
+            <div class="feature">
+
+                <div class="feature-icon">
+                    ✓
+                </div>
+
+                <div class="feature-text">
+                    <strong>Your Students</strong>
+
+                    <span>
+                        Keep track of students enrolled
+                        in your classes.
+                    </span>
+                </div>
+
+            </div>
+
+            <div class="feature">
+
+                <div class="feature-icon">
+                    ✓
+                </div>
+
+                <div class="feature-text">
+                    <strong>Your Fees</strong>
+
+                    <span>
+                        Manage your class fees and
+                        payment information.
+                    </span>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="brand-footer">
+            BTA Extra Classes &nbsp;•&nbsp; Secure Teacher Portal
+        </div>
+
+    </section>
+
+
+    <!-- =========================================
+         LOGIN PANEL
+    ========================================== -->
+
+    <section class="login-panel">
+
+        <div class="login-header">
+
+            <h1>Teacher Sign In</h1>
+
+            <p>
+                Enter your username and password to
+                access your teacher account.
+            </p>
+
+        </div>
+
+
+        <!-- FLASH MESSAGES -->
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+
+            {% if messages %}
+
+                <div class="flash-messages">
+
+                    {% for category, message in messages %}
+
+                        <div class="flash flash-{{ category }}">
+                            {{ message }}
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            {% endif %}
+
+        {% endwith %}
+
+
+        <!-- LOGIN FORM -->
+
+        <form
+            method="POST"
+            action="{{ url_for('extra_class_auth.teacher_login') }}"
+        >
+
+            <!-- CSRF TOKEN -->
+
+            <input
+                type="hidden"
+                name="csrf_token"
+                value="{{ csrf_token() }}"
+            >
+
+
+            <!-- USERNAME -->
+
+            <div class="form-group">
+
+                <label for="username">
+                    Username
+                </label>
+
+                <div class="input-wrapper">
+
+                    <span class="input-icon">
+                        👤
+                    </span>
+
+                    <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        placeholder="Enter your username"
+                        autocomplete="username"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- PASSWORD -->
+
+            <div class="form-group">
+
+                <label for="password">
+                    Password
+                </label>
+
+                <div class="input-wrapper">
+
+                    <span class="input-icon">
+                        🔒
+                    </span>
+
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Enter your password"
+                        autocomplete="current-password"
+                        required
+                    >
+
+                    <button
+                        type="button"
+                        class="password-toggle"
+                        onclick="togglePassword()"
+                    >
+                        Show
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- LOGIN BUTTON -->
+
+            <button
+                type="submit"
+                class="login-btn"
+            >
+                Sign In to Teacher Portal
+            </button>
+
+        </form>
+
+
+        <!-- REGISTER -->
+
+        <div class="register-link">
+
+            Don't have a teacher account?
+
+            <a
+                href="{{ url_for('extra_class_auth.teacher_register') }}"
+            >
+                Create an account
+            </a>
+
+        </div>
+
+
+        <!-- SECURITY NOTE -->
+
+        <div class="security-note">
+            🔒 Your teacher account is protected by secure authentication.
+        </div>
+
+    </section>
+
+</div>
+
+
+<script>
+
+    function togglePassword() {
+
+        const password =
+            document.getElementById("password");
+
+        const button =
+            document.querySelector(".password-toggle");
+
+        if (password.type === "password") {
+
+            password.type = "text";
+            button.textContent = "Hide";
+
+        } else {
+
+            password.type = "password";
+            button.textContent = "Show";
+
+        }
+
+    }
+
+</script>
+
+</body>
+</html>

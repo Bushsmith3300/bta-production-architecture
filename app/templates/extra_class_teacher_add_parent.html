@@ -1,0 +1,437 @@
+{% extends "extra_class_teacher_base.html" %}
+
+{% block title %}
+    Add Parent / Guardian
+{% endblock %}
+
+{% block extra_css %}
+
+.parent-page {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.parent-page-header {
+    margin-bottom: 22px;
+}
+
+.parent-page-header h1 {
+    margin: 0 0 7px;
+    color: #3b0d18;
+    font-size: 25px;
+    font-weight: 800;
+}
+
+.parent-page-header p {
+    margin: 0;
+    color: #777;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.student-reference {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding: 15px 17px;
+    margin-bottom: 18px;
+    background: #fff8fa;
+    border: 1px solid #ead1d8;
+    border-radius: 12px;
+}
+
+.student-reference-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #7a1f35;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 800;
+    flex-shrink: 0;
+}
+
+.student-reference-label {
+    color: #8a6871;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .4px;
+    margin-bottom: 3px;
+}
+
+.student-reference-name {
+    color: #3b0d18;
+    font-size: 15px;
+    font-weight: 800;
+}
+
+.student-reference-code {
+    color: #777;
+    font-size: 11px;
+    margin-top: 2px;
+}
+
+.parent-form-card {
+    background: #fff;
+    border: 1px solid #ececec;
+    border-radius: 14px;
+    padding: 24px;
+    box-shadow: 0 5px 18px rgba(59, 13, 24, .05);
+}
+
+.form-section-title {
+    margin: 0 0 18px;
+    color: #3b0d18;
+    font-size: 17px;
+    font-weight: 800;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.form-group {
+    min-width: 0;
+}
+
+.form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 7px;
+    color: #4b3038;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.form-label .required {
+    color: #a52245;
+}
+
+.form-control,
+.form-select {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 11px 12px;
+    border: 1px solid #dcdcdc;
+    border-radius: 9px;
+    background: #fff;
+    color: #333;
+    font-family: inherit;
+    font-size: 13px;
+    outline: none;
+    transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #7a1f35;
+    box-shadow: 0 0 0 3px rgba(122, 31, 53, .10);
+}
+
+.form-help {
+    margin-top: 5px;
+    color: #888;
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.primary-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 13px 14px;
+    margin-top: 4px;
+    background: #fafafa;
+    border: 1px solid #e7e7e7;
+    border-radius: 10px;
+}
+
+.primary-option input {
+    width: 16px;
+    height: 16px;
+    margin-top: 1px;
+    accent-color: #7a1f35;
+}
+
+.primary-option label {
+    color: #3b0d18;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.primary-option small {
+    display: block;
+    margin-top: 3px;
+    color: #888;
+    font-size: 10px;
+    font-weight: 400;
+    line-height: 1.45;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 24px;
+    padding-top: 18px;
+    border-top: 1px solid #eeeeee;
+}
+
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    padding: 0 17px;
+    border-radius: 9px;
+    text-decoration: none;
+    border: 1px solid transparent;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.action-btn.cancel {
+    background: #fff;
+    color: #555;
+    border-color: #d9d9d9;
+}
+
+.action-btn.save {
+    background: #7a1f35;
+    color: #fff;
+}
+
+.action-btn:hover {
+    opacity: .92;
+}
+
+@media (max-width: 700px) {
+    .parent-form-card {
+        padding: 18px;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-group.full-width {
+        grid-column: auto;
+    }
+
+    .form-actions {
+        flex-direction: column-reverse;
+    }
+
+    .action-btn {
+        width: 100%;
+    }
+}
+
+{% endblock %}
+
+{% block content %}
+
+<div class="parent-page">
+
+    <div class="parent-page-header">
+        <h1>Add Parent / Guardian</h1>
+        <p>
+            Register a parent or guardian and link them to this student.
+        </p>
+    </div>
+
+    <div class="student-reference">
+        <div class="student-reference-avatar">
+            {{ student.first_name[0] | upper }}
+        </div>
+
+        <div>
+            <div class="student-reference-label">Student</div>
+            <div class="student-reference-name">
+                {{ student.first_name }}
+                {% if student.other_name %}
+                    {{ student.other_name }}
+                {% endif %}
+                {{ student.surname }}
+            </div>
+            <div class="student-reference-code">
+                Student Code: {{ student.student_code }}
+            </div>
+        </div>
+    </div>
+
+    <div class="parent-form-card">
+
+        <h2 class="form-section-title">
+            Parent / Guardian Details
+        </h2>
+
+        <form method="POST">
+
+            <input
+                type="hidden"
+                name="csrf_token"
+                value="{{ csrf_token() }}"
+            >
+
+            <div class="form-grid">
+
+                <div class="form-group">
+                    <label class="form-label" for="first_name">
+                        First Name <span class="required">*</span>
+                    </label>
+                    <input
+                        type="text"
+                        id="first_name"
+                        name="first_name"
+                        class="form-control"
+                        value="{{ form_data.get('first_name', '') }}"
+                        autocomplete="given-name"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="surname">
+                        Surname <span class="required">*</span>
+                    </label>
+                    <input
+                        type="text"
+                        id="surname"
+                        name="surname"
+                        class="form-control"
+                        value="{{ form_data.get('surname', '') }}"
+                        autocomplete="family-name"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="phone">
+                        Phone Number <span class="required">*</span>
+                    </label>
+                    <input
+                        type="tel"
+                        id="phone"
+                        name="phone"
+                        class="form-control"
+                        value="{{ form_data.get('phone', '') }}"
+                        autocomplete="tel"
+                        required
+                    >
+                    <div class="form-help">
+                        The phone number is also used to identify an existing parent.
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="email">
+                        Email Address
+                    </label>
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        class="form-control"
+                        value="{{ form_data.get('email', '') }}"
+                        autocomplete="email"
+                    >
+                </div>
+
+                <div class="form-group full-width">
+                    <label class="form-label" for="relationship">
+                        Relationship to Student <span class="required">*</span>
+                    </label>
+                    <select
+                        id="relationship"
+                        name="relationship"
+                        class="form-select"
+                        required
+                    >
+                        <option value="">Select relationship</option>
+                        {% for option in [
+                            'Father',
+                            'Mother',
+                            'Guardian',
+                            'Stepfather',
+                            'Stepmother',
+                            'Grandfather',
+                            'Grandmother',
+                            'Uncle',
+                            'Aunt',
+                            'Brother',
+                            'Sister',
+                            'Other'
+                        ] %}
+                            <option
+                                value="{{ option }}"
+                                {% if form_data.get('relationship') == option %}selected{% endif %}
+                            >
+                                {{ option }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group full-width">
+                    <div class="primary-option">
+                        <input
+                            type="checkbox"
+                            id="is_primary"
+                            name="is_primary"
+                            value="1"
+                            {% if form_data.get('is_primary') %}checked{% endif %}
+                        >
+                        <div>
+                            <label for="is_primary">
+                                Make this the primary parent / guardian
+                            </label>
+                            <small>
+                                If selected, any existing primary parent for this student
+                                will no longer be marked as primary.
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="form-actions">
+                <a
+                    href="{{ url_for(
+                        'extra_class_teacher.view_class_student',
+                        class_id=extra_subject.id,
+                        student_id=student.id
+                    ) }}"
+                    class="action-btn cancel"
+                >
+                    Cancel
+                </a>
+
+                <button
+                    type="submit"
+                    class="action-btn save"
+                >
+                    Save Parent / Guardian
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}
