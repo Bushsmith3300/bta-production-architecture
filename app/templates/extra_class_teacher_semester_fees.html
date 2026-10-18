@@ -1,0 +1,143 @@
+{% extends "extra_class_teacher_base.html" %}
+
+{% block title %}Semester & Fees{% endblock %}
+{% block page_heading %}Semester & Fees{% endblock %}
+
+{% block extra_css %}
+.semester-page { max-width: 1150px; margin: 0 auto; padding-bottom: 40px; }
+.page-header { margin-bottom: 24px; }
+.page-header h1 { margin: 0 0 7px; color: var(--text); font-size: 28px; font-weight: 800; }
+.page-header p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.6; }
+.class-badge { display:inline-flex; align-items:center; gap:8px; margin-top:14px; padding:8px 13px; background:var(--white); border:1px solid var(--border); border-radius:9px; color:var(--maroon); font-size:12px; font-weight:800; }
+.grid { display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); gap:20px; align-items:start; }
+.card { background:var(--white); border:1px solid var(--border); border-radius:18px; box-shadow:0 8px 24px rgba(15,23,42,.06); padding:24px; }
+.card h2 { margin:0 0 6px; color:var(--text); font-size:18px; font-weight:800; }
+.card > p { margin:0 0 20px; color:var(--muted); font-size:12px; line-height:1.6; }
+.form-group { margin-bottom:16px; }
+label { display:block; margin-bottom:7px; color:var(--text); font-size:12px; font-weight:700; }
+.form-control { width:100%; box-sizing:border-box; min-height:46px; padding:11px 13px; background:var(--white); border:1px solid #d7dce3; border-radius:9px; outline:none; color:var(--text); font-family:inherit; font-size:13px; }
+.form-control:focus { border-color:var(--maroon); box-shadow:0 0 0 3px rgba(127,29,29,.08); }
+.date-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.btn { min-height:45px; padding:11px 20px; border:0; border-radius:9px; color:var(--white); background:linear-gradient(135deg,var(--maroon),var(--maroon-dark)); font-family:inherit; font-size:12px; font-weight:800; cursor:pointer; }
+.actions { display:flex; justify-content:flex-end; margin-top:20px; padding-top:18px; border-top:1px solid var(--border); }
+.semester-list { display:flex; flex-direction:column; gap:12px; }
+.semester-item { padding:16px; background:#f8fafc; border:1px solid var(--border); border-radius:12px; }
+.semester-top { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; }
+.semester-name { margin:0 0 5px; color:var(--text); font-size:14px; font-weight:800; }
+.semester-dates { margin:0; color:var(--muted); font-size:11px; line-height:1.6; }
+.status { display:inline-flex; padding:5px 8px; border-radius:6px; font-size:9px; font-weight:800; white-space:nowrap; }
+.status.active { background:#ecfdf3; border:1px solid #bbf7d0; color:#15803d; }
+.status.inactive { background:#f3f4f6; border:1px solid #e5e7eb; color:#6b7280; }
+.empty { padding:22px; text-align:center; color:var(--muted); background:#f8fafc; border:1px dashed var(--border); border-radius:12px; font-size:12px; }
+.fee-value { color:var(--maroon); font-size:13px; font-weight:900; margin-top:7px; }
+.fee-note { margin-top:12px; color:var(--muted); font-size:11px; line-height:1.6; }
+.back { display:inline-flex; margin-top:20px; padding:9px 18px; border:1px solid var(--border); border-radius:9px; color:var(--maroon); background:var(--white); text-decoration:none; font-size:12px; font-weight:700; }
+@media(max-width:850px){ .grid{grid-template-columns:1fr;} }
+@media(max-width:500px){ .date-grid{grid-template-columns:1fr;} .semester-top{flex-direction:column;} .actions{justify-content:stretch;} .btn{width:100%;} .card{padding:18px;} }
+{% endblock %}
+
+{% block content %}
+<div class="semester-page">
+    <div class="page-header">
+        <h1>Semester &amp; Fees</h1>
+        <p>Create semesters and configure each semester's monthly fee from this page.</p>
+        <div class="class-badge">📘 {{ extra_subject.subject.name if extra_subject.subject else "My Class" }}</div>
+    </div>
+
+    <div class="grid">
+        <div class="card">
+            <h2>1. Create Semester</h2>
+            <p>Set the date range for the semester. After creating it, configure its monthly fee on this same page.</p>
+            <form method="POST" action="{{ url_for('extra_class_teacher.teacher_semester') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="action" value="create_semester">
+                <div class="form-group">
+                    <label for="name">Semester Name</label>
+                    <input class="form-control" id="name" name="name" type="text" maxlength="100" required placeholder="e.g. First Semester 2026/2027">
+                </div>
+                <div class="date-grid">
+                    <div class="form-group">
+                        <label for="start_date">Start Date</label>
+                        <input class="form-control" id="start_date" name="start_date" type="date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="end_date">End Date</label>
+                        <input class="form-control" id="end_date" name="end_date" type="date" required>
+                    </div>
+                </div>
+                <div class="actions"><button class="btn" type="submit">＋ Create Semester</button></div>
+            </form>
+        </div>
+
+        <div class="card">
+            <h2>2. Set Monthly Fee</h2>
+            <p>Select a semester and save the monthly amount students in that semester are expected to pay.</p>
+            {% if terms %}
+            <form method="POST" action="{{ url_for('extra_class_teacher.teacher_semester') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="action" value="set_fee">
+                <div class="form-group">
+                    <label for="term_id">Semester</label>
+                    <select class="form-control" id="term_id" name="term_id" required onchange="updateSemesterFeeInput()">
+                        {% for term in terms %}
+                        <option value="{{ term.id }}" data-fee="{{ '%.2f'|format(term.monthly_fee or 0) }}" {% if selected_term and selected_term.id == term.id %}selected{% endif %}>
+                            {{ term.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="monthly_fee">Monthly Fee (GH¢)</label>
+                    <input class="form-control" type="number" id="monthly_fee" name="monthly_fee" min="0.01" max="1000000" step="0.01" value="{{ '%.2f'|format(selected_term.monthly_fee or 0) if selected_term else '' }}" required>
+                </div>
+                <div class="actions"><button class="btn" type="submit">Save Semester Fee</button></div>
+                <p class="fee-note">Changing the fee here will not rewrite existing monthly fee records or payment history.</p>
+            </form>
+            {% else %}
+            <div class="empty">Create a semester first. It will appear here so you can set its monthly fee.</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card" style="margin-top:20px;">
+        <h2>3. Your Semesters and Fees</h2>
+        <p>Review the date range, status, and monthly fee configured for each semester.</p>
+        {% if semesters %}
+        <div class="semester-list">
+            {% for semester in semesters %}
+            <div class="semester-item">
+                <div class="semester-top">
+                    <div>
+                        <p class="semester-name">{{ semester.name }}</p>
+                        <p class="semester-dates">{{ semester.start_date.strftime('%d %b %Y') }} — {{ semester.end_date.strftime('%d %b %Y') }}</p>
+                        <div class="fee-value">
+                            {% if semester.monthly_fee and semester.monthly_fee > 0 %}
+                                Monthly fee: GH¢ {{ '%.2f'|format(semester.monthly_fee) }}
+                            {% else %}
+                                Monthly fee not set
+                            {% endif %}
+                        </div>
+                    </div>
+                    <span class="status {{ 'active' if semester.is_active else 'inactive' }}">{{ 'ACTIVE' if semester.is_active else 'INACTIVE' }}</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty">No semester has been created for this class yet.</div>
+        {% endif %}
+    </div>
+
+    <a class="back" href="{{ url_for('extra_class_teacher.manage_class', class_id=extra_subject.id) }}">← Back to Manage Class</a>
+</div>
+
+<script>
+function updateSemesterFeeInput() {
+    const select = document.getElementById("term_id");
+    const input = document.getElementById("monthly_fee");
+    if (!select || !input) return;
+    const option = select.options[select.selectedIndex];
+    input.value = option ? (option.dataset.fee || "0.00") : "";
+}
+</script>
+{% endblock %}

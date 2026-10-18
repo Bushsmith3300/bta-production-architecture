@@ -92,8 +92,9 @@ def generate_enrollment_monthly_fees(enrollment):
     """
     Generate monthly fee records for one active enrollment.
 
-    The teacher's ExtraClassSubject.monthly_fee is copied into
-    standard_amount as the historical fee snapshot.
+    The selected semester's monthly_fee is copied into standard_amount
+    as the historical fee snapshot. Legacy semesters without a configured
+    fee fall back to ExtraClassSubject.monthly_fee.
 
     The initial enrollment month is always charged in full.
     Later billing cycles follow the enrollment day, clamped to
@@ -122,10 +123,27 @@ def generate_enrollment_monthly_fees(enrollment):
     if not extra_subject:
         raise ValueError("The class subject could not be found.")
 
-    standard_amount = float(extra_subject.monthly_fee or 0)
+    # Prefer the fee configured for this enrollment's semester.
+    # Fall back to the class-level fee only for older semesters that
+    # have not yet been assigned a semester-specific fee.
+    term = (
+        ExtraClassTerm.query
+        .filter_by(id=enrollment.term_id)
+        .first()
+        if enrollment.term_id else None
+    )
+    configured_amount = (
+        term.monthly_fee
+        if term is not None and term.monthly_fee is not None
+        else extra_subject.monthly_fee
+    )
+    standard_amount = float(configured_amount or 0)
 
-    if standard_amount < 0:
-        raise ValueError("The class monthly fee cannot be negative.")
+    if standard_amount <= 0:
+        raise ValueError(
+            "Set a monthly fee for this semester on the Class Fees page "
+            "before generating student fees."
+        )
 
     billing_day = enrollment.start_date.day
     current_due_date = enrollment.start_date
@@ -549,31 +567,16 @@ def teacher_dashboard():
     if subject_ids:
 
         current_semesters = (
-            db.session.query(
-                ExtraClassTerm
-            )
-            .join(
-                ExtraClassEnrollment,
-                ExtraClassEnrollment.term_id
-                == ExtraClassTerm.id
-            )
+            db.session.query(ExtraClassTerm)
             .join(
                 ExtraClassSubject,
-                ExtraClassSubject.id
-                == ExtraClassEnrollment
-                .extra_class_subject_id
+                ExtraClassSubject.id == ExtraClassTerm.extra_class_subject_id
             )
             .filter(
-                ExtraClassSubject.teacher_id
-                == teacher.id,
-
-                ExtraClassEnrollment.status
-                == "ACTIVE",
-
-                ExtraClassEnrollment.term_id
-                .isnot(None)
+                ExtraClassSubject.teacher_id == teacher.id,
+                ExtraClassSubject.is_active.is_(True),
+                ExtraClassTerm.is_active.is_(True)
             )
-            .distinct()
             .order_by(
                 ExtraClassTerm.start_date.desc()
             )
@@ -791,15 +794,173 @@ def teacher_fees_payments():
     )
 
 
-@extra_class_teacher_bp.route("/semester", methods=["GET"])
+@extra_class_teacher_bp.route("/semester", methods=["GET", "POST"])
 @extra_class_teacher_required
 def teacher_semester():
-    """Temporary Semester landing page until semester management is completed."""
+    """Manage semesters and their monthly fees on one page."""
+    teacher_id = session.get("extra_class_teacher_id")
+
+    extra_subject = (
+        ExtraClassSubject.query
+        .filter(
+            ExtraClassSubject.teacher_id == teacher_id,
+            ExtraClassSubject.is_active.is_(True)
+        )
+        .order_by(ExtraClassSubject.created_at.asc())
+        .first()
+    )
+
+    if not extra_subject:
+        flash("No active class is currently assigned to your teacher account.", "warning")
+        return redirect(url_for("extra_class_teacher.teacher_dashboard"))
+
+    def load_terms():
+        return (
+            ExtraClassTerm.query
+            .filter(ExtraClassTerm.extra_class_subject_id == extra_subject.id)
+            .order_by(ExtraClassTerm.start_date.desc())
+            .all()
+        )
+
+    if request.method == "POST":
+        action = (request.form.get("action") or "create_semester").strip()
+
+        # -----------------------------------------------------
+        # Set the monthly fee for a selected semester.
+        # -----------------------------------------------------
+        if action == "set_fee":
+            raw_term_id = (request.form.get("term_id") or "").strip()
+            raw_fee = (request.form.get("monthly_fee") or "").strip()
+
+            try:
+                term_id = int(raw_term_id)
+            except (TypeError, ValueError):
+                flash("Please select a valid semester.", "danger")
+                return redirect(url_for("extra_class_teacher.teacher_semester"))
+
+            terms = load_terms()
+            selected_term = next((term for term in terms if term.id == term_id), None)
+            if selected_term is None:
+                flash("The selected semester does not belong to your class.", "danger")
+                return redirect(url_for("extra_class_teacher.teacher_semester"))
+
+            try:
+                monthly_fee = Decimal(raw_fee)
+            except (InvalidOperation, ValueError):
+                flash("Please enter a valid monthly fee amount.", "danger")
+                return redirect(url_for(
+                    "extra_class_teacher.teacher_semester",
+                    term_id=term_id
+                ))
+
+            if monthly_fee <= Decimal("0"):
+                flash("Monthly fee must be greater than GH¢ 0.00.", "danger")
+                return redirect(url_for(
+                    "extra_class_teacher.teacher_semester",
+                    term_id=term_id
+                ))
+
+            if monthly_fee > Decimal("1000000.00"):
+                flash("Monthly fee is too high. Please enter a reasonable amount.", "danger")
+                return redirect(url_for(
+                    "extra_class_teacher.teacher_semester",
+                    term_id=term_id
+                ))
+
+            try:
+                selected_term.monthly_fee = monthly_fee.quantize(Decimal("0.01"))
+                db.session.commit()
+                flash(
+                    f"Monthly fee for {selected_term.name} has been saved as "
+                    f"GH¢ {selected_term.monthly_fee:,.2f}. "
+                    "Existing monthly fee records were not changed.",
+                    "success"
+                )
+            except Exception as exc:
+                db.session.rollback()
+                print("SET SEMESTER MONTHLY FEE ERROR:", str(exc))
+                flash("Unable to save the semester fee. Please try again.", "danger")
+
+            return redirect(url_for(
+                "extra_class_teacher.teacher_semester",
+                term_id=term_id
+            ))
+
+        # -----------------------------------------------------
+        # Create a semester.
+        # -----------------------------------------------------
+        name = (request.form.get("name") or "").strip()
+        start_date_string = (request.form.get("start_date") or "").strip()
+        end_date_string = (request.form.get("end_date") or "").strip()
+
+        if not name:
+            flash("Please enter a semester name.", "danger")
+            return redirect(url_for("extra_class_teacher.teacher_semester"))
+
+        try:
+            start_date = datetime.strptime(start_date_string, "%Y-%m-%d").date()
+            end_date = datetime.strptime(end_date_string, "%Y-%m-%d").date()
+        except ValueError:
+            flash("Please enter valid semester dates.", "danger")
+            return redirect(url_for("extra_class_teacher.teacher_semester"))
+
+        if end_date < start_date:
+            flash("The semester end date cannot be before the start date.", "danger")
+            return redirect(url_for("extra_class_teacher.teacher_semester"))
+
+        overlap = (
+            ExtraClassTerm.query
+            .filter(
+                ExtraClassTerm.extra_class_subject_id == extra_subject.id,
+                ExtraClassTerm.start_date <= end_date,
+                ExtraClassTerm.end_date >= start_date
+            )
+            .first()
+        )
+
+        if overlap:
+            flash(
+                f"The dates overlap with the existing semester '{overlap.name}'.",
+                "danger"
+            )
+            return redirect(url_for("extra_class_teacher.teacher_semester"))
+
+        semester = ExtraClassTerm(
+            name=name,
+            start_date=start_date,
+            end_date=end_date,
+            is_active=True,
+            extra_class_subject_id=extra_subject.id
+        )
+
+        db.session.add(semester)
+        db.session.commit()
+        flash(
+            f"Semester '{name}' was created successfully. "
+            "Now select it below to set its monthly fee.",
+            "success"
+        )
+        return redirect(url_for(
+            "extra_class_teacher.teacher_semester",
+            term_id=semester.id
+        ))
+
+    semesters = load_terms()
+    requested_term_id = request.args.get("term_id", type=int)
+    selected_term = next(
+        (term for term in semesters if term.id == requested_term_id),
+        None
+    )
+    if selected_term is None and semesters:
+        selected_term = semesters[0]
+
     return render_template(
-        "extra_class_teacher_feature_coming_soon.html",
-        feature_title="Semester",
-        feature_icon="📅",
-        feature_message="Semester management is the next teacher-portal feature to be completed."
+        "extra_class_teacher_semester_fees.html",
+        extra_subject=extra_subject,
+        semesters=semesters,
+        terms=semesters,
+        selected_term=selected_term,
+        form_data={}
     )
 
 
@@ -900,14 +1061,9 @@ def view_class(class_id):
     today = date.today()
 
     current_semester = (
-        db.session.query(ExtraClassTerm)
-        .join(
-            ExtraClassEnrollment,
-            ExtraClassEnrollment.term_id == ExtraClassTerm.id
-        )
+        ExtraClassTerm.query
         .filter(
-            ExtraClassEnrollment.extra_class_subject_id == class_id,
-            ExtraClassEnrollment.status == "ACTIVE",
+            ExtraClassTerm.extra_class_subject_id == class_id,
             ExtraClassTerm.is_active.is_(True),
             ExtraClassTerm.start_date <= today,
             ExtraClassTerm.end_date >= today
@@ -1090,17 +1246,9 @@ def manage_class(class_id):
 
     semesters = (
         ExtraClassTerm.query
-        .join(
-            ExtraClassEnrollment,
-            ExtraClassEnrollment.term_id
-            == ExtraClassTerm.id
-        )
         .filter(
-            ExtraClassEnrollment
-            .extra_class_subject_id
-            == extra_subject.id
+            ExtraClassTerm.extra_class_subject_id == extra_subject.id
         )
-        .distinct()
         .order_by(
             ExtraClassTerm.start_date.desc()
         )
@@ -1497,6 +1645,15 @@ def add_class_student(class_id):
 
         except Exception as exc:
             db.session.rollback()
+
+            import traceback
+            print("\n" + "=" * 80)
+            print("EXTRA CLASS STUDENT CREATION ERROR")
+            print("=" * 80)
+            print(str(exc))
+            traceback.print_exc()
+            print("=" * 80 + "\n")
+
             flash(
                 f"Unable to create student: {str(exc)}",
                 "danger"
@@ -1716,6 +1873,7 @@ def enroll_class_student(class_id, student_id):
     semesters = (
         ExtraClassTerm.query
         .filter(
+            ExtraClassTerm.extra_class_subject_id == extra_subject.id,
             ExtraClassTerm.is_active.is_(True)
         )
         .order_by(
@@ -1811,6 +1969,7 @@ def enroll_class_student(class_id, student_id):
         ExtraClassTerm.query
         .filter(
             ExtraClassTerm.id == term_id,
+            ExtraClassTerm.extra_class_subject_id == extra_subject.id,
             ExtraClassTerm.is_active.is_(True)
         )
         .first()
@@ -1829,6 +1988,19 @@ def enroll_class_student(class_id, student_id):
             semesters=semesters,
             existing_enrollment=existing_enrollment,
             form_data=form_data
+        )
+
+    if semester.monthly_fee is None or semester.monthly_fee <= 0:
+        flash(
+            "Set a monthly fee for the selected semester on the Class Fees page before enrolling this student.",
+            "warning"
+        )
+        return redirect(
+            url_for(
+                "extra_class_teacher.class_fees",
+                class_id=extra_subject.id,
+                term_id=semester.id
+            )
         )
 
     # ---------------------------------------------------------
@@ -2748,7 +2920,10 @@ def reactivate_class_student(class_id, student_id):
 
     semesters = (
         ExtraClassTerm.query
-        .filter(ExtraClassTerm.is_active.is_(True))
+        .filter(
+            ExtraClassTerm.extra_class_subject_id == extra_subject.id,
+            ExtraClassTerm.is_active.is_(True)
+        )
         .order_by(ExtraClassTerm.start_date.desc())
         .all()
     )
@@ -2801,6 +2976,7 @@ def reactivate_class_student(class_id, student_id):
         ExtraClassTerm.query
         .filter(
             ExtraClassTerm.id == term_id,
+            ExtraClassTerm.extra_class_subject_id == extra_subject.id,
             ExtraClassTerm.is_active.is_(True)
         )
         .first()
@@ -2808,6 +2984,11 @@ def reactivate_class_student(class_id, student_id):
 
     if not semester:
         return render_error("The selected semester is not available.")
+
+    if semester.monthly_fee is None or semester.monthly_fee <= 0:
+        return render_error(
+            "Set a monthly fee for the selected semester on the Class Fees page before reactivating this student."
+        )
 
     if form not in {"FORM 1", "FORM 2", "FORM 3"}:
         return render_error("Please select the student's current form.")
@@ -3164,21 +3345,7 @@ def class_payments(class_id):
 )
 @extra_class_teacher_required
 def class_fees(class_id):
-    """
-    Display the financial summary for all active students
-    in this teacher's class.
-
-    V1 rules:
-    - One student has one enrollment per teacher subject.
-    - The teacher's current ExtraClassSubject.monthly_fee is the
-      current agreed monthly fee.
-    - Historical monthly fee records are never overwritten here.
-    - Only SUCCESS payments count as money received.
-    """
-
-    # ---------------------------------------------------------
-    # 0. Verify the class belongs to the logged-in teacher
-    # ---------------------------------------------------------
+    """Show class fee summaries and set a monthly fee for one semester."""
     teacher_id = session.get("extra_class_teacher_id")
 
     extra_subject = (
@@ -3190,64 +3357,90 @@ def class_fees(class_id):
         .first_or_404()
     )
 
-    # ---------------------------------------------------------
-    # 1. Set / update the current agreed monthly fee
-    # ---------------------------------------------------------
+    terms = (
+        ExtraClassTerm.query
+        .filter(ExtraClassTerm.extra_class_subject_id == extra_subject.id)
+        .order_by(ExtraClassTerm.start_date.desc())
+        .all()
+    )
+
     if request.method == "POST":
         raw_fee = (request.form.get("monthly_fee") or "").strip()
+        raw_term_id = (request.form.get("term_id") or "").strip()
+
+        try:
+            term_id = int(raw_term_id)
+        except (TypeError, ValueError):
+            flash("Please select a valid semester.", "danger")
+            return redirect(url_for(
+                "extra_class_teacher.class_fees",
+                class_id=extra_subject.id
+            ))
+
+        selected_for_update = next(
+            (term for term in terms if term.id == term_id),
+            None
+        )
+        if selected_for_update is None:
+            flash("The selected semester does not belong to your class.", "danger")
+            return redirect(url_for(
+                "extra_class_teacher.class_fees",
+                class_id=extra_subject.id
+            ))
 
         try:
             monthly_fee = Decimal(raw_fee)
         except (InvalidOperation, ValueError):
             flash("Please enter a valid monthly fee amount.", "danger")
-            return redirect(
-                url_for(
-                    "extra_class_teacher.class_fees",
-                    class_id=extra_subject.id
-                )
-            )
+            return redirect(url_for(
+                "extra_class_teacher.class_fees",
+                class_id=extra_subject.id,
+                term_id=term_id
+            ))
 
         if monthly_fee <= Decimal("0"):
             flash("Monthly fee must be greater than GH¢ 0.00.", "danger")
-            return redirect(
-                url_for(
-                    "extra_class_teacher.class_fees",
-                    class_id=extra_subject.id
-                )
-            )
+            return redirect(url_for(
+                "extra_class_teacher.class_fees",
+                class_id=extra_subject.id,
+                term_id=term_id
+            ))
 
         if monthly_fee > Decimal("1000000.00"):
             flash("Monthly fee is too high. Please enter a reasonable amount.", "danger")
-            return redirect(
-                url_for(
-                    "extra_class_teacher.class_fees",
-                    class_id=extra_subject.id
-                )
-            )
-
-        monthly_fee = monthly_fee.quantize(Decimal("0.01"))
+            return redirect(url_for(
+                "extra_class_teacher.class_fees",
+                class_id=extra_subject.id,
+                term_id=term_id
+            ))
 
         try:
-            extra_subject.monthly_fee = monthly_fee
+            selected_for_update.monthly_fee = monthly_fee.quantize(Decimal("0.01"))
             db.session.commit()
-
             flash(
-                f"Monthly fee for {extra_subject.subject.name} has been set to "
-                f"GH¢ {monthly_fee:,.2f}. Existing monthly fee records were not changed.",
+                f"Monthly fee for {selected_for_update.name} has been saved as "
+                f"GH¢ {selected_for_update.monthly_fee:,.2f}. "
+                "Existing monthly fee records were not changed.",
                 "success"
             )
-
         except Exception as exc:
             db.session.rollback()
-            print("SET MONTHLY FEE ERROR:", str(exc))
-            flash("Unable to save the monthly fee. Please try again.", "danger")
+            print("SET SEMESTER MONTHLY FEE ERROR:", str(exc))
+            flash("Unable to save the semester fee. Please try again.", "danger")
 
-        return redirect(
-            url_for(
-                "extra_class_teacher.class_fees",
-                class_id=extra_subject.id
-            )
-        )
+        return redirect(url_for(
+            "extra_class_teacher.class_fees",
+            class_id=extra_subject.id,
+            term_id=term_id
+        ))
+
+    requested_term_id = request.args.get("term_id", type=int)
+    selected_term = next(
+        (term for term in terms if term.id == requested_term_id),
+        None
+    )
+    if selected_term is None and terms:
+        selected_term = terms[0]
 
     # ---------------------------------------------------------
     # 2. Verify the class belongs to the logged-in teacher
@@ -3355,7 +3548,9 @@ def class_fees(class_id):
             "student": student,
             "enrollment": enrollment,
             "monthly_fee": float(
-                extra_subject.monthly_fee or 0
+                enrollment.term.monthly_fee
+                if enrollment.term and enrollment.term.monthly_fee is not None
+                else extra_subject.monthly_fee or 0
             ),
             "total_fees": total_fees,
             "total_paid": total_paid,
@@ -3371,6 +3566,8 @@ def class_fees(class_id):
         "extra_class_teacher_class_fees.html",
         teacher=teacher,
         extra_subject=extra_subject,
+        terms=terms,
+        selected_term=selected_term,
         fee_students=fee_students,
         grand_total_fees=grand_total_fees,
         grand_total_paid=grand_total_paid,

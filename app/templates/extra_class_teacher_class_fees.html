@@ -442,10 +442,8 @@
     <h2>{{ extra_subject.subject.name }}</h2>
 
     <p>
-        Current agreed monthly fee:
-        <strong>
-            GH¢ {{ "%.2f"|format(extra_subject.monthly_fee or 0) }}
-        </strong>
+        Monthly fees are configured separately for each semester.
+        Existing student fee records retain their original amounts.
     </p>
 
 </div>
@@ -455,11 +453,11 @@
 <div class="fee-setting-panel">
 
     <div class="fee-setting-copy">
-        <h2>Set Monthly Fee</h2>
+        <h2>Set Semester Monthly Fee</h2>
         <p>
-            Set the current agreed monthly fee for this class.
-            New student fee records will use this amount.
-            Existing monthly fee records are kept unchanged.
+            Choose a semester and set the monthly amount students in that
+            semester are expected to pay. Previously generated fee records
+            will not be changed.
         </p>
     </div>
 
@@ -478,6 +476,28 @@
         >
 
         <div class="fee-input-group">
+            <label for="term_id">Semester</label>
+            <select
+                id="term_id"
+                name="term_id"
+                class="fee-input"
+                onchange="updateSemesterFeeInput()"
+                required
+                {% if not terms %}disabled{% endif %}
+            >
+                {% for term in terms %}
+                    <option
+                        value="{{ term.id }}"
+                        data-fee="{{ '%.2f'|format(term.monthly_fee or 0) }}"
+                        {% if selected_term and selected_term.id == term.id %}selected{% endif %}
+                    >
+                        {{ term.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="fee-input-group">
             <label for="monthly_fee">Monthly Fee (GH¢)</label>
             <input
                 type="number"
@@ -487,15 +507,22 @@
                 min="0.01"
                 max="1000000"
                 step="0.01"
-                value="{{ '%.2f'|format(extra_subject.monthly_fee or 0) }}"
+                value="{{ '%.2f'|format(selected_term.monthly_fee or 0) if selected_term else '' }}"
                 required
+                {% if not terms %}disabled{% endif %}
             >
         </div>
 
-        <button type="submit" class="save-fee-btn">
+        <button type="submit" class="save-fee-btn" {% if not terms %}disabled{% endif %}>
             Save Fee
         </button>
     </form>
+
+    {% if not terms %}
+        <p class="fee-setting-warning">
+            Create a semester first from Manage Class → Semester before setting its fee.
+        </p>
+    {% endif %}
 
 </div>
 
@@ -709,4 +736,16 @@
 
 </div>
 
+
+<script>
+function updateSemesterFeeInput() {
+    const semesterSelect = document.getElementById("term_id");
+    const feeInput = document.getElementById("monthly_fee");
+    const selectedOption = semesterSelect.options[semesterSelect.selectedIndex];
+
+    if (selectedOption && feeInput) {
+        feeInput.value = selectedOption.dataset.fee || "0.00";
+    }
+}
+</script>
 {% endblock %}

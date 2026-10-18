@@ -1094,22 +1094,22 @@
                 <span>My Students</span>
             </a>
 
-            <!-- SEMESTER -->
+            <!-- SEMESTER & FEES -->
             <a
                 href="{{ url_for('extra_class_teacher.teacher_semester') }}"
-                class="nav-link {% if request.endpoint == 'extra_class_teacher.teacher_semester' %}active{% endif %}"
+                class="nav-link {% if request.endpoint in ['extra_class_teacher.teacher_semester', 'extra_class_teacher.class_fees'] %}active{% endif %}"
             >
                 <span class="nav-icon">📅</span>
-                <span>Semester</span>
+                <span>Semester &amp; Fees</span>
             </a>
 
-            <!-- FEES & PAYMENTS -->
+            <!-- PAYMENTS -->
             <a
                 href="{{ url_for('extra_class_teacher.teacher_fees_payments') }}"
-                class="nav-link {% if request.endpoint in ['extra_class_teacher.teacher_fees_payments', 'extra_class_teacher.class_fees', 'extra_class_teacher.class_payments'] %}active{% endif %}"
+                class="nav-link {% if request.endpoint in ['extra_class_teacher.teacher_fees_payments', 'extra_class_teacher.class_payments'] %}active{% endif %}"
             >
                 <span class="nav-icon">💰</span>
-                <span>Fees &amp; Payments</span>
+                <span>Payments</span>
             </a>
 
             <!-- FINANCIAL REPORTS -->

@@ -329,6 +329,67 @@ body {
     color: #d97706;
 }
 
+
+/* ==========================================
+   MANAGEMENT IN LIVING
+   ========================================== */
+
+.subject-links a.management-in-living {
+    border: 2px solid #ff6987;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.subject-links a.management-in-living:hover {
+    background: linear-gradient(135deg, #ff416c, #ff8c42) !important;
+    border-color: #ffffff;
+    color: #ffffff !important;
+    transform: translateY(-8px) scale(1.04);
+    box-shadow:
+        0 0 12px rgba(255, 65, 108, 0.8),
+        0 0 25px rgba(255, 140, 66, 0.6);
+}
+
+.subject-links a.management-in-living:hover .subject-icon {
+    color: #ffffff !important;
+    transform: scale(1.25) rotate(-5deg);
+}
+
+
+/* ==========================================
+   BUSINESS MANAGEMENT
+   ========================================== */
+
+.subject-links a.business-management {
+    border: 2px solid #00c896;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.subject-links a.business-management:hover {
+    background: linear-gradient(135deg, #00c896, #0072ff) !important;
+    border-color: #ffffff;
+    color: #ffffff !important;
+    transform: translateY(-8px) scale(1.04);
+    box-shadow:
+        0 0 12px rgba(0, 200, 150, 0.8),
+        0 0 25px rgba(0, 114, 255, 0.6);
+}
+
+.subject-links a.business-management:hover .subject-icon {
+    color: #ffffff !important;
+    transform: scale(1.25) rotate(5deg);
+}
+
+
+/* Smooth icon animation */
+.subject-links a.management-in-living .subject-icon,
+.subject-links a.business-management .subject-icon {
+    display: inline-block;
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+
+
 </style>
 
 </head>
