@@ -2228,6 +2228,21 @@ def bulk_upload_questions():
     if request.method == "POST":
 
         # --------------------------------------------------
+        # Recover from any failed/stale SQLAlchemy transaction
+        # --------------------------------------------------
+        # A previous database error can leave the scoped session in a
+        # failed state. Reset it before this upload starts querying or
+        # writing, otherwise SQLAlchemy may raise PendingRollbackError.
+        # This route has not made any changes yet in the current request.
+        try:
+            db.session.rollback()
+        except SQLAlchemyError:
+            current_app.logger.exception(
+                "Could not reset the database session before bulk upload."
+            )
+            db.session.remove()
+
+        # --------------------------------------------------
         # State preservation after POST
         # --------------------------------------------------
 
@@ -2726,13 +2741,19 @@ def bulk_upload_questions():
 
 
                 except SQLAlchemyError:
-
+                    # begin_nested() normally rolls back to its savepoint
+                    # when this block fails. Log the full database traceback
+                    # and explicitly recover if the session is still marked
+                    # as failed, so the next question can be processed.
                     current_app.logger.exception(
                         f"Failed to import question. "
                         f"Subject={question_subject}, "
                         f"Topic={topic}, "
                         f"Question={question_text}"
                     )
+
+                    if not db.session.is_active:
+                        db.session.rollback()
 
                     errors += 1
 
@@ -2881,7 +2902,8 @@ def bulk_upload_questions():
             )
 
             flash(
-                f"Error reading file: {e}",
+                "The bulk upload could not be completed. "
+                "The database session has been reset; check the application logs for details.",
                 "danger"
             )
 

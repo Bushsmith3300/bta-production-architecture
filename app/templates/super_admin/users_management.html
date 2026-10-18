@@ -217,6 +217,80 @@
           background:#1d4ed8;
         }
 
+
+
+        .user-search-panel{
+            display:grid;
+            grid-template-columns:repeat(3,minmax(180px,1fr)) auto;
+            gap:14px;
+            padding:20px;
+            margin-bottom:18px;
+            background:#fff;
+            border-radius:12px;
+            box-shadow:0 3px 12px rgba(0,0,0,.08);
+        }
+
+        .search-field label{
+            display:block;
+            margin-bottom:7px;
+            color:#374151;
+            font-size:13px;
+            font-weight:700;
+        }
+
+        .search-field input{
+            width:100%;
+            padding:11px 12px;
+            border:1px solid #d1d5db;
+            border-radius:7px;
+            outline:none;
+            font:inherit;
+            font-size:14px;
+            background:#fff;
+        }
+
+        .search-field input:focus{
+            border-color:#2563eb;
+            box-shadow:0 0 0 3px rgba(37,99,235,.12);
+        }
+
+        .search-actions{
+            display:flex;
+            align-items:end;
+        }
+
+        .btn-clear-search{
+            padding:11px 15px;
+            border:0;
+            border-radius:7px;
+            background:#374151;
+            color:#fff;
+            font-weight:600;
+            cursor:pointer;
+            white-space:nowrap;
+        }
+
+        .search-summary{
+            padding:0 20px 14px;
+            color:#6b7280;
+            font-size:13px;
+        }
+
+        #noUsersFound td{
+            text-align:center;
+            padding:24px;
+            color:#6b7280;
+        }
+
+        @media(max-width:900px){
+            .user-search-panel{grid-template-columns:1fr 1fr;}
+            .search-actions{align-items:end;}
+        }
+
+        @media(max-width:560px){
+            .user-search-panel{grid-template-columns:1fr;}
+        }
+
         @media(max-width:900px){
 
             body{
@@ -296,8 +370,28 @@
 
 <div class="card">
     <!-- Other content -->
-</div>    <div class="card">
+</div>
 
+    <div class="user-search-panel" role="search" aria-label="Search users">
+        <div class="search-field">
+            <label for="searchUsername">Search by username</label>
+            <input type="search" id="searchUsername" placeholder="Enter username..." autocomplete="off">
+        </div>
+        <div class="search-field">
+            <label for="searchFirstName">Search by first name</label>
+            <input type="search" id="searchFirstName" placeholder="Enter first name..." autocomplete="off">
+        </div>
+        <div class="search-field">
+            <label for="searchSurname">Search by surname</label>
+            <input type="search" id="searchSurname" placeholder="Enter surname..." autocomplete="off">
+        </div>
+        <div class="search-actions">
+            <button type="button" class="btn-clear-search" id="clearUserSearch">Clear Search</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="search-summary" id="userSearchSummary" aria-live="polite">Showing all users.</div>
         <table>
 
             <thead>
@@ -316,7 +410,10 @@
 
             {% for user in users %}
 
-                <tr>
+                <tr class="user-row"
+                    data-username="{{ user.username|default('', true)|lower|e }}"
+                    data-first-name="{{ user.first_name|default('', true)|lower|e }}"
+                    data-surname="{{ user.surname|default('', true)|lower|e }}">
 
                     <td>{{ user.id }}</td>
 
@@ -468,11 +565,61 @@
 
             {% endfor %}
 
+                <tr id="noUsersFound" style="display:none;">
+                    <td colspan="7">No users match your search.</td>
+                </tr>
             </tbody>
 
         </table>
 
     </div>
+
+    <script>
+        (function () {
+            const usernameInput = document.getElementById('searchUsername');
+            const firstNameInput = document.getElementById('searchFirstName');
+            const surnameInput = document.getElementById('searchSurname');
+            const clearButton = document.getElementById('clearUserSearch');
+            const summary = document.getElementById('userSearchSummary');
+            const rows = Array.from(document.querySelectorAll('tr.user-row'));
+            const noResultsRow = document.getElementById('noUsersFound');
+
+            function applyUserSearch() {
+                const username = usernameInput.value.trim().toLowerCase();
+                const firstName = firstNameInput.value.trim().toLowerCase();
+                const surname = surnameInput.value.trim().toLowerCase();
+                let visibleCount = 0;
+
+                rows.forEach(function (row) {
+                    const matches =
+                        row.dataset.username.includes(username) &&
+                        row.dataset.firstName.includes(firstName) &&
+                        row.dataset.surname.includes(surname);
+                    row.style.display = matches ? '' : 'none';
+                    if (matches) visibleCount++;
+                });
+
+                noResultsRow.style.display = visibleCount === 0 ? '' : 'none';
+                summary.textContent = (username || firstName || surname)
+                    ? 'Showing ' + visibleCount + ' of ' + rows.length + ' users.'
+                    : 'Showing all ' + rows.length + ' users.';
+            }
+
+            [usernameInput, firstNameInput, surnameInput].forEach(function (input) {
+                input.addEventListener('input', applyUserSearch);
+            });
+
+            clearButton.addEventListener('click', function () {
+                usernameInput.value = '';
+                firstNameInput.value = '';
+                surnameInput.value = '';
+                applyUserSearch();
+                usernameInput.focus();
+            });
+
+            applyUserSearch();
+        })();
+    </script>
 
 </body>
 </html>

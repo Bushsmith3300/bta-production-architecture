@@ -127,6 +127,14 @@ class ExtraClassSubject(db.Model):
     )
 
 
+    terms = db.relationship(
+        "ExtraClassTerm",
+        back_populates="extra_class_subject",
+        cascade="all, delete-orphan",
+        order_by="ExtraClassTerm.start_date.desc()"
+    )
+
+
     monthly_fees = db.relationship(
         "ExtraClassMonthlyFee",
         back_populates="extra_class_subject"

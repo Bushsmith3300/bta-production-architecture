@@ -22,7 +22,7 @@ class Config:
     SESSION_PERMANENT = True
 
     PERMANENT_SESSION_LIFETIME = timedelta(
-        minutes=30
+        minutes=180
     )
 
     PREFERRED_URL_SCHEME = (

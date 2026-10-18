@@ -426,7 +426,13 @@
              SEMESTER
              ================================================= -->
 
-        <div class="action-card disabled">
+        <a
+            href="{{ url_for(
+                'extra_class_teacher.teacher_semester',
+                class_id=extra_subject.id
+            ) }}"
+            class="action-card"
+        >
 
             <div class="action-icon">
                 📅
@@ -443,13 +449,23 @@
                     for this class.
                 </span>
 
-                <span class="action-status">
-                    Coming next
-                </span>
+                {% if current_semester %}
+                    <span class="action-status">
+                        {{ current_semester.name }}
+                    </span>
+                {% else %}
+                    <span class="action-status">
+                        No active semester
+                    </span>
+                {% endif %}
 
             </div>
 
-        </div>
+            <span class="action-arrow">
+                →
+            </span>
+
+        </a>
 
 <!-- =================================================
      FEES

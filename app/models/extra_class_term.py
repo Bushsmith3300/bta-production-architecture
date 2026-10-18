@@ -42,6 +42,24 @@ class ExtraClassTerm(db.Model):
         default=True
     )
 
+    # Monthly fee agreed for this specific semester/class.
+    # Nullable during migration so any legacy semester can be upgraded safely.
+    monthly_fee = db.Column(
+        db.Numeric(12, 2),
+        nullable=True
+    )
+
+    # Each semester belongs to one teacher's Extra Class subject/class.
+    extra_class_subject_id = db.Column(
+        db.BigInteger,
+        db.ForeignKey(
+            "extra_class_subjects.id",
+            ondelete="RESTRICT"
+        ),
+        nullable=False,
+        index=True
+    )
+
     # ========================================================
     # TIMESTAMPS
     # ========================================================
@@ -64,6 +82,12 @@ class ExtraClassTerm(db.Model):
     # RELATIONSHIPS
     # ========================================================
 
+    extra_class_subject = db.relationship(
+        "ExtraClassSubject",
+        back_populates="terms"
+    )
+
+
     monthly_fees = db.relationship(
         "ExtraClassMonthlyFee",
         back_populates="term"
@@ -84,6 +108,10 @@ class ExtraClassTerm(db.Model):
         db.CheckConstraint(
             "end_date >= start_date",
             name="ck_extra_class_term_dates"
+        ),
+        db.CheckConstraint(
+            "monthly_fee IS NULL OR monthly_fee >= 0",
+            name="ck_extra_class_term_monthly_fee"
         ),
     )
 
