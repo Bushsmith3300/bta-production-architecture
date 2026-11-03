@@ -370,11 +370,18 @@ Ongoing development focuses on:
 
 Emmanuel Asiamah Amponsah
 
-Python Software Developer
-Creator and Developer of Bush Teaching Assistant.
+Developer
 
-GitHub: https://github.com/Bushsmith3300
+Name: Emmanuel Asiamah
 
----
+Professional Title: Python Software Developer
+
+Education: BSc Petroleum Engineering
+
+Project: Founder and Lead Developer of Bush Teaching Assistant (BTA)
+
+GitHub: Bushsmith3300
+
+GitHub Profile: https://github.com/Bushsmith3300
 
 Building technology to make quality education and examination preparation more accessible to Ghanaian students.
