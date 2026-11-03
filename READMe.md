@@ -314,12 +314,10 @@ Configure the environment variables required by the application.
 
 Example:
 
-SECRET_KEY=your_secret_key
-DATABASE_URL=your_database_connection_string
+SECRET_KEY=my_secret_key
+DATABASE_URL=my_database_connection_string
 
 Additional configuration may be required for payment processing and other integrations.
-
-Never commit real credentials, passwords or secret keys to GitHub.
 
 Step 6: Configure the Database
 
@@ -370,7 +368,7 @@ Ongoing development focuses on:
 
 14. Developer
 
-Bushsmith3300
+Emmanuel Asiamah Amponsah
 
 Python Software Developer
 Creator and Developer of Bush Teaching Assistant.
