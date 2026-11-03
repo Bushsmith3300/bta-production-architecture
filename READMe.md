@@ -1,125 +1,256 @@
-Bush Teaching Assistant (BTA) – Backend
+Bush Teaching Assistant (BTA)
 
-A Python-Powered Educational Technology Platform
+A Full-Stack Educational Technology Platform Built with Python and Flask
 
-Project Overview
+Live Application: https://bta-330.onrender.com
 
-Bush Teaching Assistant (BTA) is an educational technology platform developed to support Ghanaian Senior High School (SHS) students in preparing for examinations through interactive quizzes, practice questions, performance tracking and digital learning resources.
+Developer: Emmanuel Asiamah Amponsah
 
-The backend is built with Python and Flask and provides the application logic, database operations, authentication, API endpoints and administrative functionality.
+Project Status: Live and Actively Maintained
+
+---
+
+1. Project Overview
+
+Bush Teaching Assistant (BTA) is a full-stack educational technology platform developed to support Ghanaian Senior High School (SHS) students in preparing for examinations through interactive quizzes, topic-based practice questions, performance tracking and digital learning resources.
+
+The platform provides students with an accessible digital learning environment while equipping administrators and teachers with tools to manage educational content, students, assignments and learning activities.
 
 BTA is a live application currently being used by students.
 
-Key Features
+The application is independently designed, developed, deployed and maintained.
 
-1. User Authentication and Management
+2. Problem Statement
+
+Access to quality examination practice questions and effective digital learning resources is important for students preparing for their examinations.
+
+BTA addresses this need by providing a centralised educational platform where students can:
+
+- Practise examination questions.
+- Access multiple academic subjects.
+- Take interactive quizzes.
+- Receive immediate feedback and explanations.
+- Monitor their academic progress.
+- Participate in additional learning activities.
+
+The platform is designed around the Ghanaian Senior High School educational environment.
+
+3. Key Features
+
+Student Management
 
 - Student registration and login.
 - Secure password handling.
 - Session-based authentication.
-- Role-based access control.
-- User account management.
+- Personalised student dashboards.
+- Student account management.
 
-2. Question Management
+Interactive Assessment System
 
-- Create, retrieve, update and delete examination questions.
-- Organise questions by subject and topic.
-- Support multiple-choice questions.
-- Store correct answers and explanations.
-- Categorise questions by difficulty level.
-- Bulk question import and export.
-- Search and filter question collections.
-
-3. Online Assessment System
-
+- Subject-based learning.
 - Topic-based quizzes.
+- Multiple-choice questions.
 - Randomised question selection.
 - Automatic answer evaluation.
 - Immediate feedback and explanations.
-- Student performance tracking.
-- Quiz history management.
+- Quiz history and performance tracking.
 
-4. Administrative Management
+Question Management
+
+- Create, edit and delete examination questions.
+- Organise questions by subject and topic.
+- Manage answer options and explanations.
+- Categorise questions by difficulty.
+- Bulk question uploads.
+- Question searching and filtering.
+- Question export functionality.
+
+Administrative Management
 
 - Student management.
+- Administrator management.
 - Subject management.
 - Question administration.
 - Announcement management.
 - Online class management.
-- Administrative dashboards.
+- Administrative dashboards and reporting.
 
-5. Extra Classes Management
+Extra Classes Management
 
-- Student and parent management.
-- Teacher and subject management.
+- Student enrolment management.
+- Parent management.
+- Teacher management.
+- Subject-based class management.
 - Monthly fee management.
-- Payment record management.
-- Online payment integration.
-- Payment status tracking.
+- Payment processing.
+- Payment transaction tracking.
 
-6. Database Management
+Online Learning
 
-- Relational database architecture.
-- SQLAlchemy ORM integration.
-- Database migrations using Flask-Migrate and Alembic.
-- Database relationships and integrity management.
+- Virtual class management.
+- Class availability monitoring.
+- Google Meet integration.
+- Teacher-led learning activities.
 
-Technologies Used
+4. Technology Stack
 
 Technology| Purpose
-Python| Backend programming language
-Flask| Web application framework
-PostgreSQL| Relational database
+Python| Primary programming language
+Flask| Backend web framework
 SQLAlchemy| Object-relational mapping
+PostgreSQL| Relational database
 Flask-Migrate| Database migration management
 Alembic| Database schema versioning
-Flask-CORS| Cross-origin resource sharing
 JavaScript| Frontend interactions
-Paystack| Payment processing
-Supabase| Managed PostgreSQL database hosting
+HTML5| Web page structure
+CSS3| User interface styling
+Supabase| Managed PostgreSQL database
 Render| Application hosting
-Git and GitHub| Version control
+Paystack| Payment processing
+Git| Version control
+GitHub| Source code management
 
-Application Architecture
+5. System Architecture
 
-The backend follows a modular Flask application architecture designed to improve maintainability, organisation and scalability.
+BTA follows a modular full-stack web application architecture.
 
-The application separates its responsibilities into different components:
+The system consists of frontend interfaces, backend application services, database infrastructure and external service integrations.
 
-- Models: Database models and relationships.
-- Routes: Application endpoints and business logic.
-- Admin: Administrative functionality.
-- Utils: Shared utility functions.
-- Templates: Server-rendered HTML templates.
-- Static: CSS, JavaScript and other static resources.
-- Migrations: Database schema version history.
+Architecture Overview
 
-Database
+                 BTA USERS
+                     |
+          -----------------------
+          |          |          |
+       Students   Teachers   Admins
+          |          |          |
+          -----------------------
+                     |
+              WEB INTERFACE
+             HTML, CSS, JS
+                     |
+                     |
+              FLASK BACKEND
+                 PYTHON
+                     |
+          -----------------------
+          |          |          |
+       Database   Payments   Online Classes
+          |          |          |
+       Supabase   Paystack   Google Meet
+          |
+       PostgreSQL
+          |
+    APPLICATION DATA
 
-PostgreSQL is used as the primary relational database management system.
+Frontend Layer
 
-SQLAlchemy provides the ORM layer for database interactions, while Flask-Migrate and Alembic manage database schema changes.
+Provides the interfaces through which students, teachers and administrators interact with the application.
 
-The database supports several application modules, including:
+Backend Layer
+
+The Flask application handles:
+
+- Authentication and authorisation.
+- Application routing.
+- Business logic.
+- API endpoints.
+- Database operations.
+- Assessment processing.
+- Administrative operations.
+- Payment-related operations.
+
+Database Layer
+
+PostgreSQL stores application information, including:
 
 - User accounts.
-- Subjects and examination questions.
+- Subjects.
+- Examination questions.
 - Student progress.
 - Quiz history.
+- Assignments.
 - Announcements.
+- Extra classes.
+- Payment records.
+
+External Integrations
+
+The application integrates with external services to support additional functionality.
+
+- Supabase: PostgreSQL database hosting.
+- Paystack: Online payment processing.
+- Google Meet: Virtual classroom access.
+- Render: Application hosting.
+
+6. Database Architecture
+
+BTA uses PostgreSQL as its primary relational database management system.
+
+SQLAlchemy provides the ORM layer for database interactions.
+
+Flask-Migrate and Alembic are used to manage database schema changes and migrations.
+
+The database supports different application modules, including:
+
+- User management.
+- Subject management.
+- Question management.
+- Student progress tracking.
+- Quiz history.
 - Live classes and assessments.
+- Assignments and submissions.
 - Extra classes and enrolments.
-- Monthly fees and payment records.
+- Monthly fees and payment transactions.
 
-Payment Integration
+Database relationships and integrity constraints help maintain consistency across application records.
 
-The Extra Classes module integrates with Paystack to facilitate online fee payments.
+7. Payment System
 
-The payment system supports transaction processing, payment status tracking and the management of payment records associated with students, parents, subjects and teachers.
+The Extra Classes module incorporates Paystack for online payment processing.
 
-Project Structure
+The system supports:
 
-The application is organised into modular components.
+- Monthly class fee management.
+- Student and parent payment records.
+- Payment transaction references.
+- Payment status tracking.
+- Payment item management.
+- Teacher and subject-related payment records.
+
+The payment integration is designed to support the financial operations of the Extra Classes module.
+
+8. Application Screenshots
+
+The following screenshots demonstrate different parts of the BTA application.
+
+Student Dashboard
+
+"Student Dashboard" (screenshots/student-dashboard.jpg)
+
+Subject Selection
+
+"Subject Selection" (screenshots/subject-selection.jpg)
+
+Available Subjects
+
+"Available Subjects" (screenshots/available-subjects.jpg)
+
+Interactive Quiz Interface
+
+"Quiz Interface" (screenshots/quiz-interface.jpg)
+
+Question Management
+
+"Question Management" (screenshots/question-bank.jpg)
+
+Super Administrator Dashboard
+
+"Super Admin Dashboard" (screenshots/super-admin-dashboard.jpg)
+
+9. Project Structure
+
+The application follows a modular Flask architecture.
 
 bta-production-architecture/
 │
@@ -132,106 +263,117 @@ bta-production-architecture/
 │   └── static/
 │
 ├── migrations/
+│
+├── screenshots/
+│
 ├── populate_question_hashes.py
 ├── requirements.txt
 ├── run.py
 └── README.md
 
-Installation and Setup
+The structure above illustrates the main application components. Additional files and subdirectories may exist within individual modules.
+
+10. Installation and Local Development
 
 Prerequisites
-
-Before running the application, ensure you have:
 
 - Python 3.10 or later.
 - PostgreSQL.
 - Git.
 - pip.
 
-1. Clone the Repository
+Step 1: Clone the Repository
 
 git clone https://github.com/Bushsmith3300/bta-production-architecture.git
 
-2. Navigate to the Project Directory
+Step 2: Navigate to the Project Directory
 
 cd bta-production-architecture
 
-3. Create a Virtual Environment
+Step 3: Create a Virtual Environment
 
 python -m venv venv
 
-Activate the virtual environment.
+Activate the environment.
 
-Windows:
+Windows
 
 venv\Scripts\activate
 
-Linux/macOS:
+Linux/macOS
 
 source venv/bin/activate
 
-4. Install Dependencies
+Step 4: Install Dependencies
 
 pip install -r requirements.txt
 
-5. Configure Environment Variables
+Step 5: Configure Environment Variables
 
 Configure the environment variables required by the application.
 
 Example:
 
-SECRET_KEY=my_secret_key
-DATABASE_URL=my_database_connection_string
+SECRET_KEY=your_secret_key
+DATABASE_URL=your_database_connection_string
 
-Additional environment variables may be required depending on the application configuration.
+Additional configuration may be required for payment processing and other integrations.
 
-I have not committed passwords, API keys or other sensitive credentials to GitHub.
+Never commit real credentials, passwords or secret keys to GitHub.
 
-6. Run Database Migrations
+Step 6: Configure the Database
 
-After configuring the database and Flask application:
+Configure PostgreSQL and ensure the application has the correct database connection settings.
+
+Run database migrations using Flask-Migrate:
 
 flask db upgrade
 
-7. Start the Application
+Step 7: Start the Application
 
 python run.py
 
-The application will start using the configured development server settings.
+The application will start using its configured development server settings.
 
-Deployment
+11. Deployment
 
-The BTA application uses cloud infrastructure for hosting and database management.
+BTA is deployed using cloud infrastructure.
 
-- Backend Hosting: Render.
-- Database Hosting: Supabase PostgreSQL.
-- Payment Processing: Paystack.
+Service| Responsibility
+Render| Hosting the Flask application
+Supabase| PostgreSQL database hosting
+Paystack| Payment processing
+GitHub| Source code and version control
 
 The production environment is configured separately from local development.
 
-Security
+12. Security and Data Protection
 
-Security and data integrity are important considerations in the development of BTA.
+Security is an important consideration in the development of BTA.
 
-The application incorporates authentication, role-based access control and secure database operations.
+The application incorporates authentication, access control, database management and secure configuration practices.
 
-Production credentials and sensitive configuration values are managed through environment variables.
+Production credentials, database passwords, payment gateway secret keys and sensitive student information must never be exposed in public repositories.
 
-Sensitive student information, database passwords and payment gateway secret keys must not be exposed in my public repositories.
+13. Continuous Development
 
-Project Status
+BTA is an actively maintained application.
 
-Status: Live and Actively Maintained
+Ongoing development focuses on:
 
-Bush Teaching Assistant is an ongoing software development project. The platform is currently being used by students, with continuous improvements and additional features being introduced.
+- Expanding educational content across additional SHS subjects.
+- Improving student learning analytics.
+- Enhancing assessment functionality.
+- Improving application performance.
+- Expanding educational and administrative features.
+- Maintaining database integrity and application security.
 
-Developer
+14. Developer
 
-Developer: Emmanuel Asiamah Amponsah
+Bushsmith3300
 
-Professional Role: Python Software Developer
-
-Education: BSc Petroleum Engineering
+Python Software Developer
+Creator and Developer of Bush Teaching Assistant.
 
 GitHub: https://github.com/Bushsmith3300
 
