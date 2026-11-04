@@ -7,7 +7,7 @@ class Question(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
 
-    topic = db.Column(db.String(100), nullable=False)
+    topic = db.Column(db.String(255), nullable=False)
 
     question_text = db.Column(db.Text, nullable=False)
 
