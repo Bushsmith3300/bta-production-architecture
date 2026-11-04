@@ -241,8 +241,8 @@ pip install -r requirements.txt
 Configure the environment variables required by the application. For example:
 
 ```env
-SECRET_KEY=your_secret_key
-DATABASE_URL=your_database_connection_string
+SECRET_KEY=my_secret_key
+DATABASE_URL=my_database_connection_string
 ```
 
 Additional configuration may be required for payment processing and other integrations. Use development credentials locally. Never commit real credentials, passwords, API keys, or production secrets.
