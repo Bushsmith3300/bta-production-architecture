@@ -23,6 +23,21 @@ def create_app():
     app.config.from_object(Config)
 
     db.init_app(app)
+    try:
+        with app.app_context():
+            with db.engine.connect() as connection:
+                result = connection.execute(
+                    text("SELECT current_user, session_user")
+                ).fetchone()
+
+                app.logger.warning(
+                    "BTA DATABASE ROLE CHECK: current_user=%s, session_user=%s",
+                    result[0],
+                    result[1]
+                )
+    except Exception:
+     app.logger.exception("BTA DATABASE ROLE CHECK FAILED")
+        
     migrate.init_app(app, db)
     csrf.init_app(app)
     cors.init_app(app)
