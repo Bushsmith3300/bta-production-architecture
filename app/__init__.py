@@ -1,4 +1,5 @@
 from flask import Flask
+from sqlalchemy import text
 from app.config import Config
 from app.extensions import db, migrate, csrf, cors
 from app.routes.auth_routes import auth_bp
