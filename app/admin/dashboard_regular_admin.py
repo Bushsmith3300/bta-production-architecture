@@ -156,7 +156,7 @@ def no_subject():
 
    if not user:
 
-   return redirect(
+      return redirect(
         url_for("auth.login")
     )
 
@@ -166,7 +166,7 @@ def no_subject():
 
    if user.role == "super_admin":
 
-   return redirect(
+      return redirect(
         url_for("dashboard_super_admin.dashboard")
     )
 
@@ -183,5 +183,4 @@ def no_subject():
 # --------------------------------------------------
 # DISPLAY NO-SUBJECT PAGE
 # --------------------------------------------------
-
-   return render_template("admin/no_subject.html",user=user)
+return render_template("admin/no_subject.html",user=user)
