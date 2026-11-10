@@ -29,11 +29,11 @@ name,
 url_prefix="/admin"
 )
 
-======================================================
+#======================================================
 
-REGULAR ADMIN DASHBOARD
+# REGULAR ADMIN DASHBOARD
 
-======================================================
+#======================================================
 
 @regular_admin_bp.route("/")
 @admin_subject_required
@@ -194,11 +194,11 @@ return render_template(
     data=dashboard_data
 )
 
-======================================================
+#======================================================
 
-ADMIN WITHOUT AN ASSIGNED SUBJECT
+# ADMIN WITHOUT AN ASSIGNED SUBJECT
 
-======================================================
+#======================================================
 
 @regular_admin_bp.route("/no-subject")
 @login_required
