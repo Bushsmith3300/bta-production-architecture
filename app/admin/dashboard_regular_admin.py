@@ -97,12 +97,12 @@ def dashboard():
 
     # Keep the session subject updated.
 
-        session["subject"] = user.subject
-        session["role"] = user.role
+    session["subject"] = user.subject
+    session["role"] = user.role
 
     # Count questions for the assigned subject.
 
-        total_questions = Question.query.filter(
+    total_questions = Question.query.filter(
             Question.subject_id == admin_subject.id
         ).count()
 
@@ -121,9 +121,9 @@ def dashboard():
 # COUNT ASSIGNMENTS
 # ==================================================
 
-    total_assignments = Assignment.query.count()
+  total_assignments = Assignment.query.count()
 
-    total_assignment_questions = (
+  total_assignment_questions = (
         AssignmentQuestion.query.count()
     )
 
@@ -131,7 +131,7 @@ def dashboard():
 # COUNT PENDING SUBMISSIONS
 # ==================================================
 
-    pending_submissions = (
+ pending_submissions = (
         AssignmentSubmission.query.filter_by(
             submit_status="pending"
         ).count()
@@ -141,19 +141,19 @@ def dashboard():
 # COUNT LIVE CLASSES
 # ==================================================
 
-    total_live_classes = LiveClass.query.count()
+ total_live_classes = LiveClass.query.count()
 
 # ==================================================
 # COUNT ANNOUNCEMENTS
 # ==================================================
 
-    total_announcements = Announcement.query.count()
+ total_announcements = Announcement.query.count()
 
 # ==================================================
 # GET CURRENT LIVE CLASS STATUS
 # ==================================================
 
-    class_status = LiveClass.query.filter_by(
+ class_status = LiveClass.query.filter_by(
         is_live=True
     ).first()
 
@@ -161,7 +161,7 @@ def dashboard():
 # RECENT ACTIVITY
 # ==================================================
 
-    recent_activity = [
+ recent_activity = [
         "Created a new assignment",
         "Started a live class",
         "Published an announcement",
@@ -172,7 +172,7 @@ def dashboard():
 # DASHBOARD DATA
 # ==================================================
 
-    dashboard_data = {
+ dashboard_data = {
         "questions": total_questions,
         "assignments": total_assignments,
         "assignment_questions": total_assignment_questions,
@@ -187,7 +187,7 @@ def dashboard():
 # RENDER DASHBOARD
 # ==================================================
 
-    return render_template(
+return render_template(
         "admin/dashboard_regular_admin.html",
         data=dashboard_data
     )
