@@ -81,9 +81,8 @@ def dashboard():
                 url_for("regular_admin.no_subject")
             )
 
-        admin_subject = Subject.query.filter_by(
-            name=subject_name
-        ).first()
+         admin_subject = Subject.query.filter_by(
+            name=subject_name).first()
 
         if admin_subject is None:
 
