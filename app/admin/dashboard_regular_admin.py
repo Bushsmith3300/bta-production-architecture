@@ -88,8 +88,7 @@ def dashboard():
 # COUNT PENDING SUBMISSIONS
 # ==================================================
 
-   pending_submissions = (AssignmentSubmission.query.filter_by(
-        submit_status="pending").count())
+   pending_submissions = (AssignmentSubmission.query.filter_by(submit_status="pending").count())
 
 # ==================================================
 # COUNT LIVE CLASSES
