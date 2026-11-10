@@ -39,39 +39,7 @@ url_prefix="/admin"
 @admin_subject_required
 def dashboard():
    
-# ==================================================
-# GET ADMIN'S ASSIGNED SUBJECT
-# ==================================================
-
-   user = User.query.get(session["user_id"])
-
-   admin_subject = None
-
-   if user.role == "super_admin":
-
-# Super Admin can access all subjects.
-        total_questions = Question.query.count()
-
-   elif user.role == "admin":
-
-# Regular Admin must have an assigned subject.
-        subject_name = user.subject
-
-   if not subject_name:
-        flash(
-            "Your administrator account has not been assigned a subject yet. Please contact the Super Admin.",
-            "warning"
-        )
-
-        return redirect(
-            url_for("regular_admin.no_subject")
-        )
-
-   admin_subject = Subject.query.filter_by(
-        name=subject_name
-    ).first()
-
-   if admin_subject is None:
+if admin_subject is None:
         flash(
             "Your assigned subject could not be found.",
             "danger"
@@ -87,7 +55,7 @@ def dashboard():
         Question.subject_id == admin_subject.id
     ).count()
 
-   else:
+else:
 
         flash(
         "You do not have permission to access this page.",
@@ -97,7 +65,6 @@ def dashboard():
         return redirect(
         url_for("dashboard.dashboard")
     )   
-
 
 
 # ==================================================
