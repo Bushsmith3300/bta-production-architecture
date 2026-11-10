@@ -106,7 +106,7 @@ def dashboard():
             Question.subject_id == admin_subject.id
         ).count()
 
- else:
+    else:
 
         flash(
         "You do not have permission to access this page.",
