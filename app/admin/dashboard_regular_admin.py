@@ -50,12 +50,12 @@ def dashboard():
    if user.role == "super_admin":
 
     # Super Admin does not require subject assignment.
-    total_questions = Question.query.count()
+        total_questions = Question.query.count()
 
    else:
 
-   # Regular Admin must have an assigned subject.
-   subject_name = user.subject
+    # Regular Admin must have an assigned subject.
+        subject_name = user.subject
 
    if not subject_name:
         flash(
