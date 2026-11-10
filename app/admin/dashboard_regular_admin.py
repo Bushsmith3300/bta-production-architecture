@@ -142,17 +142,17 @@ def dashboard():
    return render_template("admin/dashboard_regular_admin.html",
     data=dashboard_data)
 
-======================================================
+# ======================================================
 
-ADMIN WITHOUT AN ASSIGNED SUBJECT
+# ADMIN WITHOUT AN ASSIGNED SUBJECT
 
-======================================================
+# ======================================================
 
 @regular_admin_bp.route("/no-subject")
 @login_required
 def no_subject():
 
-    user = User.query.get(session["user_id"])
+   user = User.query.get(session["user_id"])
 
    if not user:
 
