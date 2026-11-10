@@ -25,7 +25,7 @@ Announcement
 
 regular_admin_bp = Blueprint(
 "regular_admin",
-name,
+__name__,
 url_prefix="/admin"
 )
 
