@@ -175,7 +175,7 @@ def no_subject():
 
    if user.role != "admin":
 
-   return redirect(
+      return redirect(
         url_for("dashboard.dashboard")
     )
 
