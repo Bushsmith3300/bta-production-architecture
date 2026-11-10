@@ -49,13 +49,13 @@ def dashboard():
 
    if user.role == "super_admin":
 
-    # Super Admin does not require subject assignment.
-        total_questions = Question.query.count()
+# Super Admin can access all subjects.
+   total_questions = Question.query.count()
 
-   else:
+   elif user.role == "admin":
 
-    # Regular Admin must have an assigned subject.
-        subject_name = user.subject
+# Regular Admin must have an assigned subject.
+   subject_name = user.subject
 
    if not subject_name:
         flash(
@@ -86,6 +86,18 @@ def dashboard():
    total_questions = Question.query.filter(
         Question.subject_id == admin_subject.id
     ).count()
+
+   else:
+
+        flash(
+        "You do not have permission to access this page.",
+        "danger"
+    )
+
+        return redirect(
+        url_for("dashboard.dashboard")
+    )   
+
 
 
 # ==================================================
