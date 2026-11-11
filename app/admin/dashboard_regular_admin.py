@@ -1,46 +1,47 @@
 from flask import (
-Blueprint,
-render_template,
-session,
-redirect,
-url_for,
-flash
+    Blueprint,
+    render_template,
+    session,
+    redirect,
+    url_for,
+    flash
 )
 
 from app.utils.decorators import (
-admin_subject_required,
-login_required
+    admin_subject_required,
+    login_required
 )
 
 from app.models import (
-Question,
-Subject,
-User,
-Assignment,
-AssignmentQuestion,
-AssignmentSubmission,
-LiveClass,
-Announcement
+    Question,
+    Subject,
+    User,
+    Assignment,
+    AssignmentQuestion,
+    AssignmentSubmission,
+    LiveClass,
+    Announcement
 )
+
 
 regular_admin_bp = Blueprint(
-"regular_admin",
-name,
-url_prefix="/admin"
+    "regular_admin",
+    __name__,
+    url_prefix="/admin"
 )
 
-#======================================================
 
+# ======================================================
 # REGULAR ADMIN DASHBOARD
+# ======================================================
 
-#======================================================
 @regular_admin_bp.route("/")
 @admin_subject_required
 def dashboard():
 
-# ==================================================
-# GET CURRENT USER
-# ==================================================
+    # ==================================================
+    # GET CURRENT USER
+    # ==================================================
 
     user = User.query.get(session["user_id"])
 
@@ -51,128 +52,132 @@ def dashboard():
             url_for("auth.login")
         )
 
-# ==================================================
-# GET ADMIN'S ASSIGNED SUBJECT
-# ==================================================
+    # ==================================================
+    # GET QUESTIONS BASED ON ADMIN ROLE
+    # ==================================================
 
     admin_subject = None
 
     if user.role == "super_admin":
 
-    # Super Admin can access all subjects.
-    # No subject assignment is required.
+        # Super Admin can access all subjects.
+        # No subject assignment is required.
+
+        session["role"] = user.role
+        session.pop("subject", None)
 
         total_questions = Question.query.count()
 
     elif user.role == "admin":
 
-    # Regular Admin must have an assigned subject.
+        # Regular Admin must have an assigned subject.
 
         subject_name = user.subject
 
-    if not subject_name:
+        if not subject_name:
 
             flash(
-            "Your administrator account has not been assigned a subject yet. Please contact the Super Admin.",
-            "warning"
+                "Your administrator account has not been assigned a subject yet. Please contact the Super Admin.",
+                "warning"
             )
 
             return redirect(
                 url_for("regular_admin.no_subject")
             )
 
-    admin_subject = Subject.query.filter_by(
-        name=subject_name).first()
+        admin_subject = Subject.query.filter_by(
+            name=subject_name
+        ).first()
 
-    if admin_subject is None:
+        if admin_subject is None:
 
             flash(
-            "Your assigned subject could not be found.",
-            "danger"
+                "Your assigned subject could not be found.",
+                "danger"
             )
 
             return redirect(
-                 url_for("regular_admin.no_subject")
+                url_for("regular_admin.no_subject")
             )
 
-    # Keep the session subject updated.
+        # Keep the session information updated.
 
-    session["subject"] = user.subject
-    session["role"] = user.role
+        session["subject"] = user.subject
+        session["role"] = user.role
 
-    # Count questions for the assigned subject.
+        # Count questions for the assigned subject.
 
-    total_questions = Question.query.filter(
+        total_questions = Question.query.filter(
             Question.subject_id == admin_subject.id
         ).count()
 
     else:
 
         flash(
-        "You do not have permission to access this page.",
-        "danger"
+            "You do not have permission to access this page.",
+            "danger"
         )
 
         return redirect(
             url_for("dashboard.dashboard")
         )
 
-# ==================================================
-# COUNT ASSIGNMENTS
-# ==================================================
+    # ==================================================
+    # COUNT ASSIGNMENTS
+    # ==================================================
 
-  total_assignments = Assignment.query.count()
+    total_assignments = Assignment.query.count()
 
-  total_assignment_questions = (
+    total_assignment_questions = (
         AssignmentQuestion.query.count()
     )
 
-# ==================================================
-# COUNT PENDING SUBMISSIONS
-# ==================================================
+    # ==================================================
+    # COUNT PENDING SUBMISSIONS
+    # ==================================================
 
- pending_submissions = (
+    pending_submissions = (
         AssignmentSubmission.query.filter_by(
             submit_status="pending"
         ).count()
     )
 
-# ==================================================
-# COUNT LIVE CLASSES
-# ==================================================
+    # ==================================================
+    # COUNT LIVE CLASSES
+    # ==================================================
 
- total_live_classes = LiveClass.query.count()
+    total_live_classes = LiveClass.query.count()
 
-# ==================================================
-# COUNT ANNOUNCEMENTS
-# ==================================================
+    # ==================================================
+    # COUNT ANNOUNCEMENTS
+    # ==================================================
 
- total_announcements = Announcement.query.count()
+    total_announcements = Announcement.query.count()
 
-# ==================================================
-# GET CURRENT LIVE CLASS STATUS
-# ==================================================
+    # ==================================================
+    # GET CURRENT LIVE CLASS STATUS
+    # ==================================================
 
- class_status = LiveClass.query.filter_by(
+    class_status = LiveClass.query.filter_by(
         is_live=True
     ).first()
 
-# ==================================================
-# RECENT ACTIVITY
-# ==================================================
+    # ==================================================
+    # RECENT ACTIVITY
+    # ==================================================
 
- recent_activity = [
+    recent_activity = [
         "Created a new assignment",
         "Started a live class",
         "Published an announcement",
         "Added new assignment questions"
     ]
 
-# ==================================================
-# DASHBOARD DATA
-# ==================================================
+    # ==================================================
+    # DASHBOARD DATA
+    # ==================================================
 
- dashboard_data = {
+    dashboard_data = {
         "questions": total_questions,
         "assignments": total_assignments,
         "assignment_questions": total_assignment_questions,
@@ -183,20 +188,19 @@ def dashboard():
         "recent_activity": recent_activity
     }
 
-# ==================================================
-# RENDER DASHBOARD
-# ==================================================
+    # ==================================================
+    # RENDER DASHBOARD
+    # ==================================================
 
-return render_template(
+    return render_template(
         "admin/dashboard_regular_admin.html",
         data=dashboard_data
     )
 
-#======================================================
 
+# ======================================================
 # ADMIN WITHOUT AN ASSIGNED SUBJECT
-
-#======================================================
+# ======================================================
 
 @regular_admin_bp.route("/no-subject")
 @login_required
@@ -214,9 +218,9 @@ def no_subject():
             url_for("auth.login")
         )
 
-# --------------------------------------------------
-# SUPER ADMIN
-# --------------------------------------------------
+    # --------------------------------------------------
+    # SUPER ADMIN
+    # --------------------------------------------------
 
     if user.role == "super_admin":
 
@@ -224,9 +228,9 @@ def no_subject():
             url_for("dashboard_super_admin.dashboard")
         )
 
-# --------------------------------------------------
-# REGULAR ADMIN
-# --------------------------------------------------
+    # --------------------------------------------------
+    # REGULAR ADMIN
+    # --------------------------------------------------
 
     if user.role != "admin":
 
@@ -234,9 +238,9 @@ def no_subject():
             url_for("dashboard.dashboard")
         )
 
-# --------------------------------------------------
-# DISPLAY NO-SUBJECT PAGE
-# --------------------------------------------------
+    # --------------------------------------------------
+    # DISPLAY NO-SUBJECT PAGE
+    # --------------------------------------------------
 
     return render_template(
         "admin/no_subject.html",
