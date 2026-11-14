@@ -25,7 +25,10 @@ from flask import send_file
 
 from sqlalchemy.exc import IntegrityError
 
-from sqlalchemy import or_, func
+from sqlalchemy import or_, func, create_engine
+from sqlalchemy.orm import sessionmaker
+
+import os
 
 from app.extensions import db
 
@@ -44,6 +47,63 @@ from app.utils.decorators import (
 )
 
 from app.utils.question_hash import generate_question_hash
+
+
+# ======================================================
+# RESTRICTED QUESTION IMPORTER DATABASE SESSION
+# ======================================================
+
+def get_question_importer_session():
+    """Create a SQLAlchemy session using the restricted importer account.
+
+    The normal Flask-SQLAlchemy session remains responsible for application
+    reads and authorization. This separate session is used only by the bulk
+    question import route for inserting Question records.
+    """
+
+    database_url = (
+        current_app.config.get("QUESTION_IMPORTER_DATABASE_URL")
+        or os.environ.get("QUESTION_IMPORTER_DATABASE_URL")
+    )
+
+    if not database_url:
+        raise RuntimeError(
+            "QUESTION_IMPORTER_DATABASE_URL is not configured. "
+            "Bulk question import requires the restricted importer account."
+        )
+
+    # Reuse one Engine per Flask application instead of creating a new
+    # connection pool for every upload request.
+    engine = current_app.extensions.get("question_importer_engine")
+
+    if engine is None:
+        engine = create_engine(
+            database_url,
+            pool_pre_ping=True,
+            connect_args={
+                "sslmode": "require",
+                "connect_timeout": 10,
+            },
+        )
+
+        current_app.extensions["question_importer_engine"] = engine
+
+        current_app.extensions["question_importer_session_factory"] = (
+            sessionmaker(bind=engine, expire_on_commit=False)
+        )
+
+
+    session_factory = current_app.extensions.get(
+        "question_importer_session_factory"
+    )
+
+
+    if session_factory is None:
+        raise RuntimeError(
+            "The question importer database session could not be initialized."
+        )
+
+    return session_factory()
 
 
 # ======================================================
@@ -443,8 +503,8 @@ def view_question(question_id):
     filter_topic = request.args.get("filter_topic", "", type=str).strip()
     filter_subject = request.args.get("filter_subject", "", type=str).strip()
     filter_difficulty = request.args.get("filter_difficulty", "", type=str).strip()
-    
-   
+
+
 
     if (
         session.get("role") == "admin"
@@ -464,11 +524,11 @@ def view_question(question_id):
 
 
     return render_template("admin/view_question.html",
-             question=question, 
+             question=question,
              question_id=question_id,
              page=page,
              search=search,
-             filter_topic=filter_topic,             
+             filter_topic=filter_topic,
              filter_subject=filter_subject,
              filter_difficulty=filter_difficulty,
     )
@@ -483,24 +543,24 @@ def view_question(question_id):
 @admin_subject_required
 def add_question():
 
-    
+
     # -----------------------------------------
     # State preservation after GET
-    # ----------------------------------------- 
+    # -----------------------------------------
 
     page = request.args.get("page", 1, type=int)
     search = request.args.get("search", "")
     filter_topic = request.args.get("filter_topic", "")
     filter_subject = request.args.get("filter_subject", "")
     filter_difficulty = request.args.get("filter_difficulty", "")
-    
-    
+
+
     if request.method == "POST":
 
         # -----------------------------------------
         # State preservation after POST
         # -----------------------------------------
-        
+
         page = request.form.get("page", 1, type=int)
         search = request.form.get("search", "").strip()
         filter_topic = request.form.get("filter_topic", "").strip()
@@ -510,11 +570,11 @@ def add_question():
         # -----------------------------------------
         # Question data
         # -----------------------------------------
-        
-        topic = request.form.get("topic", "").strip()  
-        
+
+        topic = request.form.get("topic", "").strip()
+
         difficulty = request.form.get("difficulty", "").strip()
- 
+
         if session.get("role") == "admin":
             subject = session.get("subject")
         else:
@@ -555,12 +615,12 @@ def add_question():
             "explanation",
             ""
         ).strip()
-       
+
 
         # --------------------------------------------------
         # Validation
         # --------------------------------------------------
-        
+
         print(request.form)
         print("Topic:", request.form.get("topic"))
 
@@ -2322,6 +2382,8 @@ def bulk_upload_questions():
         # READ JSON FILE
         # ==================================================
 
+        importer_session = None
+
         try:
 
             questions = json.load(file)
@@ -2442,6 +2504,15 @@ def bulk_upload_questions():
                             filter_difficulty=filter_difficulty,
                         )
                     )
+
+
+            # ==================================================
+            # OPEN RESTRICTED IMPORTER SESSION
+            # ==================================================
+            # Do not fall back to db.session if this connection is missing.
+            # The importer role must be the account performing the inserts.
+
+            importer_session = get_question_importer_session()
 
 
             # ==================================================
@@ -2725,11 +2796,11 @@ def bulk_upload_questions():
 
                 try:
 
-                    with db.session.begin_nested():
+                    with importer_session.begin_nested():
 
-                        db.session.add(question)
+                        importer_session.add(question)
 
-                        db.session.flush()
+                        importer_session.flush()
 
 
                     existing_hashes.add(
@@ -2752,8 +2823,8 @@ def bulk_upload_questions():
                         f"Question={question_text}"
                     )
 
-                    if not db.session.is_active:
-                        db.session.rollback()
+                    if not importer_session.is_active:
+                        importer_session.rollback()
 
                     errors += 1
 
@@ -2766,12 +2837,12 @@ def bulk_upload_questions():
 
             try:
 
-                db.session.commit()
+                importer_session.commit()
 
 
             except SQLAlchemyError:
 
-                db.session.rollback()
+                importer_session.rollback()
 
                 current_app.logger.exception(
                     "Bulk upload database commit failed."
@@ -2897,6 +2968,9 @@ def bulk_upload_questions():
 
             db.session.rollback()
 
+            if importer_session is not None:
+                importer_session.rollback()
+
             current_app.logger.exception(
                 "Unexpected bulk upload error."
             )
@@ -2918,6 +2992,10 @@ def bulk_upload_questions():
                 )
             )
 
+        finally:
+            if importer_session is not None:
+                importer_session.close()
+
 
     # ==================================================
     # GET REQUEST
@@ -2933,7 +3011,7 @@ def bulk_upload_questions():
     )
 
 
-    
+
 # ======================================================
 # EXPORT QUESTIONS
 # ======================================================
@@ -3296,4 +3374,3 @@ def export_questions():
     )
 
 
-        
