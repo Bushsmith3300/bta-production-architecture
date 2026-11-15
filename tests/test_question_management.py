@@ -365,3 +365,361 @@ def test_super_admin_can_view_question_from_another_subject(question_client):
     )
 
     assert response.status_code == 200
+
+
+# ======================================================
+# QUESTION EDITING TESTS
+# ======================================================
+
+def test_super_admin_can_edit_question(question_client):
+
+    chemistry = create_subject("Chemistry", "CHEM")
+
+    question = create_question_for_subject(
+        chemistry,
+        "Atomic Structure",
+        "g"
+    )
+
+    admin = create_test_user(
+        "super_edit_admin",
+        role="super_admin"
+    )
+
+    login_user(question_client, admin)
+
+    data = valid_question_data()
+    data["subject"] = str(chemistry.id)
+    data["question_text"] = "What is the relative charge of a proton?"
+    data["explanation"] = "A proton has a positive charge."
+
+    response = question_client.post(
+        f"/admin/questions/edit/{question.id}",
+        data=data,
+        follow_redirects=False
+    )
+
+    assert response.status_code == 302
+
+    db.session.refresh(question)
+
+    assert question.question_text == (
+        "What is the relative charge of a proton?"
+    )
+
+    assert question.explanation == (
+        "A proton has a positive charge."
+    )
+
+    assert question.subject_id == chemistry.id
+
+    expected_hash = generate_question_hash(
+        topic=data["topic"],
+        subject=chemistry.name,
+        question_text=data["question_text"],
+        option_a=data["option_a"],
+        option_b=data["option_b"],
+        option_c=data["option_c"],
+        option_d=data["option_d"],
+        correct_answer=data["correct_answer"]
+    )
+
+    assert question.question_hash == expected_hash
+
+
+def test_admin_can_edit_question_from_assigned_subject(question_client):
+
+    chemistry = create_subject("Chemistry", "CHEM")
+
+    question = create_question_for_subject(
+        chemistry,
+        "Atomic Structure",
+        "h"
+    )
+
+    admin = create_test_user(
+        "chemistry_edit_admin",
+        role="admin",
+        subject="Chemistry"
+    )
+
+    login_user(question_client, admin)
+
+    data = valid_question_data()
+    data["question_text"] = "What is the charge of an electron?"
+
+    response = question_client.post(
+        f"/admin/questions/edit/{question.id}",
+        data=data,
+        follow_redirects=False
+    )
+
+    assert response.status_code == 302
+
+    db.session.refresh(question)
+
+    assert question.question_text == (
+        "What is the charge of an electron?"
+    )
+
+    assert question.subject_id == chemistry.id
+
+
+def test_admin_cannot_edit_question_from_another_subject(question_client):
+
+    chemistry = create_subject("Chemistry", "CHEM")
+    physics = create_subject("Physics", "PHYS")
+
+    question = create_question_for_subject(
+        physics,
+        "Mechanics",
+        "i"
+    )
+
+    admin = create_test_user(
+        "restricted_edit_admin",
+        role="admin",
+        subject="Chemistry"
+    )
+
+    login_user(question_client, admin)
+
+    original_text = question.question_text
+
+    data = valid_question_data()
+    data["question_text"] = "Unauthorized modification attempt."
+
+    response = question_client.post(
+        f"/admin/questions/edit/{question.id}",
+        data=data,
+        follow_redirects=False
+    )
+
+    assert response.status_code == 302
+
+    db.session.refresh(question)
+
+    assert question.question_text == original_text
+    assert question.subject_id == physics.id
+
+
+def test_edit_nonexistent_question_returns_404(question_client):
+
+    admin = create_test_user(
+        "missing_question_edit_admin",
+        role="super_admin"
+    )
+
+    login_user(question_client, admin)
+
+    response = question_client.get(
+        "/admin/questions/edit/999999"
+    )
+
+    assert response.status_code == 404
+
+
+def test_edit_rejects_duplicate_options_without_modifying_question(
+    question_client
+):
+
+    chemistry = create_subject("Chemistry", "CHEM")
+
+    question = create_question_for_subject(
+        chemistry,
+        "Atomic Structure",
+        "j"
+    )
+
+    admin = create_test_user(
+        "duplicate_options_edit_admin",
+        role="super_admin"
+    )
+
+    login_user(question_client, admin)
+
+    original_text = question.question_text
+
+    data = valid_question_data()
+    data["subject"] = str(chemistry.id)
+    data["question_text"] = "This question should not be saved."
+    data["option_b"] = data["option_a"]
+
+    response = question_client.post(
+        f"/admin/questions/edit/{question.id}",
+        data=data,
+        follow_redirects=False
+    )
+
+    assert response.status_code == 302
+
+    db.session.refresh(question)
+
+    assert question.question_text == original_text
+
+
+# ======================================================
+# QUESTION DELETION TESTS
+# ======================================================
+
+def test_super_admin_can_delete_unused_question(
+    question_client, monkeypatch
+):
+    import app.admin.questions_management as question_module
+
+    chemistry = create_subject("Chemistry", "CHEM")
+
+    question = create_question_for_subject(
+        chemistry, "Atomic Structure", "k"
+    )
+
+    admin = create_test_user(
+        "super_delete_admin",
+        role="super_admin"
+    )
+
+    login_user(question_client, admin)
+
+    monkeypatch.setattr(
+        question_module,
+        "question_has_dependencies",
+        lambda question_id: False
+    )
+
+    response = question_client.post(
+        f"/admin/questions/delete/{question.id}",
+        follow_redirects=False
+    )
+
+    assert response.status_code == 302
+    assert db.session.get(Question, question.id) is None
+
+
+def test_admin_can_delete_question_from_assigned_subject(
+    question_client, monkeypatch
+):
+    import app.admin.questions_management as question_module
+
+    chemistry = create_subject("Chemistry", "CHEM")
+
+    question = create_question_for_subject(
+        chemistry, "Atomic Structure", "l"
+    )
+
+    admin = create_test_user(
+        "chemistry_delete_admin",
+        role="admin",
+        subject="Chemistry"
+    )
+
+    login_user(question_client, admin)
+
+    monkeypatch.setattr(
+        question_module,
+        "question_has_dependencies",
+        lambda question_id: False
+    )
+
+    response = question_client.post(
+        f"/admin/questions/delete/{question.id}",
+        follow_redirects=False
+    )
+
+    assert response.status_code == 302
+    assert db.session.get(Question, question.id) is None
+
+
+
+def test_admin_cannot_delete_question_from_another_subject(
+    question_client, monkeypatch
+):
+    import app.admin.questions_management as question_module
+
+    chemistry = create_subject("Chemistry", "CHEM")
+    physics = create_subject("Physics", "PHYS")
+
+    question = create_question_for_subject(
+        physics, "Mechanics", "m"
+    )
+
+    admin = create_test_user(
+        "restricted_delete_admin",
+        role="admin",
+        subject="Chemistry"
+    )
+
+    login_user(question_client, admin)
+
+    monkeypatch.setattr(
+        question_module,
+        "question_has_dependencies",
+        lambda question_id: False
+    )
+
+    original_text = question.question_text
+
+    response = question_client.post(
+        f"/admin/questions/delete/{question.id}",
+        follow_redirects=False
+    )
+
+    assert response.status_code == 302
+
+    db.session.refresh(question)
+
+    assert question.question_text == original_text
+    assert question.subject_id == physics.id
+
+
+def test_delete_nonexistent_question_returns_404(question_client):
+
+    admin = create_test_user(
+        "missing_question_delete_admin",
+        role="super_admin"
+    )
+
+    login_user(question_client, admin)
+
+    response = question_client.post(
+        "/admin/questions/delete/999999",
+        follow_redirects=False
+    )
+
+    assert response.status_code == 404
+
+
+def test_question_with_dependencies_cannot_be_deleted(
+    question_client, monkeypatch
+):
+    import app.admin.questions_management as question_module
+
+    chemistry = create_subject("Chemistry", "CHEM")
+
+    question = create_question_for_subject(
+        chemistry, "Atomic Structure", "n"
+    )
+
+    admin = create_test_user(
+        "dependent_question_admin",
+        role="super_admin"
+    )
+
+    login_user(question_client, admin)
+
+    monkeypatch.setattr(
+        question_module,
+        "question_has_dependencies",
+        lambda question_id: True
+    )
+
+    response = question_client.post(
+        f"/admin/questions/delete/{question.id}",
+        follow_redirects=False
+    )
+
+    assert response.status_code == 302
+
+    db.session.refresh(question)
+
+    assert question.id is not None
+    assert Question.query.filter_by(id=question.id).first() is not None

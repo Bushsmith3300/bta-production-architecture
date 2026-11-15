@@ -6,8 +6,17 @@ from app.models import (
     User,
     UserProgress,
     Subject,
-    Question
+    Question,
+    UserHistory,
+    Assignment,
+    AssignmentQuestion,
+    AssignmentSubmission,
+    StudentAnswer,
+    LiveClass,
+    LiveQuizQuestion,
+    LiveQuizAnswer
 )
+
 
 @pytest.fixture
 def app():
@@ -52,16 +61,22 @@ def auth_client(app):
 
 @pytest.fixture
 def question_client(app):
-
     tables = [
         User.__table__,
         UserProgress.__table__,
         Subject.__table__,
         Question.__table__,
+        UserHistory.__table__,
+        Assignment.__table__,
+        AssignmentQuestion.__table__,
+        AssignmentSubmission.__table__,
+        StudentAnswer.__table__,
+        LiveClass.__table__,
+        LiveQuizQuestion.__table__,
+        LiveQuizAnswer.__table__,
     ]
 
     with app.app_context():
-
         db.metadata.create_all(
             bind=db.engine,
             tables=tables
