@@ -8,8 +8,10 @@ from flask import (
     flash,
     redirect,
     url_for,
-    session
+    session,
+    abort
 )
+    
 
 from flask import current_app
 
@@ -492,47 +494,126 @@ def view_questions():
 @admin_subject_required
 def view_question(question_id):
 
-    question = Question.query.get_or_404(question_id)
-
     # --------------------------------------------------
-    # Preserve current page and filters
+    # GET QUESTION
     # --------------------------------------------------
 
-    page = request.args.get("page", 1, type=int)
-    search = request.args.get("search", "", type=str).strip()
-    filter_topic = request.args.get("filter_topic", "", type=str).strip()
-    filter_subject = request.args.get("filter_subject", "", type=str).strip()
-    filter_difficulty = request.args.get("filter_difficulty", "", type=str).strip()
+    question = db.session.get(Question, question_id)
 
+    if question is None:
+        abort(404)
 
+    # --------------------------------------------------
+    # PRESERVE CURRENT PAGE AND FILTERS
+    # --------------------------------------------------
 
-    if (
-        session.get("role") == "admin"
-        and question.subject != session.get("subject")):
+    page = request.args.get(
+        "page",
+        1,
+        type=int
+    )
+
+    search = request.args.get(
+        "search",
+        "",
+        type=str
+    ).strip()
+
+    filter_topic = request.args.get(
+        "filter_topic",
+        "",
+        type=str
+    ).strip()
+
+    filter_subject = request.args.get(
+        "filter_subject",
+        "",
+        type=str
+    ).strip()
+
+    filter_difficulty = request.args.get(
+        "filter_difficulty",
+        "",
+        type=str
+    ).strip()
+
+    # --------------------------------------------------
+    # REGULAR ADMIN SUBJECT AUTHORIZATION
+    # --------------------------------------------------
+
+    if session.get("role") == "admin":
+
+        admin_subject = Subject.query.filter_by(
+            name=session.get("subject")
+        ).first()
+
+        if not admin_subject:
+
+            flash(
+                "Your assigned subject could not be found.",
+                "danger"
+            )
+
+            return redirect(
+                url_for("regular_admin.dashboard")
+            )
+
+        # Compare relational subject IDs
+        
+        if question.subject_id != admin_subject.id:
+
+            flash(
+                "You do not have permission to view this question.",
+                "danger"
+            )
+
+            return redirect(
+                url_for(
+                    "questions.view_questions",
+                    page=page,
+                    search=search,
+                    filter_topic=filter_topic,
+                    filter_subject=filter_subject,
+                    filter_difficulty=filter_difficulty
+                )
+            )
+
+    # --------------------------------------------------
+    # VERIFY QUESTION SUBJECT RELATIONSHIP
+    # --------------------------------------------------
+
+    if not question.subject_ref:
 
         flash(
-            "You do not have permission to view this question.",
+            "This question is not linked to a valid subject.",
             "danger"
+        )
+
+        return redirect(
+            url_for(
+                "questions.view_questions",
+                page=page,
+                search=search,
+                filter_topic=filter_topic,
+                filter_subject=filter_subject,
+                filter_difficulty=filter_difficulty
+            )
+        )
+
+    # --------------------------------------------------
+    # RENDER QUESTION DETAILS
+    # --------------------------------------------------
+
+    return render_template(
+        "admin/view_question.html",
+        question=question,
+        question_id=question_id,
+        page=page,
+        search=search,
+        filter_topic=filter_topic,
+        filter_subject=filter_subject,
+        filter_difficulty=filter_difficulty
     )
-        return redirect(url_for("questions.view_questions",
-             page=page,
-             search=search,
-             filter_topic=filter_topic,
-             filter_subject=filter_subject,
-             filter_difficulty=filter_difficulty,
-             ))
-
-
-    return render_template("admin/view_question.html",
-             question=question,
-             question_id=question_id,
-             page=page,
-             search=search,
-             filter_topic=filter_topic,
-             filter_subject=filter_subject,
-             filter_difficulty=filter_difficulty,
-    )
-
 
 
 # ======================================================
@@ -543,7 +624,6 @@ def view_question(question_id):
 @admin_subject_required
 def add_question():
 
-
     # -----------------------------------------
     # State preservation after GET
     # -----------------------------------------
@@ -553,7 +633,6 @@ def add_question():
     filter_topic = request.args.get("filter_topic", "")
     filter_subject = request.args.get("filter_subject", "")
     filter_difficulty = request.args.get("filter_difficulty", "")
-
 
     if request.method == "POST":
 
@@ -580,118 +659,75 @@ def add_question():
         else:
             subject = request.form.get("subject", "").strip()
 
-
         question_text = request.form.get(
-            "question_text",
-            ""
+            "question_text", ""
         ).strip()
 
         option_a = request.form.get(
-            "option_a",
-            ""
+            "option_a", ""
         ).strip()
 
         option_b = request.form.get(
-            "option_b",
-            ""
+            "option_b", ""
         ).strip()
 
         option_c = request.form.get(
-            "option_c",
-            ""
+            "option_c", ""
         ).strip()
 
         option_d = request.form.get(
-            "option_d",
-            ""
+            "option_d", ""
         ).strip()
 
         correct_answer = request.form.get(
-            "correct_answer",
-            ""
+            "correct_answer", ""
         ).strip().upper()
 
         explanation = request.form.get(
-            "explanation",
-            ""
+            "explanation", ""
         ).strip()
 
-
         # --------------------------------------------------
-        # Validation
+        # REQUIRED FIELD VALIDATION
         # --------------------------------------------------
-
-        print(request.form)
-        print("Topic:", request.form.get("topic"))
 
         if not topic:
-            flash(
-                "Topic is required.",
-                "danger"
-            )
-            return redirect(
-                url_for("questions.add_question")
-            )
+            flash("Topic is required.", "danger")
+            return redirect(url_for("questions.add_question"))
 
         if not subject:
-            flash(
-                "Subject is required.",
-                "danger"
-            )
-            return redirect(
-                url_for("questions.add_question")
-            )
+            flash("Subject is required.", "danger")
+            return redirect(url_for("questions.add_question"))
 
         if not question_text:
-            flash(
-                "Question text is required.",
-                "danger"
-            )
-            return redirect(
-                url_for("questions.add_question")
-            )
+            flash("Question text is required.", "danger")
+            return redirect(url_for("questions.add_question"))
 
         if not option_a:
-            flash(
-                "Option A is required.",
-                "danger"
-            )
-            return redirect(
-                url_for("questions.add_question")
-            )
+            flash("Option A is required.", "danger")
+            return redirect(url_for("questions.add_question"))
 
         if not option_b:
-            flash(
-                "Option B is required.",
-                "danger"
-            )
-            return redirect(
-                url_for("questions.add_question")
-            )
+            flash("Option B is required.", "danger")
+            return redirect(url_for("questions.add_question"))
 
         if not option_c:
-            flash(
-                "Option C is required.",
-                "danger"
-            )
-            return redirect(
-                url_for("questions.add_question")
-            )
+            flash("Option C is required.", "danger")
+            return redirect(url_for("questions.add_question"))
 
         if not option_d:
-            flash(
-                "Option D is required.",
-                "danger"
-            )
-            return redirect(
-                url_for("questions.add_question")
-            )
+            flash("Option D is required.", "danger")
+            return redirect(url_for("questions.add_question"))
+
+        # --------------------------------------------------
+        # OPTION UNIQUENESS VALIDATION
+        # --------------------------------------------------
 
         options = [
             option_a.lower(),
             option_b.lower(),
             option_c.lower(),
-            option_d.lower(),
+            option_d.lower()
         ]
 
         if len(set(options)) != 4:
@@ -699,23 +735,22 @@ def add_question():
                 "All options must be different.",
                 "danger"
             )
-            return redirect(
-                url_for("questions.add_question")
-            )
+            return redirect(url_for("questions.add_question"))
 
-        if correct_answer not in [
-            "A",
-            "B",
-            "C",
-            "D"
-        ]:
+        # --------------------------------------------------
+        # CORRECT ANSWER VALIDATION
+        # --------------------------------------------------
+
+        if correct_answer not in ["A", "B", "C", "D"]:
             flash(
                 "Correct answer must be A, B, C or D.",
                 "danger"
             )
-            return redirect(
-                url_for("questions.add_question")
-            )
+            return redirect(url_for("questions.add_question"))
+
+        # --------------------------------------------------
+        # DIFFICULTY VALIDATION
+        # --------------------------------------------------
 
         if difficulty not in [
             "DOK_1",
@@ -727,12 +762,29 @@ def add_question():
                 "Invalid difficulty level. Choose DOK_1, DOK_2, DOK_3 or DOK_4.",
                 "danger"
             )
-            return redirect(
-                url_for("questions.add_question")
-            )
+            return redirect(url_for("questions.add_question"))
 
         # --------------------------------------------------
-        # Generate question hash
+        # RESOLVE SUBJECT FROM DATABASE
+        # --------------------------------------------------
+
+        subject_record = Subject.query.filter(
+            Subject.name == subject,
+            Subject.is_active.is_(True)
+        ).first()
+
+        if not subject_record:
+            flash(
+                "The selected subject does not exist or is inactive.",
+                "danger"
+            )
+            return redirect(url_for("questions.add_question"))
+
+        # Use the official subject name from the database
+        subject = subject_record.name
+
+        # --------------------------------------------------
+        # GENERATE QUESTION HASH
         # --------------------------------------------------
 
         question_hash = generate_question_hash(
@@ -747,43 +799,42 @@ def add_question():
         )
 
         # --------------------------------------------------
-        # Duplicate check
+        # DUPLICATE CHECK
         # --------------------------------------------------
 
-        duplicate = Question.query.filter_by(question_hash=question_hash).first()
+        duplicate = Question.query.filter_by(
+            question_hash=question_hash
+        ).first()
 
         if duplicate:
             flash(
                 f"This question already exists (Question ID: {duplicate.id}).",
                 "warning"
             )
-            return redirect(
-                url_for("questions.add_question")
-            )
-
+            return redirect(url_for("questions.add_question"))
 
         # --------------------------------------------------
-        # Save question
+        # SAVE QUESTION
         # --------------------------------------------------
 
         try:
 
             question = Question(
-
                 topic=topic,
 
+                # Legacy subject field
                 subject=subject,
+
+                # Relational subject field
+                subject_id=subject_record.id,
 
                 difficulty=difficulty,
 
                 question_text=question_text,
 
                 option_a=option_a,
-
                 option_b=option_b,
-
                 option_c=option_c,
-
                 option_d=option_d,
 
                 correct_answer=correct_answer,
@@ -791,7 +842,6 @@ def add_question():
                 explanation=explanation,
 
                 question_hash=question_hash
-
             )
 
             db.session.add(question)
@@ -804,12 +854,13 @@ def add_question():
             )
 
             return redirect(
-                url_for("questions.view_questions",
-                page=page,
-                search=search,
-                filter_topic=filter_topic,
-                filter_subject=filter_subject,
-                filter_difficulty=filter_difficulty,
+                url_for(
+                    "questions.view_questions",
+                    page=page,
+                    search=search,
+                    filter_topic=filter_topic,
+                    filter_subject=filter_subject,
+                    filter_difficulty=filter_difficulty,
                 )
             )
 
@@ -826,12 +877,15 @@ def add_question():
                 url_for("questions.add_question")
             )
 
-        except Exception as e:
-
+        except Exception:
             db.session.rollback()
 
+            current_app.logger.exception(
+                "Error adding question"
+            )
+
             flash(
-                f"Error adding question: {e}",
+                "An unexpected error occurred while adding the question.",
                 "danger"
             )
 
@@ -839,13 +893,19 @@ def add_question():
                 url_for("questions.add_question")
             )
 
-    return render_template("admin/add_question.html",
-            page=page,
-            search=search,
-            filter_topic=filter_topic,
-            filter_subject=filter_subject,
-            filter_difficulty=filter_difficulty,
-            )
+    # --------------------------------------------------
+    # RENDER ADD QUESTION PAGE
+    # --------------------------------------------------
+
+    return render_template(
+        "admin/add_question.html",
+        page=page,
+        search=search,
+        filter_topic=filter_topic,
+        filter_subject=filter_subject,
+        filter_difficulty=filter_difficulty,
+    )
+
 
 
 # ======================================================
@@ -856,7 +916,41 @@ def add_question():
 @admin_subject_required
 def get_topics_for_subject(subject_id):
 
-    subject = Subject.query.get_or_404(subject_id)
+    # --------------------------------------------------
+    # REGULAR ADMIN SUBJECT RESTRICTION
+    # --------------------------------------------------
+
+    if session.get("role") == "admin":
+
+        admin_subject = Subject.query.filter_by(
+            name=session.get("subject")
+        ).first()
+
+        if not admin_subject:
+
+            return jsonify({
+                "error": "Your assigned subject could not be found."
+            }), 403
+
+        if admin_subject.id != subject_id:
+
+            return jsonify({
+                "error": "You are not authorised to access this subject."
+            }), 403
+
+    # --------------------------------------------------
+    # GET SUBJECT
+    # --------------------------------------------------
+
+    subject = db.session.get(Subject, subject_id)
+
+    if subject is None:
+        abort(404)
+
+
+    # --------------------------------------------------
+    # GET SUBJECT TOPICS
+    # --------------------------------------------------
 
     topics = (
         db.session.query(Question.topic)
@@ -887,7 +981,10 @@ def get_topics_for_subject(subject_id):
 @admin_subject_required
 def edit_question(question_id):
 
-    question = Question.query.get_or_404(question_id)
+    question = db.session.get(Question, question_id)
+
+    if question is None:
+        abort(404)
 
     # --------------------------------------------------
     # Preserve current page and filters
@@ -1654,7 +1751,10 @@ def edit_question(question_id):
 @admin_subject_required
 def delete_question(question_id):
 
-    question = Question.query.get_or_404(question_id)
+    question = db.session.get(Question, question_id)
+
+    if question is None:
+        abort(404)
 
     # --------------------------------------------------
     # Preserve current page and filters

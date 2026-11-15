@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from app.extensions import db
 
@@ -55,16 +55,16 @@ class Subject(db.Model):
     )
 
     created_at = db.Column(
-        db.DateTime,
-        nullable=False,
-        default=datetime.utcnow
+    db.DateTime,
+    nullable=False,
+    default=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
     )
 
     updated_at = db.Column(
-        db.DateTime,
-        nullable=False,
-        default=datetime.utcnow,
-        onupdate=datetime.utcnow
+    db.DateTime,
+    nullable=False,
+    default=lambda: datetime.now(timezone.utc).replace(tzinfo=None),
+    onupdate=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
     )
     
     

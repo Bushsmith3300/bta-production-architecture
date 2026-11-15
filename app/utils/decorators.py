@@ -1,5 +1,7 @@
 from functools import wraps
 
+from app.extensions import db
+
 from flask import session, redirect, url_for, flash
 
 from app.models import User
@@ -25,9 +27,8 @@ def login_required(f):
                 url_for("auth.login")
             )
 
-        user = User.query.get(
-            session["user_id"]
-        )
+        user = db.session.get(User,session["user_id"])
+
 
         if not user:
 
@@ -65,9 +66,8 @@ def super_admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
 
-        user = User.query.get(
-            session["user_id"]
-        )
+        user = db.session.get(User,session["user_id"])
+
 
         if user.role != "super_admin":
 
@@ -95,9 +95,8 @@ def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
 
-        user = User.query.get(
-            session["user_id"]
-        )
+
+        user = db.session.get(User,session["user_id"])
 
         if user.role not in [
             "admin",
@@ -127,9 +126,9 @@ def admin_subject_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
 
-        user = User.query.get(
-            session["user_id"]
-        )
+
+        user = db.session.get(User,session["user_id"])
+
 
         # ----------------------------------------------------
         # SUPER ADMIN
