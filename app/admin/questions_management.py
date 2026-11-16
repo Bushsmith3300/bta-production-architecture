@@ -953,7 +953,8 @@ def get_topics_for_subject(subject_id):
 
     subject = db.session.get(Subject, subject_id)
 
-    if subject is None:
+    
+    if subject is None or not subject.is_active:
         abort(404)
 
 
