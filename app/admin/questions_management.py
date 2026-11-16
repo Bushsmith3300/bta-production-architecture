@@ -764,6 +764,29 @@ def add_question():
             )
             return redirect(url_for("questions.add_question"))
 
+
+        # -------------------------------------------------
+        # Resolve and validate subject
+        # --------------------------------------------------
+
+        subject_record = Subject.query.filter_by(
+            name=subject,
+            is_active=True
+        ).first()
+
+        if not subject_record:
+            flash(
+                "The selected subject is invalid or inactive.",
+                "danger"
+            )
+            return redirect(
+                url_for("questions.add_question")
+            )
+
+        # Use the official subject name
+        subject = subject_record.name
+        
+        
         # --------------------------------------------------
         # RESOLVE SUBJECT FROM DATABASE
         # --------------------------------------------------
