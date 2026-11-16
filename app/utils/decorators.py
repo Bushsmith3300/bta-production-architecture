@@ -30,13 +30,19 @@ def login_required(f):
         user = db.session.get(User,session["user_id"])
 
 
-        if not user:
+       if not user:
 
-            session.clear()
+           session.clear()
 
-            return redirect(
-                url_for("auth.login")
-            )
+           flash(
+              "Your session is no longer valid. Please log in again.",
+              "warning"
+    )
+
+
+           return redirect(
+              url_for("auth.login")
+    ) 
 
         if not user.is_active:
 
@@ -155,9 +161,9 @@ def admin_subject_required(f):
                 url_for("dashboard.dashboard")
             )
 
-
+        
         # ----------------------------------------------------
-        # CHECK SUBJECT ASSIGNMENT
+        # VALIDATE SUBJECT ASSIGNMENT
         # ----------------------------------------------------
 
         if not user.subject:
@@ -171,7 +177,23 @@ def admin_subject_required(f):
                 url_for("regular_admin.no_subject")
             )
 
+        
+        admin_subject = Subject.query.filter_by(
+            name=user.subject,
+            is_active=True
+        ).first()
 
+        if not admin_subject:
+
+            flash(
+                "Your assigned subject is invalid or inactive. Please contact the Super Admin.",
+                "danger"
+            )
+
+            return redirect(
+                url_for("regular_admin.no_subject")
+            )
+        
         # ----------------------------------------------------
         # KEEP SESSION SUBJECT UP TO DATE
         # ----------------------------------------------------
@@ -179,7 +201,7 @@ def admin_subject_required(f):
         # changes the admin's subject, we don't want the
         # session to keep an old subject value.
 
-        session["subject"] = user.subject
+        session["subject"] = admin_subject.name
         session["role"] = user.role
 
 
