@@ -562,21 +562,7 @@ def view_question(question_id):
         
         if question.subject_id != admin_subject.id:
 
-            flash(
-                "You do not have permission to view this question.",
-                "danger"
-            )
-
-            return redirect(
-                url_for(
-                    "questions.view_questions",
-                    page=page,
-                    search=search,
-                    filter_topic=filter_topic,
-                    filter_subject=filter_subject,
-                    filter_difficulty=filter_difficulty
-                )
-            )
+            abort (404)
 
     # --------------------------------------------------
     # VERIFY QUESTION SUBJECT RELATIONSHIP
