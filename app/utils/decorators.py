@@ -4,7 +4,7 @@ from app.extensions import db
 
 from flask import session, redirect, url_for, flash
 
-from app.models import User
+from app.models import User, Subject
 
 
 # ============================================================

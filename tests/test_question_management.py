@@ -339,8 +339,7 @@ def test_admin_cannot_view_question_from_another_subject(question_client):
         f"/admin/questions/view/{question.id}"
     )
 
-    assert response.status_code == 302
-    assert "/admin/questions" in response.location
+    assert response.status_code == 404
 
 
 def test_super_admin_can_view_question_from_another_subject(question_client):
@@ -495,7 +494,7 @@ def test_admin_cannot_edit_question_from_another_subject(question_client):
         follow_redirects=False
     )
 
-    assert response.status_code == 302
+    assert response.status_code == 404
 
     db.session.refresh(question)
 
