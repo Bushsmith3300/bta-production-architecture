@@ -1621,6 +1621,7 @@ def edit_question(question_id):
         # UPDATE QUESTION
         # ==================================================
 
+
         try:
 
             # ----------------------------------------------
@@ -1680,7 +1681,6 @@ def edit_question(question_id):
                 )
             )
 
-
         except IntegrityError:
 
             db.session.rollback()
@@ -1703,13 +1703,18 @@ def edit_question(question_id):
                 )
             )
 
-
-        except Exception as e:
+        except Exception:
 
             db.session.rollback()
 
+            current_app.logger.exception(
+                "Unexpected error while updating question ID %s",
+                question.id
+            )
+
             flash(
-                f"Error updating question: {e}",
+                "An unexpected error occurred while updating "
+                "the question. Please try again.",
                 "danger"
             )
 
