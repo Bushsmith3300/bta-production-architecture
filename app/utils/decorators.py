@@ -30,7 +30,7 @@ def login_required(f):
         user = db.session.get(User,session["user_id"])
 
 
-       if not user:
+        if not user:
 
            session.clear()
 
