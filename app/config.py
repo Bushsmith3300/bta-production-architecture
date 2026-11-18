@@ -70,6 +70,25 @@ class Config:
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
+    #----------------------------
+    # Maximum upload size: 5 MB
+    #----------------------------
+
+    MAX_CONTENT_LENGTH = 5 * 1024 * 1024
+
+    #----------------------------
+    # Maximum number of questions per upload
+    #----------------------------
+
+    MAX_QUESTIONS_PER_UPLOAD = 200
+
+    #----------------------------
+    # Maximum number of questions per bulk delete
+    #----------------------------
+
+    MAX_QUESTIONS_PER_BULK_DELETE = 200
+
+
     if database_url.startswith("postgresql://"):
 
        SQLALCHEMY_ENGINE_OPTIONS = {
