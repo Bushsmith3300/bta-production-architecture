@@ -13,3 +13,7 @@ def test_app_uses_separate_test_database(app):
         from app.extensions import db
 
         assert db.engine.dialect.name == "sqlite"
+
+
+def test_app_has_maximum_upload_size(app):
+    assert app.config["MAX_CONTENT_LENGTH"] == 5 * 1024 * 1024
