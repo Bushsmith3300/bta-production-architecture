@@ -2042,12 +2042,176 @@ def bulk_delete_questions():
             # CHECK QUESTION DEPENDENCIES
             # ==================================================
 
-            if question_has_dependencies(question.id):
+# ======================================================
+# BULK DELETE
+# ======================================================
+
+@questions_bp.route("/bulk-delete", methods=["POST"])
+@admin_subject_required
+def bulk_delete_questions():
+
+    ids = request.form.getlist("question_ids")
+
+    # ==================================================
+    # REMOVE DUPLICATE QUESTION IDS
+    # ==================================================
+
+    ids = list(dict.fromkeys(ids))
+
+    # ==================================================
+    # LIMIT BULK DELETION
+    # ==================================================
+
+    max_delete = current_app.config.get(
+        "MAX_QUESTIONS_PER_BULK_DELETE",
+        200
+    )
+
+    if len(ids) > max_delete:
+        flash(
+            f"You selected {len(ids)} questions. "
+            f"The maximum allowed is {max_delete} questions per request.",
+            "danger"
+        )
+
+        return redirect(
+            url_for("questions.view_questions")
+        )
+
+    # --------------------------------------------------
+    # Preserve current page and filters
+    # --------------------------------------------------
+
+    page = request.form.get("page", 1, type=int)
+    search = request.form.get("search", "")
+    question_id = request.form.get("question_id", type=int)
+    filter_topic = request.form.get("filter_topic", "")
+    filter_subject = request.form.get("filter_subject", "")
+    filter_difficulty = request.form.get("filter_difficulty", "")
+
+    # ==================================================
+    # NO QUESTIONS SELECTED
+    # ==================================================
+
+    if not ids:
+
+        flash(
+            "Please select at least one question.",
+            "warning"
+        )
+
+        return redirect(
+            url_for(
+                "questions.view_questions",
+                page=page,
+                search=search,
+                filter_topic=filter_topic,
+                filter_subject=filter_subject,
+                filter_difficulty=filter_difficulty,
+            )
+        )
+
+    deleted = 0
+    skipped = 0
+
+    # ==================================================
+    # GET REGULAR ADMIN'S SUBJECT
+    # ==================================================
+
+    admin_subject = None
+
+    if session.get("role") == "admin":
+
+        admin_subject = (
+            Subject.query
+            .filter(
+                Subject.name == session.get("subject"),
+                Subject.is_active.is_(True)
+            )
+            .first()
+        )
+
+        # --------------------------------------------------
+        # Assigned subject could not be found
+        # --------------------------------------------------
+
+        if not admin_subject:
+
+            flash(
+                "Your assigned subject could not be found.",
+                "danger"
+            )
+
+            return redirect(
+                url_for(
+                    "questions.view_questions",
+                    page=page,
+                    search=search,
+                    filter_topic=filter_topic,
+                    filter_subject=filter_subject,
+                    filter_difficulty=filter_difficulty,
+                )
+            )
+
+    # ==================================================
+    # PROCESS SELECTED QUESTIONS
+    # ==================================================
+
+    try:
+
+        for selected_id in ids:
+
+            # --------------------------------------------------
+            # Validate question ID
+            # --------------------------------------------------
+
+            try:
+
+                selected_id = int(selected_id)
+
+            except (ValueError, TypeError):
 
                 skipped += 1
 
                 continue
 
+            # --------------------------------------------------
+            # Get question
+            # --------------------------------------------------
+
+            question = db.session.get(
+                Question,
+                selected_id
+            )
+
+            if not question:
+
+                skipped += 1
+
+                continue
+
+            # ==================================================
+            # REGULAR ADMIN AUTHORIZATION
+            # ==================================================
+
+            if (
+                session.get("role") == "admin"
+                and question.subject_id != admin_subject.id
+            ):
+
+                skipped += 1
+
+                continue
+
+            # ==================================================
+            # CHECK QUESTION DEPENDENCIES
+            # ==================================================
+
+            if question_has_dependencies(question.id):
+
+                skipped += 1
+
+                continue
 
             # ==================================================
             # DELETE QUESTION
@@ -2057,13 +2221,11 @@ def bulk_delete_questions():
 
             deleted += 1
 
-
         # ==================================================
         # COMMIT CHANGES
         # ==================================================
 
         db.session.commit()
-
 
         # ==================================================
         # SUCCESS MESSAGE
@@ -2076,7 +2238,6 @@ def bulk_delete_questions():
                 "success"
             )
 
-
         # ==================================================
         # SKIPPED MESSAGE
         # ==================================================
@@ -2087,7 +2248,6 @@ def bulk_delete_questions():
                 f"{skipped} question(s) were skipped because they were invalid, unauthorized, not found, or already in use.",
                 "warning"
             )
-
 
     # ==================================================
     # DATABASE INTEGRITY ERROR
@@ -2102,7 +2262,6 @@ def bulk_delete_questions():
             "warning"
         )
 
-
     # ==================================================
     # GENERAL ERROR
     # ==================================================
@@ -2110,6 +2269,7 @@ def bulk_delete_questions():
     except Exception:
 
         db.session.rollback()
+
         current_app.logger.exception(
             "Unexpected error during bulk question deletion"
         )
@@ -2118,7 +2278,6 @@ def bulk_delete_questions():
             "An unexpected error occurred while deleting questions. Please try again.",
             "danger"
         )
-
 
     # ==================================================
     # RETURN TO QUESTION LIST
@@ -2134,8 +2293,6 @@ def bulk_delete_questions():
             filter_difficulty=filter_difficulty,
         )
     )
-
-
 
 # ======================================================
 # DELETE ALL UNUSED QUESTIONS
