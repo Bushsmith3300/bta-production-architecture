@@ -1,429 +1,1233 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Bush Teaching Assistant - WAEC Past Questions & Customized Tests for Ghanaian SHS Students">
+
+<meta name="description"
+content="Bush Teaching Assistant - WAEC Past Questions & Customized Tests for Ghanaian SHS Students">
+
 <meta name="author" content="Emmanuel Asiamah Amponsah">
-<meta name="keywords" content="WAEC, past questions, SHS, teaching assistant, Ghana education">
+
+<meta name="keywords"
+content="WAEC, past questions, SHS, teaching assistant, Ghana education">
+
+<meta name="csrf-token" content="{{ csrf_token() }}">
 
 <title>BTA WAEC Practice Quiz</title>
 
 <style>
-* { margin:0; padding:0; box-sizing:border-box; }
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
 body {
-  font-family: 'Segoe UI', Arial, sans-serif;
-  min-height: 100vh;
-  background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-  color: white;
-  display: flex;
-  flex-direction: column;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+    color: white;
+    display: flex;
+    flex-direction: column;
 }
 
 .container {
-  max-width: 850px;
-  margin: 40px auto;
-  padding: 20px;
-  flex: 1;
+    max-width: 850px;
+    width: 100%;
+    margin: 40px auto;
+    padding: 20px;
+    flex: 1;
 }
 
 h1 {
-  text-align: center;
-  font-size: 3rem;
-  margin-bottom: 10px;
-  background: linear-gradient(to right, #00ffea, #ff00cc);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+    text-align: center;
+    font-size: 3rem;
+    margin-bottom: 10px;
+    background: linear-gradient(to right, #00ffea, #ff00cc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .subtitle {
-  text-align: center;
-  margin-bottom: 40px;
-  opacity: 0.85;
-  font-size: 0.7rem;
+    text-align: center;
+    margin-bottom: 40px;
+    opacity: 0.85;
+    font-size: 0.7rem;
+}
+
+.header {
+    padding-top: 20px;
 }
 
 #loading {
- text-align:center; margin-top:80px;
+    text-align: center;
+    margin-top: 80px;
 }
 
 .spinner {
-  width: 65px;
-  height: 65px;
-  margin:auto;
-  border:6px solid rgba(255,255,255,0.15);
-  border-top:6px solid #00ffea;
-  border-radius:50%;
-  animation: spin 1s linear infinite;
+    width: 65px;
+    height: 65px;
+    margin: auto;
+    border: 6px solid rgba(255,255,255,0.15);
+    border-top: 6px solid #00ffea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
 }
 
-@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
 
 .question-card {
-  background: rgba(255,255,255,0.08);
-  backdrop-filter: blur(12px);
-  padding: 35px;
-  border-radius: 20px;
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(12px);
+    padding: 35px;
+    border-radius: 20px;
 }
 
 #progress {
-  text-align:center;
-  margin-bottom:15px;
-  color:#00ffea;
-  font-weight:bold;
+    text-align: center;
+    margin-bottom: 15px;
+    color: #00ffea;
+    font-weight: bold;
 }
 
 .options button {
-  width: 100%;
-  padding: 18px;
-  margin: 6px 0;
-  border-radius: 14px;
-  background: rgba(255,255,255,0.07);
-  color: white;
-  border: 1px solid rgba(255,255,255,0.15);
-  cursor: pointer;
-  text-align:left;
+    width: 100%;
+    padding: 18px;
+    margin: 6px 0;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.07);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.15);
+    cursor: pointer;
+    text-align: left;
+    transition: 0.2s;
 }
 
 .options button:hover:not(:disabled) {
-  background: rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.15);
 }
 
 .options button.correct {
-  background: #00ff9d !important;
-  color: black;
+    background: #00ff9d !important;
+    color: black;
 }
 
 .options button.wrong {
-  background: #ff4d6d !important;
+    background: #ff4d6d !important;
+    color: white;
 }
 
 .options button.selected {
-  border: 2px solid #00ffea;
+    border: 2px solid #00ffea;
+}
+
+.options button:disabled {
+    cursor: not-allowed;
+    opacity: 0.95;
 }
 
 #feedback {
-  margin:20px 0;
-  text-align:center;
-  font-weight:bold;
+    margin: 20px 0;
+    text-align: center;
+    font-weight: bold;
 }
 
 #explanation {
-  background: rgba(0, 255, 234, 0.08); /* soft cyan glow instead of yellow */
-  border-left: 4px solid #00ffea;      /* visual indicator */
-  padding: 20px;
-  border-radius: 12px;
-  margin-top: 20px;
-  display: none;
-  line-height: 1.6;
-  color: #e6fefe;                     /* softer white for readability */
-
+    background: rgba(0, 255, 234, 0.08);
+    border-left: 4px solid #00ffea;
+    padding: 20px;
+    border-radius: 12px;
+    margin-top: 20px;
+    display: none;
+    line-height: 1.6;
+    color: #e6fefe;
 }
 
 .btn-group {
-  display:flex;
-  justify-content:center;
-  gap:10px;
-  margin-top:20px;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 20px;
 }
 
 #topic-title {
-  text-align:center;
-  margin-bottom: 20px;
-  opacity: 0.9;
-  font-size: 2rem;
+    text-align: center;
+    margin-bottom: 20px;
+    opacity: 0.9;
+    font-size: 2rem;
 }
 
 button {
-  padding:10px 20px;
-  border:none;
-  border-radius:20px;
-  cursor:pointer;
-  font-weight:bold;
-  font-size: 1rem;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1rem;
 }
 
-#prev-btn { background:#888; }
-#next-btn { background:#00ffea; color:black; }
-#skip-btn { background:#ff9800; }
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
 
-/* NAV */
+#prev-btn {
+    background: #888;
+    color: white;
+}
+
+#next-btn {
+    background: #00ffea;
+    color: black;
+}
+
+#skip-btn {
+    background: #ff9800;
+    color: black;
+}
+
+/* NAVIGATION */
+
 .nav-links {
-  text-align: center;
-  margin: 45px 0 25px;
+    text-align: center;
+    margin: 45px 0 25px;
 }
 
 .nav-links a {
-  display: inline-block;
-  padding: 12px 28px;
-  margin: 8px;
-  text-decoration: none;
-  color: white;
-  font-size: 0.95rem;
-  border-radius: 30px;
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-  transition: 0.3s;
-  box-shadow: 0 6px 20px rgba(59,130,246,0.5);
+    display: inline-block;
+    padding: 12px 28px;
+    margin: 8px;
+    text-decoration: none;
+    color: white;
+    font-size: 0.95rem;
+    border-radius: 30px;
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    transition: 0.3s;
+    box-shadow: 0 6px 20px rgba(59,130,246,0.5);
 }
 
 .nav-links a:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 25px rgba(59,130,246,0.7);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(59,130,246,0.7);
 }
 
 /* LOGOUT */
+
 .logout {
-  margin-top: 20px;
-  text-align: center;
+    margin-top: 20px;
+    text-align: center;
 }
 
 .logout a {
-  color: #dc3545;
-  text-decoration: none;
-  font-weight: bold;
+    color: #dc3545;
+    text-decoration: none;
+    font-weight: bold;
 }
 
+/* FOOTER */
+
 footer {
-  text-align: center;
-  padding: 20px;
-  opacity: 0.7;
-  margin-top: auto;
+    text-align: center;
+    padding: 20px;
+    opacity: 0.7;
+    margin-top: auto;
 }
 
 .question-id {
-  text-align:right;
-  font-size:0.75rem;
-  color:#00ffea;
-  opacity:0.8;
-  margin-bottom:15px;
+    text-align: right;
+    font-size: 0.75rem;
+    color: #00ffea;
+    opacity: 0.8;
+    margin-bottom: 15px;
+}
+
+.result-card {
+    text-align: center;
+}
+
+.result-score {
+    font-size: 3rem;
+    margin: 25px 0;
+    color: #00ffea;
+}
+
+.result-detail {
+    margin: 12px 0;
+    font-size: 1.1rem;
+}
+
+.error-message {
+    color: #ff6b81;
+    text-align: center;
+    margin-top: 20px;
+}
+
+@media (max-width: 600px) {
+
+    .container {
+        margin: 20px auto;
+        padding: 12px;
+    }
+
+    h1 {
+        font-size: 2rem;
+    }
+
+    #topic-title {
+        font-size: 1.5rem;
+    }
+
+    .question-card {
+        padding: 22px;
+    }
+
+    .options button {
+        padding: 15px;
+    }
+
+    .nav-links a {
+        display: block;
+        margin: 12px auto;
+        max-width: 250px;
+    }
+
 }
 
 </style>
 
 </head>
 
+
 <body>
 
 <div class="header">
-<h2 style="text-align:center;">Hi, {{ user.first_name }} 👋</h2>
-</div> 
+
+    <h2 style="text-align:center;">
+        Hi, {{ user.first_name }} 👋
+    </h2>
+
+</div>
+
 
 <div class="logout">
-  <a href="{{ url_for('auth.logout') }}">Logout</a>
+
+    <a href="{{ url_for('auth.logout') }}">
+        Logout
+    </a>
+
 </div>
+
 
 <div class="container">
-  <h1 style="text-align:center">BTA {{ subject }} Quiz</h1>
-  <p class="subtitle">Powered by Bush Soft Technologies.</p>
-  <h2 id="topic-title">{{ topic }}</h2><br><br>
 
-  <p id="progress"></p>
+    <h1>BTA {{ subject }} Quiz</h1>
 
-  <div id="loading">
-    <div class="spinner"></div>
-    <p>Loading questions...</p>
-  </div>
+    <p class="subtitle">
+        Powered by Bush Soft Technologies.
+    </p>
 
-  <div id="quiz-container" style="display:none;"></div>
+    <h2 id="topic-title">{{ topic }}</h2>
+
+    <br><br>
+
+    <p id="progress"></p>
+
+    <div id="loading">
+
+        <div class="spinner"></div>
+
+        <p>Loading questions...</p>
+
+    </div>
+
+    <div id="quiz-container" style="display:none;"></div>
+
 </div>
+
 
 <div class="nav-links">
-  <a href="https://wa.me/233554454161" target="_blank">Ask Teacher(Bush)</a>
-  <a href="{{ url_for('dashboard.topic_select', subject=subject) }}">
-    ← Change topic
-  </a>
-  <a href="{{url_for('dashboard.dashboard')}}">← Dashboard</a>
+
+    <a href="https://wa.me/233554454161" target="_blank" rel="noopener">
+        Ask Teacher(Bush)
+    </a>
+
+    <a href="{{ url_for('dashboard.topic_select', subject=subject) }}">
+        ← Change topic
+    </a>
+
+    <a href="{{ url_for('dashboard.dashboard') }}">
+        ← Dashboard
+    </a>
+
 </div>
 
+
 <footer>
-  <p>&copy; 2026 Bush Teaching Assistant</p>
+
+    <p>&copy; 2026 Bush Teaching Assistant</p>
+
 </footer>
 
 
 <script>
 
-const subject = "{{ subject }}";
-const topic = "{{ topic }}";
+// ==================================================
+// INITIAL VARIABLES
+// ==================================================
+
+const subject = {{ subject | tojson }};
+const topic = {{ topic | tojson }};
+
+const csrfToken = document.querySelector(
+    'meta[name="csrf-token"]'
+).content;
 
 let allQuestions = [];
+
 let currentIndex = 0;
-let userAnswers = [];
 
-// LOAD QUESTIONS
-async function loadQuestions() {
+let userAnswers = {};
 
-  try {
+let answerResults = {};
 
-    const res = await fetch(
-      `/questions/${encodeURIComponent(subject)}/${encodeURIComponent(topic)}`
+let practiceSessionId = null;
+
+let submittingAnswer = false;
+
+let completingQuiz = false;
+
+
+// ==================================================
+// CSRF HEADERS
+// ==================================================
+
+function csrfHeaders() {
+
+    return {
+
+        "Content-Type": "application/json",
+
+        "X-CSRFToken": csrfToken
+
+    };
+
+}
+
+
+// ==================================================
+// SAFE HTML OUTPUT
+// ==================================================
+
+function escapeHTML(value) {
+
+    return String(value ?? "").replace(
+        /[&<>"']/g,
+
+        character => ({
+
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#039;"
+
+        })[character]
     );
 
-    if (!res.ok) {
-      throw new Error("Unauthorized or server error");
-    }
-
-    const data = await res.json();
-
-    allQuestions = data.questions.slice(0, 50);
-    userAnswers = new Array(allQuestions.length).fill(null);
-
-    if (allQuestions.length === 0) {
-      document.getElementById("loading").innerHTML =
-        "<p style='color:red;'>No questions found</p>";
-      return;
-    }
-
-    document.getElementById("loading").style.display = "none";
-    document.getElementById("quiz-container").style.display = "block";
-
-    showQuestion();
-
-  } catch (err) {
-    document.getElementById("loading").innerHTML =
-      "<p style='color:red;'>Failed to load questions</p>";
-  }
 }
 
 
-// SHOW QUESTION
+// ==================================================
+// DISPLAY LOADING ERROR
+// ==================================================
+
+function displayLoadingError(message) {
+
+    const loading = document.getElementById("loading");
+
+    loading.innerHTML = `
+        <p class="error-message">
+            ${escapeHTML(message)}
+        </p>
+
+        <button onclick="loadQuestions()">
+            Try Again
+        </button>
+    `;
+
+}
+
+
+// ==================================================
+// START PRACTICE SESSION AND LOAD QUESTIONS
+// ==================================================
+
+async function loadQuestions() {
+
+    const loading = document.getElementById("loading");
+
+    loading.style.display = "block";
+
+    loading.innerHTML = `
+        <div class="spinner"></div>
+        <p>Loading questions...</p>
+    `;
+
+    document.getElementById("quiz-container").style.display = "none";
+
+    try {
+
+        const response = await fetch(
+
+            `/practice/start/${encodeURIComponent(subject)}/${encodeURIComponent(topic)}`,
+
+            {
+
+                method: "POST",
+
+                headers: csrfHeaders()
+
+            }
+
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.error || "Unable to start practice."
+            );
+
+        }
+
+        practiceSessionId = data.session_id;
+
+        allQuestions = data.questions || [];
+
+        currentIndex = 0;
+
+        userAnswers = {};
+
+        answerResults = {};
+
+        if (allQuestions.length === 0) {
+
+            throw new Error("No questions found for this topic.");
+
+        }
+
+        loading.style.display = "none";
+
+        document.getElementById(
+            "quiz-container"
+        ).style.display = "block";
+
+        showQuestion();
+
+    }
+
+    catch (error) {
+
+        displayLoadingError(error.message);
+
+    }
+
+}
+
+
+// ==================================================
+// DISPLAY CURRENT QUESTION
+// ==================================================
+
 function showQuestion() {
-  const q = allQuestions[currentIndex];
 
-  document.getElementById('progress').textContent =
-    `Question ${currentIndex + 1} of ${allQuestions.length}`;
+    if (!allQuestions.length) return;
 
-  let optionsHTML = '';
+    const q = allQuestions[currentIndex];
 
-  q.options.forEach(opt => {
-   optionsHTML += `
-     <button data-letter="${opt.letter}">
-       ${opt.letter}. ${opt.text}
-     </button>
-   `;
-  });
+    document.getElementById("progress").textContent =
 
-  document.getElementById('quiz-container').innerHTML = `
-    <div class="question-card">
+        `Question ${currentIndex + 1} of ${allQuestions.length}`;
 
-      <div class="question-id">
-        QID: ${q.question_id}
-      </div>
 
-      <h2>${q.question}</h2><br><br>
+    let optionsHTML = "";
 
-      <div class="options">${optionsHTML}</div>
+    q.options.forEach(option => {
 
-      <div id="feedback"></div>
+        optionsHTML += `
 
-      <div id="explanation"></div>
+            <button
+                type="button"
+                class="option"
+                data-letter="${escapeHTML(option.letter)}"
+            >
 
-      <div class="btn-group">
-        <button id="prev-btn" onclick="prev()">← Previous</button>
-        <button id="skip-btn" onclick="skip()">Skip →</button>
-        <button id="next-btn" onclick="next()" style="display:none;">Next</button>
-      </div>
-    </div>
-  `;
+                ${escapeHTML(option.letter)}.
+                ${escapeHTML(option.text)}
 
-  const buttons = document.querySelectorAll('.options button');
+            </button>
 
-  buttons.forEach(btn => {
-    btn.onclick = () => selectAnswer(btn, q);
-  });
+        `;
 
-  // Restore previous answer
-  const saved = userAnswers[currentIndex];
-  if (saved) {
-    buttons.forEach(b => {
-      const letter = b.dataset.letter;
-
-      if (letter === saved) b.classList.add('selected');
-      if (letter === q.answer) b.classList.add('correct');
-
-      b.disabled = true;
     });
 
-    document.getElementById('next-btn').style.display = 'inline-block';
-    showExplanation(q);
-  }
+
+    document.getElementById("quiz-container").innerHTML = `
+
+        <div class="question-card">
+
+            <div class="question-id">
+
+                QID: ${escapeHTML(q.question_id)}
+
+            </div>
+
+            <h2>${escapeHTML(q.question)}</h2>
+
+            <br><br>
+
+            <div class="options">
+
+                ${optionsHTML}
+
+            </div>
+
+            <div id="feedback"></div>
+
+            <div id="explanation"></div>
+
+            <div class="btn-group">
+
+                <button
+                    id="prev-btn"
+                    onclick="prev()"
+                    ${currentIndex === 0 ? "disabled" : ""}
+                >
+
+                    ← Previous
+
+                </button>
+
+                <button
+                    id="skip-btn"
+                    onclick="skip()"
+                >
+
+                    Skip →
+
+                </button>
+
+                <button
+                    id="next-btn"
+                    onclick="next()"
+                    style="display:none;"
+                >
+
+                    Next
+
+                </button>
+
+            </div>
+
+        </div>
+
+    `;
+
+
+    const buttons = document.querySelectorAll(
+        ".options button"
+    );
+
+
+    buttons.forEach(button => {
+
+        button.addEventListener("click", function () {
+
+            selectAnswer(
+                button,
+                button.dataset.letter
+            );
+
+        });
+
+    });
+
+
+    // RESTORE PREVIOUSLY SUBMITTED ANSWER
+
+    const savedAnswer = userAnswers[q.question_id];
+
+    if (savedAnswer) {
+
+        buttons.forEach(button => {
+
+            const letter = button.dataset.letter;
+
+            button.disabled = true;
+
+            if (letter === savedAnswer) {
+
+                button.classList.add("selected");
+
+            }
+
+            if (
+                letter === answerResults[q.question_id].correct_answer
+            ) {
+
+                button.classList.add("correct");
+
+            }
+
+            if (
+                letter === savedAnswer &&
+                savedAnswer !== answerResults[q.question_id].correct_answer
+            ) {
+
+                button.classList.add("wrong");
+
+            }
+
+        });
+
+
+        showFeedback(q.question_id);
+
+        document.getElementById(
+            "next-btn"
+        ).style.display = "inline-block";
+
+        document.getElementById(
+            "skip-btn"
+        ).disabled = true;
+
+
+        if (currentIndex === allQuestions.length - 1) {
+
+            document.getElementById(
+                "next-btn"
+            ).textContent = "Finish Quiz";
+
+        }
+
+    }
+
 }
 
-// SELECT ANSWER
-function selectAnswer(btn, q) {
 
-  const selected = btn.dataset.letter;
-  userAnswers[currentIndex] = selected;
+// ==================================================
+// SUBMIT ANSWER TO SERVER
+// ==================================================
 
-  document.querySelectorAll('.options button').forEach(b => {
-    b.disabled = true;
+async function selectAnswer(btn, selected) {
 
-    const letter = b.dataset.letter;
+    if (submittingAnswer || completingQuiz) return;
 
-    if (letter === q.answer) b.classList.add('correct');
-    if (b === btn && selected !== q.answer) b.classList.add('wrong');
-  });
+    const q = allQuestions[currentIndex];
 
-  document.getElementById('feedback').innerHTML =
-    selected === q.answer
-      ? "<span style='color:#00ff9d;'>✓ Correct!</span>"
-      : "<span style='color:#ff4d6d;'>✗ Wrong!</span>";
+    if (userAnswers[q.question_id]) return;
 
-  showExplanation(q);
+    submittingAnswer = true;
 
-  document.getElementById('next-btn').style.display = 'inline-block';
-  document.getElementById('skip-btn').disabled = true;
+
+    const buttons = document.querySelectorAll(
+        ".options button"
+    );
+
+    buttons.forEach(button => {
+
+        button.disabled = true;
+
+    });
+
+
+    btn.style.opacity = "0.6";
+
+
+    try {
+
+        const response = await fetch(
+
+            `/practice/answer/${practiceSessionId}`,
+
+            {
+
+                method: "POST",
+
+                headers: csrfHeaders(),
+
+                body: JSON.stringify({
+
+                    question_id: q.question_id,
+
+                    selected_answer: selected
+
+                })
+
+            }
+
+        );
+
+
+        const data = await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.error || "Unable to submit answer."
+            );
+
+        }
+
+
+        userAnswers[q.question_id] = selected;
+
+        answerResults[q.question_id] = data;
+
+
+        showQuestion();
+
+    }
+
+    catch (error) {
+
+        alert(error.message);
+
+        buttons.forEach(button => {
+
+            button.disabled = false;
+
+        });
+
+        btn.style.opacity = "1";
+
+    }
+
+    finally {
+
+        submittingAnswer = false;
+
+    }
+
 }
 
-// EXPLANATION
-function showExplanation(q) {
-  const exp = document.getElementById('explanation');
-  exp.innerHTML = `<strong>Explanation:</strong><br>${q.explanation || "No explanation"}`;
-  exp.style.display = 'block';
+
+// ==================================================
+// SHOW ANSWER FEEDBACK
+// ==================================================
+
+function showFeedback(questionId) {
+
+    const result = answerResults[questionId];
+
+    if (!result) return;
+
+
+    const feedback = document.getElementById("feedback");
+
+    const explanation = document.getElementById("explanation");
+
+
+    if (result.is_correct) {
+
+        feedback.innerHTML = `
+
+            <span style="color:#00ff9d;">
+
+                ✓ Correct!
+
+            </span>
+
+        `;
+
+    }
+
+    else {
+
+        feedback.innerHTML = `
+
+            <span style="color:#ff4d6d;">
+
+                ✗ Wrong!
+
+            </span>
+
+        `;
+
+    }
+
+
+    explanation.innerHTML = `
+
+        <strong>Correct answer:</strong>
+
+        ${escapeHTML(result.correct_answer)}
+
+        <br><br>
+
+        <strong>Explanation:</strong>
+
+        <br>
+
+        ${escapeHTML(result.explanation || "No explanation available.")}
+
+    `;
+
+
+    explanation.style.display = "block";
+
 }
 
-// NAVIGATION
-function next() {
-  currentIndex++;
-  if (currentIndex >= allQuestions.length) return showScore();
-  window.scrollTo(0,0);
-  showQuestion();
+
+// ==================================================
+// SAVE CURRENT QUESTION POSITION
+// ==================================================
+
+async function savePosition() {
+
+    if (!practiceSessionId) return;
+
+    try {
+
+        const response = await fetch(
+
+            `/practice/progress/${practiceSessionId}`,
+
+            {
+
+                method: "POST",
+
+                headers: csrfHeaders(),
+
+                body: JSON.stringify({
+
+                    current_question_index: currentIndex
+
+                })
+
+            }
+
+        );
+
+
+        if (!response.ok) {
+
+            console.warn("Unable to save question position.");
+
+        }
+
+    }
+
+    catch (error) {
+
+        console.error("Progress saving error:", error);
+
+    }
+
 }
 
-function prev() {
-  if (currentIndex > 0) {
-    currentIndex--;
-    window.scrollTo(0,0);
-    showQuestion();
-  }
+
+// ==================================================
+// NEXT QUESTION
+// ==================================================
+
+async function next() {
+
+    if (submittingAnswer || completingQuiz) return;
+
+
+    if (currentIndex < allQuestions.length - 1) {
+
+        currentIndex++;
+
+        await savePosition();
+
+        window.scrollTo(0, 0);
+
+        showQuestion();
+
+    }
+
+    else {
+
+        showScore();
+
+    }
+
 }
 
-function skip() {
-  currentIndex++;
-  if (currentIndex >= allQuestions.length) return showScore();
-  window.scrollTo(0,0);
-  showQuestion();
+
+// ==================================================
+// PREVIOUS QUESTION
+// ==================================================
+
+async function prev() {
+
+    if (submittingAnswer || completingQuiz) return;
+
+
+    if (currentIndex > 0) {
+
+        currentIndex--;
+
+        await savePosition();
+
+        window.scrollTo(0, 0);
+
+        showQuestion();
+
+    }
+
 }
 
-// SCORE
-function showScore() {
-  let score = 0;
 
-  allQuestions.forEach((q, i) => {
-    if (userAnswers[i] === q.answer) score++;
-  });
+// ==================================================
+// SKIP QUESTION
+// ==================================================
 
-  document.getElementById('quiz-container').innerHTML = `
-    <div class="question-card">
-      <h2 style="text-align:center">Quiz Completed</h2>
-      <h1>${score} / ${allQuestions.length}</h1><br><br>
-      <p>Keep improving !</p>
-    </div>
-  `;
+async function skip() {
+
+    if (submittingAnswer || completingQuiz) return;
+
+
+    if (currentIndex < allQuestions.length - 1) {
+
+        currentIndex++;
+
+        await savePosition();
+
+        window.scrollTo(0, 0);
+
+        showQuestion();
+
+    }
+
+    else {
+
+        showScore();
+
+    }
+
 }
+
+
+// ==================================================
+// COMPLETE PRACTICE SESSION
+// ==================================================
+
+async function showScore() {
+
+    if (completingQuiz) return;
+
+    completingQuiz = true;
+
+
+    const container = document.getElementById(
+        "quiz-container"
+    );
+
+
+    container.innerHTML = `
+
+        <div class="question-card">
+
+            <h2 style="text-align:center;">
+
+                Completing your quiz...
+
+            </h2>
+
+            <br>
+
+            <p style="text-align:center;">
+
+                Please wait while BTA saves your results.
+
+            </p>
+
+        </div>
+
+    `;
+
+
+    try {
+
+        const response = await fetch(
+
+            `/practice/complete/${practiceSessionId}`,
+
+            {
+
+                method: "POST",
+
+                headers: csrfHeaders()
+
+            }
+
+        );
+
+
+        const data = await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+
+                data.error || "Unable to save your quiz results."
+
+            );
+
+        }
+
+
+        const score = data.correct_answers;
+
+        const attempted = data.questions_attempted;
+
+        const total = data.total_questions;
+
+        const accuracy = data.accuracy;
+
+
+        container.innerHTML = `
+
+            <div class="question-card result-card">
+
+                <h2>
+
+                    Quiz Completed!
+
+                </h2>
+
+                <div class="result-score">
+
+                    ${score} / ${attempted}
+
+                </div>
+
+                <h2>
+
+                    ${accuracy}% Accuracy
+
+                </h2>
+
+                <br>
+
+                <p class="result-detail">
+
+                    Questions in quiz: ${total}
+
+                </p>
+
+                <p class="result-detail">
+
+                    Questions attempted: ${attempted}
+
+                </p>
+
+                <p class="result-detail">
+
+                    Correct answers: ${score}
+
+                </p>
+
+                <br>
+
+                <p>
+
+                    Keep improving!
+
+                </p>
+
+                <br>
+
+                <div class="nav-links">
+
+                    <a href="{{ url_for('dashboard.dashboard') }}">
+
+                        Return to Dashboard
+
+                    </a>
+
+                    <a href="{{ url_for('dashboard.topic_select', subject=subject) }}">
+
+                        Practise Another Topic
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        `;
+
+    }
+
+    catch (error) {
+
+        completingQuiz = false;
+
+
+        container.innerHTML = `
+
+            <div class="question-card">
+
+                <h2 style="text-align:center;">
+
+                    Unable to save your results
+
+                </h2>
+
+                <br>
+
+                <p style="text-align:center;">
+
+                    ${escapeHTML(error.message)}
+
+                </p>
+
+                <br>
+
+                <div style="text-align:center;">
+
+                    <button onclick="showScore()">
+
+                        Try Again
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        `;
+
+    }
+
+}
+
+
+// ==================================================
+// START QUIZ
+// ==================================================
 
 window.onload = loadQuestions;
 
 </script>
+
 </body>
+
 </html>
