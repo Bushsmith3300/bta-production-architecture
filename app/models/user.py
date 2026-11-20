@@ -80,11 +80,16 @@ class User(db.Model):
         back_populates="user"
     )
 
+    practice_sessions = db.relationship(
+        "PracticeSession",
+        back_populates="user",
+        cascade="all, delete-orphan"
+    )
+
     assignment_submissions = db.relationship(
         "AssignmentSubmission",
         back_populates="student"
     )
-
 
     live_quiz_answers = db.relationship(
         "LiveQuizAnswer",
