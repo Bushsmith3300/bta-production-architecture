@@ -81,6 +81,11 @@ class Subject(db.Model):
         "ExtraClassSubject",
         back_populates="subject"
     )
+
+    practice_sessions = db.relationship(
+        "PracticeSession",
+        back_populates="subject"
+    )
     
 
     def __repr__(self):
