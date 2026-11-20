@@ -50,6 +50,17 @@ class UserHistory(db.Model):
     )
 
 
+    practice_session_id = db.Column(
+        db.Integer,
+        db.ForeignKey(
+        "practice_sessions.id",
+        ondelete="SET NULL"
+        ),
+        nullable=True,
+        index=True
+    )
+
+
 #-------RELATIONSHIPS--------
 
     user = db.relationship(
@@ -59,5 +70,10 @@ class UserHistory(db.Model):
 
     question = db.relationship(
         "Question",
+        back_populates="user_history"
+    )
+
+    practice_session = db.relationship(
+        "PracticeSession",
         back_populates="user_history"
     )
