@@ -1,11 +1,19 @@
 from app.extensions import db
 from datetime import datetime
-
+from sqlalchemy import UniqueConstraint
 
 
 class UserHistory(db.Model):
 
     __tablename__ = "user_history"
+
+    __table_args__ = (
+        UniqueConstraint(
+            "practice_session_id",
+            "question_id",
+            name="unique_practice_session_question"
+        ),
+    )
 
     id = db.Column(
         db.Integer,
@@ -32,7 +40,6 @@ class UserHistory(db.Model):
         index=True
     )
 
- 
     selected_answer = db.Column(
         db.String(1),
         nullable=False
@@ -49,19 +56,17 @@ class UserHistory(db.Model):
         nullable=False
     )
 
-
     practice_session_id = db.Column(
         db.Integer,
         db.ForeignKey(
-        "practice_sessions.id",
-        ondelete="SET NULL"
+            "practice_sessions.id",
+            ondelete="SET NULL"
         ),
         nullable=True,
         index=True
     )
 
-
-#-------RELATIONSHIPS--------
+    # RELATIONSHIPS
 
     user = db.relationship(
         "User",
