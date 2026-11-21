@@ -16,7 +16,7 @@ from app.admin.extra_class_management import extra_class_bp
 from app.routes.extra_class_auth import extra_class_auth_bp
 from app.routes.extra_class_teacher import extra_class_teacher_bp
 from app.routes.extra_class_payment import extra_class_payment_bp
-from app.models.practice_session import PracticeSession
+
 
 
 def create_app(config_overrides=None):
