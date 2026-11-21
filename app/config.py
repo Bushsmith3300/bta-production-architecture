@@ -6,8 +6,6 @@ from dotenv import load_dotenv
 
 from datetime import timedelta
 
-from sqlalchemy.pool import NullPool
-
 load_dotenv()
 
 
