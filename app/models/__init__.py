@@ -25,4 +25,4 @@ from .extra_class_payment_item import ExtraClassPaymentItem
 from .extra_class_teacher_settlement import ExtraClassTeacherSettlement
 from .extra_class_term import ExtraClassTerm
 from app.models.extra_class_teacher_account import ExtraClassTeacherAccount
-from .practice_session import PracticeSession
+from app.models.practice_session import PracticeSession
