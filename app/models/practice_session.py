@@ -1,23 +1,54 @@
 from datetime import datetime, timezone
 
+from sqlalchemy import CheckConstraint
+
 from app.extensions import db
 
 
 class PracticeSession(db.Model):
+
     __tablename__ = "practice_sessions"
 
-    id = db.Column(db.Integer, primary_key=True)
+    # DATABASE CONSTRAINTS
+    __table_args__ = (
+
+        CheckConstraint(
+            "current_question_index >= 0",
+            name="check_practice_session_question_index"
+        ),
+
+        CheckConstraint(
+            "total_questions > 0",
+            name="check_practice_session_total_questions"
+        ),
+
+        CheckConstraint(
+            "correct_answers >= 0 AND correct_answers <= total_questions",
+            name="check_practice_session_correct_answers"
+        ),
+
+    )
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
 
     user_id = db.Column(
         db.Integer,
-        db.ForeignKey("users.id", ondelete="CASCADE"),
+        db.ForeignKey(
+            "users.id",
+            ondelete="CASCADE"
+        ),
         nullable=False,
         index=True
     )
 
     subject_id = db.Column(
         db.Integer,
-        db.ForeignKey("subjects.id"),
+        db.ForeignKey(
+            "subjects.id"
+        ),
         nullable=False,
         index=True
     )
@@ -76,7 +107,8 @@ class PracticeSession(db.Model):
         nullable=True
     )
 
-    # Relationships
+    # RELATIONSHIPS
+
     user = db.relationship(
         "User",
         back_populates="practice_sessions"
@@ -92,7 +124,10 @@ class PracticeSession(db.Model):
         back_populates="practice_session"
     )
 
+    # REPRESENTATION
+
     def __repr__(self):
+
         return (
             f"<PracticeSession "
             f"id={self.id} "
